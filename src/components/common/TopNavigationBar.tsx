@@ -2,22 +2,22 @@ import React from 'react';
 import styled from 'styled-components/native';
 import {TouchableOpacity} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
-import DontWorryLogo from '../../assets/navigation/logo.svg'; // 로고 이미지 경로
-import BellIcon from '../../assets/navigation/bell.svg';
-import ProfileIcon from '../../assets/navigation/profile.svg';
+import DontWorryLogo from '../../assets/topnavigation/logo.svg';
+import BellIcon from '../../assets/topnavigation/bell.svg';
+import ProfileIcon from '../../assets/topnavigation/profile.svg';
 
 type TopNavigationProps = {
   title?: string;
 };
 
-function TopNavigation({title}: TopNavigationProps) {
+function TopNavigationBar({title}: TopNavigationProps) {
   const navigation = useNavigation();
 
   return (
     <Container>
       <LeftSection>
         <TouchableOpacity onPress={() => navigation.navigate('Home')}>
-          <DontWorryLogo width={40} height={40} />
+          <DontWorryLogo width={30} height={30} />
         </TouchableOpacity>
       </LeftSection>
       <CenterSection>{title ? <Title>{title}</Title> : null}</CenterSection>
@@ -37,8 +37,9 @@ const Container = styled.View`
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  padding: 16px;
+  padding: 12px 16px;
   background-color: #fff;
+  height: 60px; /* 높이 고정 */
 `;
 
 const LeftSection = styled.View`
@@ -60,6 +61,7 @@ const RightSection = styled.View`
 const Title = styled.Text`
   font-size: 20px;
   font-weight: bold;
+  color: black;
 `;
 
-export default TopNavigation;
+export default TopNavigationBar;

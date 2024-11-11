@@ -22,8 +22,18 @@
 | Version Control      | ![Git](https://img.shields.io/badge/git-%23F05033.svg?style=for-the-badge&logo=git&logoColor=white) ![GitHub](https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white)                           |
 
 </div>
+
 <div>
-  
+[Version]
+
+- React-Native : 0.75.3
+- Styled-components : 6.1.13
+- Prettier : 2.8.8
+- Typescript: 5.0.4
+- Node.js : 20.18.0
+- NPM : 10.8.2
+</div>
+
 <h2>  📄 컨벤션 및 브랜치 전략 </h2>
 
 <br/>
