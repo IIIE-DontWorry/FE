@@ -3,10 +3,10 @@
 import React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {Text} from 'react-native';
-import HomeScreen from '../../pages/HomeScreen';
-import ReportScreen from '../../pages/ReportScreen';
-import GalleryScreen from '../../pages/GalleryScreen';
-import MessageScreen from '../../pages/MessageScreen';
+import HomeScreen from '../../pages/Home';
+import ReportScreen from '../../pages/Report';
+import GalleryScreen from '../../pages/Gallery';
+import MessageScreen from '../../pages/Message';
 import TopNavigationBar from './TopNavigationBar';
 
 // SVG 아이콘 컴포넌트

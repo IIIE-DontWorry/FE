@@ -195,7 +195,7 @@ const HomeScreen = () => {
   const navigation = useNavigation();
   const [isModalVisible, setModalVisible] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [temperature, setTemperature] = useState(35);
+  const [temperature, setTemperature] = useState(30);
 
   useEffect(() => {
     // 예시 API 호출 (실제 API에서 데이터를 가져오는 로직을 추가해야 함)
