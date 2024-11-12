@@ -12,7 +12,7 @@ const Text = styled.Text`
   font-size: 18px;
 `;
 
-const GalleryScreen = () => {
+const Gallery = () => {
   return (
     <Container>
       <Text>최근 갤러리</Text>
@@ -20,4 +20,4 @@ const GalleryScreen = () => {
   );
 };
 
-export default GalleryScreen;
+export default Gallery;
