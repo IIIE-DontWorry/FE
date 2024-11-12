@@ -17,16 +17,16 @@ function TopNavigationBar({title}: TopNavigationProps) {
     <Container>
       <LeftSection>
         <TouchableOpacity onPress={() => navigation.navigate('Home')}>
-          <DontWorryLogo width={30} height={30} />
+          <DontWorryLogo width={50} height={50} />
         </TouchableOpacity>
       </LeftSection>
       <CenterSection>{title ? <Title>{title}</Title> : null}</CenterSection>
       <RightSection>
         <TouchableOpacity onPress={() => navigation.navigate('Landing')}>
-          <BellIcon width={24} height={24} />
+          <BellIcon width={30} height={30} />
         </TouchableOpacity>
         <TouchableOpacity>
-          <ProfileIcon width={24} height={24} />
+          <ProfileIcon width={30} height={30} />
         </TouchableOpacity>
       </RightSection>
     </Container>
