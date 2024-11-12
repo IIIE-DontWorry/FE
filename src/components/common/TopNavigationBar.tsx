@@ -22,7 +22,7 @@ function TopNavigationBar({title}: TopNavigationProps) {
       </LeftSection>
       <CenterSection>{title ? <Title>{title}</Title> : null}</CenterSection>
       <RightSection>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('Landing')}>
           <BellIcon width={24} height={24} />
         </TouchableOpacity>
         <TouchableOpacity>
