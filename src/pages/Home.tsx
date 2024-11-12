@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const HomeScreen = () => {
+const Home = () => {
   const navigation = useNavigation();
   const [isModalVisible, setModalVisible] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -322,4 +322,4 @@ const HomeScreen = () => {
   );
 };
 
-export default HomeScreen;
+export default Home;
