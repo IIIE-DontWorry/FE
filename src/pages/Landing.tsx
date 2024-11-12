@@ -28,8 +28,8 @@ const Landing = () => {
   const handleKakaoLogin = () => {
     //추후 카카오 로그인 로직 구현
     console.log('카카오 로그인 시도');
-    // 일단 Main 화면으로 이동
-    navigation.navigate('Main');
+    // 일단 UserCategory 화면으로 이동
+    navigation.navigate('UserCategory');
   };
 
   const navigation = useNavigation<NavigationProp>();
