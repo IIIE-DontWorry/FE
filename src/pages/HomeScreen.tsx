@@ -7,6 +7,7 @@ import ReportIcon from '../assets/bottomnavigation/report.svg';
 import MessageIcon from '../assets/bottomnavigation/message.svg';
 import MockupImage from '../assets/home/img_mockup.svg';
 import Heart from '../assets/home/heart.svg';
+import Book from '../assets/home/book.svg';
 
 const Container = styled.ScrollView`
   flex: 1;
@@ -100,11 +101,18 @@ const Item = styled.TouchableOpacity`
   width: 90px;
   align-items: center;
 `;
-
 const ItemImage = styled(MockupImage)`
   width: 70px;
   height: 70px;
   margin-bottom: 4px;
+`;
+// 최근 간병 보고서에 사용될 Book 이미지를 위한 스타일 컴포넌트
+const BookImageContainer = styled.View`
+  width: 70px;
+  height: 70px;
+  margin-bottom: 4px;
+  align-items: center;
+  justify-content: center;
 `;
 
 const ItemInfo = styled.View`
@@ -157,7 +165,7 @@ const MessageTime = styled.Text`
   color: #888;
   margin-top: 2px;
 `;
-// ProgressIndicator를 styled-components가 아닌 StyleSheet와 View를 사용해 구현
+
 const ScoreIndicator = ({temperature}: {temperature: number}) => {
   const progressWidth = `${(temperature / 50) * 100}%`;
 
@@ -174,7 +182,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     alignItems: 'center',
     top: -25,
-    transform: [{translateX: -20}], // transform 속성을 객체로 전달
+    transform: [{translateX: -20}],
   },
   scoreText: {
     fontSize: 12,
@@ -182,13 +190,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
+
 const HomeScreen = () => {
   const navigation = useNavigation();
   const [isModalVisible, setModalVisible] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-
   const [temperature, setTemperature] = useState(35);
-  //온도 상태
+
   useEffect(() => {
     // 예시 API 호출 (실제 API에서 데이터를 가져오는 로직을 추가해야 함)
   }, []);
@@ -218,6 +226,7 @@ const HomeScreen = () => {
           <ScoreIndicator temperature={temperature} />
         </ProgressContainer>
       </MannerSection>
+
       <Section>
         <SectionHeader>
           <SectionTitleContainer>
@@ -259,8 +268,10 @@ const HomeScreen = () => {
         </SectionHeader>
         <ItemContainer>
           {[1, 2, 3].map((_, index) => (
-            <Item key={index} onPress={() => openModal('Image')}>
-              <ItemImage />
+            <Item>
+              <BookImageContainer>
+                <Book width={70} height={70} />
+              </BookImageContainer>
               <ItemDate style={{fontSize: 9}}>10월 15일 간병보고서</ItemDate>
               <SmallText>간병인</SmallText>
             </Item>
