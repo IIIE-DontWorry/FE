@@ -1,7 +1,5 @@
-// src/pages/HomeScreen.tsx
-
-import React, {useState} from 'react';
-import {Text, View, Modal, TouchableOpacity} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {Text, View, Modal, TouchableOpacity, StyleSheet} from 'react-native';
 import styled from 'styled-components/native';
 import {useNavigation} from '@react-navigation/native';
 import GalleryIcon from '../assets/bottomnavigation/gallery.svg';
@@ -21,6 +19,34 @@ const MannerSection = styled.View`
   background-color: #f8f8f8;
   border-radius: 10px;
 `;
+
+const ProgressContainer = styled.View`
+  position: relative;
+  margin-top: 20px;
+  height: 10px;
+  background-color: #cfcfcf;
+  border-radius: 5px;
+`;
+
+const ProgressBar = styled.View<{width: string}>`
+  width: ${props => props.width};
+  height: 100%;
+  background-color: #a2d5a2;
+  border-radius: 5px;
+`;
+
+const Triangle = styled.View`
+  width: 0;
+  height: 0;
+  border-left-width: 5px;
+  border-right-width: 5px;
+  border-top-width: 5px;
+  border-left-color: transparent;
+  border-right-color: transparent;
+  border-top-color: #a2d5a2;
+  margin-top: 2px;
+`;
+
 const MessageSection = styled.View`
   margin: 16px;
   padding: 16px;
@@ -131,11 +157,41 @@ const MessageTime = styled.Text`
   color: #888;
   margin-top: 2px;
 `;
+// ProgressIndicator를 styled-components가 아닌 StyleSheet와 View를 사용해 구현
+const ScoreIndicator = ({temperature}: {temperature: number}) => {
+  const progressWidth = `${(temperature / 50) * 100}%`;
 
+  return (
+    <View style={[styles.scoreIndicator, {left: progressWidth}]}>
+      <Text style={styles.scoreText}>{temperature.toFixed(1)}도</Text>
+      <Triangle />
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  scoreIndicator: {
+    position: 'absolute',
+    alignItems: 'center',
+    top: -25,
+    transform: [{translateX: -20}], // transform 속성을 객체로 전달
+  },
+  scoreText: {
+    fontSize: 12,
+    color: '#444',
+    fontWeight: 'bold',
+  },
+});
 const HomeScreen = () => {
   const navigation = useNavigation();
   const [isModalVisible, setModalVisible] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
+  const [temperature, setTemperature] = useState(35);
+  //온도 상태
+  useEffect(() => {
+    // 예시 API 호출 (실제 API에서 데이터를 가져오는 로직을 추가해야 함)
+  }, []);
 
   const openModal = (image: string) => {
     setSelectedImage(image);
@@ -146,9 +202,10 @@ const HomeScreen = () => {
     setModalVisible(false);
   };
 
+  const progressWidth = `${(temperature / 50) * 100}%`;
+
   return (
     <Container>
-      {/* 매너 점수 섹션 */}
       <MannerSection>
         <SectionHeader>
           <SectionTitleContainer>
@@ -156,26 +213,11 @@ const HomeScreen = () => {
           </SectionTitleContainer>
         </SectionHeader>
         <Text>간병인이 당신의 매너 점수를 다음과 같이 판단할 수 있어요.</Text>
-        {/* Progress Bar */}
-        <View
-          style={{
-            marginTop: 16,
-            height: 10,
-            backgroundColor: '#cfcfcf',
-            borderRadius: 5,
-          }}>
-          <View
-            style={{
-              width: '75%',
-              height: '100%',
-              backgroundColor: '#a2d5a2',
-              borderRadius: 5,
-            }}
-          />
-        </View>
+        <ProgressContainer>
+          <ProgressBar width={progressWidth} />
+          <ScoreIndicator temperature={temperature} />
+        </ProgressContainer>
       </MannerSection>
-
-      {/* 최근 갤러리 섹션 */}
       <Section>
         <SectionHeader>
           <SectionTitleContainer>
