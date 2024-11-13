@@ -12,7 +12,7 @@ const Text = styled.Text`
   font-size: 18px;
 `;
 
-const MessageScreen = () => {
+const Message = () => {
   return (
     <Container>
       <Text>최근 쪽지</Text>
@@ -20,4 +20,4 @@ const MessageScreen = () => {
   );
 };
 
-export default MessageScreen;
+export default Message;
