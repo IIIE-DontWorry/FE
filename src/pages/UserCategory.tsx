@@ -15,6 +15,7 @@ type RootStackParamList = {
   Landing: undefined;
   Main: undefined;
   UserCategory: undefined;
+  ProtectorInfo: undefined;
 };
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
@@ -27,7 +28,12 @@ const UserCategory = () => {
 
   const handleCategorySelect = (category: CategoryOption) => {
     setSelectedCategory(category);
-    navigation.navigate('Main');
+    // 카테고리에 따라 다른 화면으로 이동
+    if (category === '보호자') {
+      navigation.navigate('ProtectorInfo');
+    } else {
+      navigation.navigate('Main');  // 다른 카테고리는 일단 Main으로
+    }
   };
 
   return (
