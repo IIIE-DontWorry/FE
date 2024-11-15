@@ -1,8 +1,8 @@
-// src/pages/ProtectorMyPage.tsx
+// src/pages/Mypage/ProtectorMyPage.tsx
 import React from 'react';
 import styled from 'styled-components/native';
 import { TouchableOpacity } from 'react-native';
-import TopNavigationBar from '../components/common/TopNavigationBar';
+import TopNavigationBar from '../../components/common/TopNavigationBar';
 
 const Container = styled.View`
   flex: 1;
@@ -73,17 +73,11 @@ const ProtectorMyPage = () => {
         <ProfileSection>
           <ProfileImage />
           <ProfileInfo>
-            <ProfileName>장효제</ProfileName>
+            <ProfileName>장호자</ProfileName>
             <ProfileContact>45세, 남{'\n'}010-0000-0000</ProfileContact>
           </ProfileInfo>
         </ProfileSection>
 
-        <MenuSection>
-          <MenuTitle>보호자 관리</MenuTitle>
-          <MenuItem>
-            <MenuText>보호자 프로필</MenuText>
-          </MenuItem>
-        </MenuSection>
 
         <MenuSection>
           <MenuTitle>간병인 관리</MenuTitle>
@@ -91,9 +85,22 @@ const ProtectorMyPage = () => {
             <MenuText>간병인 프로필</MenuText>
           </MenuItem>
           <MenuItem>
-            <MenuText>간병인 해고</MenuText>
+            <MenuText>그만두기</MenuText>
           </MenuItem>
         </MenuSection>
+
+
+        <MenuSection>
+          <MenuTitle>보호자 관리</MenuTitle>
+          <MenuItem>
+            <MenuText>보호자 프로필</MenuText>
+          </MenuItem>
+          <MenuItem>
+            <MenuText>지인 관리</MenuText>
+          </MenuItem>
+        </MenuSection>
+
+
 
         <MenuSection>
           <MenuTitle>환자 관리</MenuTitle>

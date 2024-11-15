@@ -8,9 +8,9 @@ import GalleryScreen from '../pages/Gallery';
 import ReportScreen from '../pages/Report';
 import MessageScreen from '../pages/Message';
 import ReportCreate from '../pages/ReportCreate';
-import ProtectorInfo from '../pages/ProtectorInfo';
-import CaregiverInfo from '../pages/CaregiverInfo';
-import AcquaintanceInfo from '../pages/AcquaintanceInfo';
+import ProtectorInfo from '../pages/Info/ProtectorInfo';
+import CaregiverInfo from '../pages/Info/CaregiverInfo';
+import AcquaintanceInfo from '../pages/Info/AcquaintanceInfo';
 
 const Stack = createStackNavigator();
 

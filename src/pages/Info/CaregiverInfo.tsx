@@ -1,4 +1,4 @@
-    // src/pages/CaregiverInfo.tsx
+    // src/pages/Info/CaregiverInfo.tsx
 import React, { useState } from 'react';
 import styled from 'styled-components/native';
 import { ScrollView, Modal, TouchableOpacity, Text } from 'react-native';

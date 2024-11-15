@@ -1,4 +1,4 @@
-// src/pages/AcquaintanceInfo.tsx
+// src/pages/Info/AcquaintanceInfo.tsx
 import React, { useState } from 'react';
 import styled from 'styled-components/native';
 import { ScrollView } from 'react-native';

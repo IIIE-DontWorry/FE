@@ -1,4 +1,4 @@
-// src/pages/ProtectorInfo.tsx
+// src/pages/Info/ProtectorInfo.tsx
 import React, { useState } from 'react';
 import styled from 'styled-components/native';
 import { ScrollView, Modal, Clipboard,TouchableOpacity,Text, View  } from 'react-native';
