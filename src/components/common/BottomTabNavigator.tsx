@@ -59,7 +59,6 @@ const BottomTabNavigator = () => {
         },
       })}>
       
-      <Tab.Screen name="ProtectorInfo" component={ProtectorInfo} />
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Reports" component={ReportScreen} />
       <Tab.Screen name="Gallery" component={GalleryScreen} />

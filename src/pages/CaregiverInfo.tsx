@@ -31,7 +31,7 @@ const SectionTitle = styled.Text`
   font-size: 18px;
   font-weight: bold;
   margin-bottom: 15px;
-  color: #FFC149;
+  color: #00D6A3
 `;
 
 const InputGroup = styled.View`
@@ -67,7 +67,7 @@ const ExperienceInput = styled(Input)`
 
 const IconButton = styled.TouchableOpacity<{ remove?: boolean }>`
   padding: 5px 10px;
-  background-color: ${props => props.remove ? '#FF6B6B' : '#FFC149'};
+  background-color: ${props => props.remove ? '#C9E270' : '#00D6A3'};
   border-radius: 5px;
   margin-left: 5px;
 `;
@@ -79,7 +79,7 @@ const IconText = styled.Text`
 `;
 
 const SubmitButton = styled.TouchableOpacity`
-  background-color: #FFC149;
+  background-color: #00D6A3;
   padding: 15px;
   border-radius: 8px;
   align-items: center;
