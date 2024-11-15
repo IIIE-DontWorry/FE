@@ -1,5 +1,4 @@
-// src/navigation/BottomTabNavigator.tsx
-
+// src/components/common/BottomTabNavigator.tsx
 import React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {Text} from 'react-native';
