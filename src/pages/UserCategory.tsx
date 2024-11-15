@@ -16,6 +16,7 @@ type RootStackParamList = {
   Main: undefined;
   UserCategory: undefined;
   ProtectorInfo: undefined;
+  CaregiverInfo: undefined;
 };
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
@@ -31,7 +32,11 @@ const UserCategory = () => {
     // 카테고리에 따라 다른 화면으로 이동
     if (category === '보호자') {
       navigation.navigate('ProtectorInfo');
-    } else {
+    } 
+    else if (category === '간병인') {
+      navigation.navigate('CaregiverInfo');
+    }
+    else {
       navigation.navigate('Main');  // 다른 카테고리는 일단 Main으로
     }
   };

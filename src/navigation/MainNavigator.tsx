@@ -9,6 +9,7 @@ import ReportScreen from '../pages/Report';
 import MessageScreen from '../pages/Message';
 import ReportCreate from '../pages/ReportCreate';
 import ProtectorInfo from '../pages/ProtectorInfo';
+import CaregiverInfo from '../pages/CaregiverInfo';
 const Stack = createStackNavigator();
 
 const MainNavigator = () => {
@@ -25,6 +26,7 @@ const MainNavigator = () => {
       <Stack.Screen name="Messages" component={MessageScreen} />
       <Stack.Screen name="ReportCreate" component={ReportCreate} />
       <Stack.Screen name="ProtectorInfo" component={ProtectorInfo} />
+      <Stack.Screen name="CaregiverInfo" component={CaregiverInfo} />
     </Stack.Navigator>
   );
 };
