@@ -10,6 +10,8 @@ import MessageScreen from '../pages/Message';
 import ReportCreate from '../pages/ReportCreate';
 import ProtectorInfo from '../pages/ProtectorInfo';
 import CaregiverInfo from '../pages/CaregiverInfo';
+import AcquaintanceInfo from '../pages/AcquaintanceInfo';
+
 const Stack = createStackNavigator();
 
 const MainNavigator = () => {
@@ -27,6 +29,7 @@ const MainNavigator = () => {
       <Stack.Screen name="ReportCreate" component={ReportCreate} />
       <Stack.Screen name="ProtectorInfo" component={ProtectorInfo} />
       <Stack.Screen name="CaregiverInfo" component={CaregiverInfo} />
+      <Stack.Screen name="AcquaintanceInfo" component={AcquaintanceInfo} />
     </Stack.Navigator>
   );
 };

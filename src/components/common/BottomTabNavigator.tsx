@@ -1,5 +1,4 @@
-// src/navigation/BottomTabNavigator.tsx
-
+// src/components/common/BottomTabNavigator.tsx
 import React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {Text} from 'react-native';
@@ -7,7 +6,6 @@ import HomeScreen from '../../pages/Home';
 import ReportScreen from '../../pages/Report';
 import GalleryScreen from '../../pages/Gallery';
 import MessageScreen from '../../pages/Message';
-import ProtectorInfo from '../../pages/ProtectorInfo';  // 추가
 import TopNavigationBar from './TopNavigationBar';
 
 // SVG 아이콘 컴포넌트

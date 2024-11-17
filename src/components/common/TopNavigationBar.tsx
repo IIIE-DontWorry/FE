@@ -1,3 +1,4 @@
+// src/components/common/TopNavigationBar.tsx
 import React from 'react';
 import styled from 'styled-components/native';
 import {TouchableOpacity} from 'react-native';
@@ -22,10 +23,10 @@ function TopNavigationBar({title}: TopNavigationProps) {
       </LeftSection>
       <CenterSection>{title ? <Title>{title}</Title> : null}</CenterSection>
       <RightSection>
-        <TouchableOpacity onPress={() => navigation.navigate('Landing')}>
+        <TouchableOpacity onPress={() => navigation.navigate('Landing')/**알림 페이지를 구성하기 전 임시 네비게이트*/}>
           <BellIcon width={30} height={30} />
         </TouchableOpacity>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('Landing')/**마이 페이지를 구성하기 전 임시 네비게이트*/}>
           <ProfileIcon width={30} height={30} />
         </TouchableOpacity>
       </RightSection>

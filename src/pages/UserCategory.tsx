@@ -17,6 +17,7 @@ type RootStackParamList = {
   UserCategory: undefined;
   ProtectorInfo: undefined;
   CaregiverInfo: undefined;
+  AcquaintanceInfo: undefined;
 };
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
@@ -37,7 +38,7 @@ const UserCategory = () => {
       navigation.navigate('CaregiverInfo');
     }
     else {
-      navigation.navigate('Main');  // 다른 카테고리는 일단 Main으로
+      navigation.navigate('AcquaintanceInfo');
     }
   };
 
@@ -84,7 +85,7 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     alignItems: 'center',
-    paddingTop: 100,  // 상단 여백
+    paddingTop: 100,
   },
   title: {
     fontSize: 24,
