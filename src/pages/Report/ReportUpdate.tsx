@@ -4,15 +4,17 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+  Alert,
   ScrollView,
 } from 'react-native';
 import styled from 'styled-components/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import BtnAdd from '../../assets/report/btn_add.svg';
-import {format} from 'date-fns';
-import TimeEntryModal from '../../components/Report/TimeEntryModal';
 import CheckBox from 'react-native-check-box';
+import BtnAdd from '../../assets/report/btn_add.svg';
+import {format, parseISO, isValid} from 'date-fns';
+import TimeEntryModal from '../../components/Report/TimeEntryModal';
 import {useReports} from '../../store/ReportContext';
+
 const Container = styled.ScrollView`
   flex: 1;
   background-color: #ffffff;
@@ -43,71 +45,66 @@ const SectionTitle = styled.Text`
   margin-bottom: 8px;
 `;
 
-const AddButton = styled.TouchableOpacity`
-  margin-top: 20px;
-  padding: 10px;
-  border-radius: 8px;
-  width: 200px;
-  flex-shrink: 0;
-  align-items: center;
-  margin-bottom: 20px;
-  background: #6adec0;
-`;
-
 const ButtonSection = styled.View`
   align-items: center;
-  margin-top: 8px;
+  margin-top: 16px;
+  margin-bottom: 10px;
 `;
 
-const ReportCreate = ({route, navigation}) => {
-  const [date, setDate] = useState(new Date());
+const ButtonRow = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
+  margin-top: 16px;
+  width: 80%;
+`;
+
+const StyledButton = styled.TouchableOpacity`
+  flex: 1;
+  margin: 0 8px;
+  padding: 12px;
+  border-radius: 8px;
+  align-items: center;
+  background: ${props => (props.bgColor ? props.bgColor : '#6adec0')};
+`;
+
+const StyledButtonText = styled.Text`
+  color: #fff;
+  font-size: 14px;
+  font-weight: bold;
+`;
+
+const ReportUpdate = ({route, navigation}) => {
+  const {report} = route.params;
+  const {updateReport, deleteReport} = useReports();
+
+  // 안전한 날짜 처리
+  const initialDate = isValid(parseISO(report.date))
+    ? parseISO(report.date)
+    : new Date();
+
+  const [date, setDate] = useState(initialDate);
+  const [timeEntries, setTimeEntries] = useState(report.timeEntries || []);
+  const [activities, setActivities] = useState(report.activities);
+  const [medications, setMedications] = useState(report.medications);
+  const [notes, setNotes] = useState(report.notes || '');
+  const [specialRequests, setSpecialRequests] = useState(
+    report.specialRequests || {},
+  );
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [timeEntries, setTimeEntries] = useState<string[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
-  const [activities, setActivities] = useState({
-    bowel: {morning: false, afternoon: false, evening: false},
-    meal: {morning: false, afternoon: false, evening: false},
-  });
-  const [medications, setMedications] = useState({
-    protein: {morning: false, afternoon: false, evening: false},
-    arginine: {morning: false, afternoon: false, evening: false},
-    creatine: {morning: false, afternoon: false, evening: false},
-    betaAlanine: {morning: false, afternoon: false, evening: false},
-  });
-  const [notes, setNotes] = useState('');
-  const [specialRequests, setSpecialRequests] = useState({
-    massage: false,
-    additionalCare: false,
-    dietarySupplement: false,
-  });
 
-  const {addReport} = useReports(); // Context에서 addReport 함수 가져오기
-
-  const handleComplete = () => {
-    const newReport = {
-      date: format(date, 'yyyy년 MM월 dd일'),
-      timeEntries, // 시간에 따른 일지 포함
-      activities,
-      medications,
-      notes,
-      specialRequests,
-    };
-    addReport(newReport); // 전역 상태에 추가
-    navigation.goBack(); // 이전 화면으로 이동
-  };
-
-  const onDateChange = (event: any, selectedDate?: Date) => {
+  const onDateChange = (event, selectedDate) => {
     setShowDatePicker(false);
     if (selectedDate) {
       setDate(selectedDate);
     }
   };
 
-  const addTimeEntry = (entry: string) => {
+  const addTimeEntry = entry => {
     setTimeEntries(prev => [...prev, entry]);
   };
 
-  const toggleCheckbox = (category: string, itemKey: string, time: string) => {
+  const toggleCheckbox = (category, itemKey, time) => {
     if (category === 'activities') {
       setActivities(prev => ({
         ...prev,
@@ -127,24 +124,61 @@ const ReportCreate = ({route, navigation}) => {
     }
   };
 
-  const toggleSpecialRequest = (key: string) => {
+  const toggleSpecialRequest = key => {
     setSpecialRequests(prev => ({
       ...prev,
       [key]: !prev[key],
     }));
   };
 
+  const handleUpdate = () => {
+    const updatedReport = {
+      ...report,
+      date: format(date, 'yyyy-MM-dd'),
+      timeEntries,
+      activities,
+      medications,
+      notes,
+      specialRequests,
+    };
+
+    updateReport(updatedReport);
+    Alert.alert('수정 완료', '보고서가 성공적으로 수정되었습니다.', [
+      {text: '확인', onPress: () => navigation.goBack()},
+    ]);
+  };
+
+  const handleDelete = () => {
+    Alert.alert(
+      '보고서 삭제',
+      '이 보고서를 정말 삭제하시겠습니까?',
+      [
+        {text: '취소', style: 'cancel'},
+        {
+          text: '삭제',
+          style: 'destructive',
+          onPress: () => {
+            deleteReport(report.id);
+            Alert.alert('삭제 완료', '보고서가 성공적으로 삭제되었습니다.', [
+              {text: '확인', onPress: () => navigation.goBack()},
+            ]);
+          },
+        },
+      ],
+      {cancelable: true},
+    );
+  };
+
   return (
     <Container>
       <Header>
-        <HeaderText>간병 보고서 작성</HeaderText>
+        <HeaderText>간병 보고서 수정</HeaderText>
       </Header>
 
-      {/* 날짜 선택 섹션 */}
       <Section>
         <SectionTitle>날짜</SectionTitle>
         <TouchableOpacity onPress={() => setShowDatePicker(true)}>
-          <Text>{format(date, 'yyyy년 MM월 dd일')}</Text>
+          <Text>{format(date, 'yyyy-MM-dd')}</Text>
         </TouchableOpacity>
         {showDatePicker && (
           <DateTimePicker
@@ -156,9 +190,8 @@ const ReportCreate = ({route, navigation}) => {
         )}
       </Section>
 
-      {/* 시간에 따른 일지 작성 */}
       <Section>
-        <SectionTitle>시간에 따른 일지 작성</SectionTitle>
+        <SectionTitle>시간에 따른 일지</SectionTitle>
         {timeEntries.map((entry, index) => (
           <Text key={index} style={{marginTop: 8}}>
             {entry}
@@ -171,12 +204,8 @@ const ReportCreate = ({route, navigation}) => {
         </View>
       </Section>
 
-      {/* 배변활동 및 식사여부 */}
       <Section>
         <SectionTitle>배변활동 및 식사여부</SectionTitle>
-        <Text style={{color: '#888', fontSize: 12, marginBottom: 8}}>
-          ※ 아침, 점심, 저녁 순서대로 체크해주세요
-        </Text>
         {['배변활동', '식사여부'].map((type, idx) => (
           <View key={idx}>
             <Text style={{fontWeight: 'bold', marginBottom: 4}}>{type}</Text>
@@ -217,12 +246,8 @@ const ReportCreate = ({route, navigation}) => {
         ))}
       </Section>
 
-      {/* 투약 체크 리스트 */}
       <Section>
         <SectionTitle>투약 체크 리스트</SectionTitle>
-        <Text style={{color: '#888', fontSize: 12, marginBottom: 8}}>
-          ※ 아침, 점심, 저녁 순서대로 체크해주세요
-        </Text>
         {Object.entries(medications).map(([key, value]) => (
           <View key={key}>
             <Text style={{fontWeight: 'bold', marginBottom: 4}}>
@@ -263,12 +288,10 @@ const ReportCreate = ({route, navigation}) => {
         ))}
       </Section>
 
-      {/* 특이사항 */}
       <Section>
         <SectionTitle>특이사항</SectionTitle>
         <TextInput
           multiline
-          placeholder="특이사항을 입력하세요."
           value={notes}
           onChangeText={setNotes}
           style={{
@@ -281,40 +304,16 @@ const ReportCreate = ({route, navigation}) => {
         />
       </Section>
 
-      {/* 보호자 특별 요청 사항 */}
-      <Section>
-        <SectionTitle>보호자 특별 요청 사항</SectionTitle>
-        {Object.entries(specialRequests).map(([key, value]) => (
-          <View
-            key={key}
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              marginBottom: 8,
-            }}>
-            <CheckBox
-              isChecked={value}
-              onClick={() => toggleSpecialRequest(key)}
-            />
-            <Text style={{marginLeft: 8}}>
-              {key === 'massage'
-                ? '마사지 추가'
-                : key === 'additionalCare'
-                ? '추가 케어 요청'
-                : '영양제 추가'}
-            </Text>
-          </View>
-        ))}
-      </Section>
-
-      {/* 완료 버튼 */}
       <ButtonSection>
-        <AddButton onPress={handleComplete}>
-          <Text style={{color: '#fff'}}>완료</Text>
-        </AddButton>
+        <ButtonRow>
+          <StyledButton onPress={handleUpdate}>
+            <StyledButtonText>수정</StyledButtonText>
+          </StyledButton>
+          <StyledButton bgColor="#FF4D4D" onPress={handleDelete}>
+            <StyledButtonText>삭제</StyledButtonText>
+          </StyledButton>
+        </ButtonRow>
       </ButtonSection>
-
-      {/* 시간에 따른 일지 추가 모달 */}
       <TimeEntryModal
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
@@ -324,4 +323,4 @@ const ReportCreate = ({route, navigation}) => {
   );
 };
 
-export default ReportCreate;
+export default ReportUpdate;
