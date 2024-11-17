@@ -2,12 +2,12 @@ import React, {useState, useEffect} from 'react';
 import {Text, View, Modal, TouchableOpacity, StyleSheet} from 'react-native';
 import styled from 'styled-components/native';
 import {useNavigation} from '@react-navigation/native';
-import GalleryIcon from '../assets/bottomnavigation/gallery.svg';
-import ReportIcon from '../assets/bottomnavigation/report.svg';
-import MessageIcon from '../assets/bottomnavigation/message.svg';
-import MockupImage from '../assets/home/img_mockup.svg';
-import Heart from '../assets/home/heart.svg';
-import Book from '../assets/home/book.svg';
+import GalleryIcon from '../../assets/bottomnavigation/gallery.svg';
+import ReportIcon from '../../assets/bottomnavigation/report.svg';
+import MessageIcon from '../../assets/bottomnavigation/message.svg';
+import MockupImage from '../../assets/home/img_mockup.svg';
+import Heart from '../../assets/home/heart.svg';
+import Book from '../../assets/home/book.svg';
 
 const Container = styled.ScrollView`
   flex: 1;
@@ -262,7 +262,7 @@ const Home = () => {
             </IconContainer>
             <SectionTitle>최근 간병 보고서</SectionTitle>
           </SectionTitleContainer>
-          <MoreButton onPress={() => navigation.navigate('Reports')}>
+          <MoreButton onPress={() => navigation.navigate('Report')}>
             <MoreText>더보기 &gt;</MoreText>
           </MoreButton>
         </SectionHeader>
@@ -288,7 +288,7 @@ const Home = () => {
             </IconContainer>
             <SectionTitle>최근 쪽지</SectionTitle>
           </SectionTitleContainer>
-          <MoreButton onPress={() => navigation.navigate('Messages')}>
+          <MoreButton onPress={() => navigation.navigate('Message')}>
             <MoreText>더보기 &gt;</MoreText>
           </MoreButton>
         </SectionHeader>
