@@ -262,7 +262,7 @@ const Home = () => {
             </IconContainer>
             <SectionTitle>최근 간병 보고서</SectionTitle>
           </SectionTitleContainer>
-          <MoreButton onPress={() => navigation.navigate('Reports')}>
+          <MoreButton onPress={() => navigation.navigate('Report')}>
             <MoreText>더보기 &gt;</MoreText>
           </MoreButton>
         </SectionHeader>
@@ -288,7 +288,7 @@ const Home = () => {
             </IconContainer>
             <SectionTitle>최근 쪽지</SectionTitle>
           </SectionTitleContainer>
-          <MoreButton onPress={() => navigation.navigate('Messages')}>
+          <MoreButton onPress={() => navigation.navigate('Message')}>
             <MoreText>더보기 &gt;</MoreText>
           </MoreButton>
         </SectionHeader>

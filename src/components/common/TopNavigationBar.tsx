@@ -23,10 +23,22 @@ function TopNavigationBar({title}: TopNavigationProps) {
       </LeftSection>
       <CenterSection>{title ? <Title>{title}</Title> : null}</CenterSection>
       <RightSection>
-        <TouchableOpacity onPress={() => navigation.navigate('Landing')/**알림 페이지를 구성하기 전 임시 네비게이트*/}>
+        <TouchableOpacity
+          onPress={
+            () =>
+              navigation.navigate(
+                'Landing',
+              ) /**알림 페이지를 구성하기 전 임시 네비게이트*/
+          }>
           <BellIcon width={30} height={30} />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('Landing')/**마이 페이지를 구성하기 전 임시 네비게이트*/}>
+        <TouchableOpacity
+          onPress={
+            () =>
+              navigation.navigate(
+                'Landing',
+              ) /**마이 페이지를 구성하기 전 임시 네비게이트*/
+          }>
           <ProfileIcon width={30} height={30} />
         </TouchableOpacity>
       </RightSection>

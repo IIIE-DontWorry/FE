@@ -10,8 +10,9 @@ import styled from 'styled-components/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import BtnAdd from '../../assets/report/btn_add.svg';
 import {format} from 'date-fns';
-import TimeEntryModal from '../../components/Report/TimeEntryModal'; // 모달 컴포넌트 분리
+import TimeEntryModal from '../../components/Report/TimeEntryModal';
 import CheckBox from 'react-native-check-box';
+
 const Container = styled.ScrollView`
   flex: 1;
   background-color: #ffffff;
@@ -53,33 +54,12 @@ const AddButton = styled.TouchableOpacity`
   background: #6adec0;
 `;
 
-const CheckBoxContainer = styled.View`
-  flex-direction: row;
-  flex-wrap: wrap;
-  margin-top: 8px;
-`;
-
-const CheckBoxWrapper = styled.View`
-  flex-direction: row;
-  align-items: center;
-  margin-right: 16px;
-  margin-bottom: 8px;
-`;
-
-const GuidanceText = styled.Text`
-  color: #888;
-  font-size: 12px;
-  margin-bottom: 8px;
-`;
-const CenteredAddButtonContainer = styled.View`
-  align-items: center; /* 버튼을 가로로 가운데 정렬 */
-  margin-top: 8px;
-`;
 const ButtonSection = styled.View`
-  align-items: center; /* 버튼을 가로로 가운데 정렬 */
+  align-items: center;
   margin-top: 8px;
 `;
-const ReportCreate = () => {
+
+const ReportCreate = ({route, navigation}) => {
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [timeEntries, setTimeEntries] = useState<string[]>([]);
@@ -100,19 +80,24 @@ const ReportCreate = () => {
     additionalCare: false,
     dietarySupplement: false,
   });
-  const {handleAddReport} = route.params; // Report에서 전달받은 콜백
+
+  const {handleAddReport} = route.params || {}; // 안전하게 params에서 가져옴
 
   const handleComplete = () => {
-    const newReport = {
-      date: format(date, 'yyyy년 MM월 dd일'),
-      activities,
-      medications,
-      notes,
-      specialRequests,
-    };
+    if (typeof handleAddReport === 'function') {
+      const newReport = {
+        date: format(date, 'yyyy년 MM월 dd일'),
+        activities,
+        medications,
+        notes,
+        specialRequests,
+      };
 
-    handleAddReport(newReport); // 새 보고서 전달
-    navigation.goBack(); // 이전 화면으로 돌아감
+      handleAddReport(newReport); // 새로운 보고서를 추가
+      navigation.goBack(); // 이전 화면으로 돌아감
+    } else {
+      console.error('handleAddReport is not defined');
+    }
   };
 
   const onDateChange = (event: any, selectedDate?: Date) => {
@@ -175,33 +160,41 @@ const ReportCreate = () => {
         )}
       </Section>
 
+      {/* 시간에 따른 일지 작성 */}
       <Section>
         <SectionTitle>시간에 따른 일지 작성</SectionTitle>
-
         {timeEntries.map((entry, index) => (
           <Text key={index} style={{marginTop: 8}}>
             {entry}
           </Text>
         ))}
-        <CenteredAddButtonContainer>
-          <TouchableOpacity
-            onPress={() => setModalVisible(true)}
-            style={{marginTop: 8}}>
+        <View style={{alignItems: 'center', marginTop: 8}}>
+          <TouchableOpacity onPress={() => setModalVisible(true)}>
             <BtnAdd width={24} height={24} />
           </TouchableOpacity>
-        </CenteredAddButtonContainer>
+        </View>
       </Section>
 
       {/* 배변활동 및 식사여부 */}
       <Section>
         <SectionTitle>배변활동 및 식사여부</SectionTitle>
-        <GuidanceText>※ 아침, 점심, 저녁 순서대로 체크해주세요</GuidanceText>
+        <Text style={{color: '#888', fontSize: 12, marginBottom: 8}}>
+          ※ 아침, 점심, 저녁 순서대로 체크해주세요
+        </Text>
         {['배변활동', '식사여부'].map((type, idx) => (
           <View key={idx}>
             <Text style={{fontWeight: 'bold', marginBottom: 4}}>{type}</Text>
-            <CheckBoxContainer>
+            <View
+              style={{flexDirection: 'row', flexWrap: 'wrap', marginTop: 8}}>
               {['morning', 'afternoon', 'evening'].map(time => (
-                <CheckBoxWrapper key={`${type}-${time}`}>
+                <View
+                  key={`${type}-${time}`}
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    marginRight: 16,
+                    marginBottom: 8,
+                  }}>
                   <CheckBox
                     isChecked={
                       activities[type === '배변활동' ? 'bowel' : 'meal'][time]
@@ -221,9 +214,9 @@ const ReportCreate = () => {
                       ? '점심'
                       : '저녁'}
                   </Text>
-                </CheckBoxWrapper>
+                </View>
               ))}
-            </CheckBoxContainer>
+            </View>
           </View>
         ))}
       </Section>
@@ -231,7 +224,9 @@ const ReportCreate = () => {
       {/* 투약 체크 리스트 */}
       <Section>
         <SectionTitle>투약 체크 리스트</SectionTitle>
-        <GuidanceText>※ 아침, 점심, 저녁 순서대로 체크해주세요</GuidanceText>
+        <Text style={{color: '#888', fontSize: 12, marginBottom: 8}}>
+          ※ 아침, 점심, 저녁 순서대로 체크해주세요
+        </Text>
         {Object.entries(medications).map(([key, value]) => (
           <View key={key}>
             <Text style={{fontWeight: 'bold', marginBottom: 4}}>
@@ -243,9 +238,17 @@ const ReportCreate = () => {
                 ? '크레아틴'
                 : '베타알라닌'}
             </Text>
-            <CheckBoxContainer>
+            <View
+              style={{flexDirection: 'row', flexWrap: 'wrap', marginTop: 8}}>
               {['morning', 'afternoon', 'evening'].map(time => (
-                <CheckBoxWrapper key={`${key}-${time}`}>
+                <View
+                  key={`${key}-${time}`}
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    marginRight: 16,
+                    marginBottom: 8,
+                  }}>
                   <CheckBox
                     isChecked={value[time]}
                     onClick={() => toggleCheckbox('medications', key, time)}
@@ -257,9 +260,9 @@ const ReportCreate = () => {
                       ? '점심'
                       : '저녁'}
                   </Text>
-                </CheckBoxWrapper>
+                </View>
               ))}
-            </CheckBoxContainer>
+            </View>
           </View>
         ))}
       </Section>
@@ -286,19 +289,25 @@ const ReportCreate = () => {
       <Section>
         <SectionTitle>보호자 특별 요청 사항</SectionTitle>
         {Object.entries(specialRequests).map(([key, value]) => (
-          <CheckBoxWrapper key={key}>
+          <View
+            key={key}
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              marginBottom: 8,
+            }}>
             <CheckBox
               isChecked={value}
               onClick={() => toggleSpecialRequest(key)}
             />
-            <Text>
+            <Text style={{marginLeft: 8}}>
               {key === 'massage'
                 ? '마사지 추가'
                 : key === 'additionalCare'
                 ? '추가 케어 요청'
                 : '영양제 추가'}
             </Text>
-          </CheckBoxWrapper>
+          </View>
         ))}
       </Section>
 
@@ -308,6 +317,7 @@ const ReportCreate = () => {
           <Text style={{color: '#fff'}}>완료</Text>
         </AddButton>
       </ButtonSection>
+
       {/* 시간에 따른 일지 추가 모달 */}
       <TimeEntryModal
         visible={modalVisible}

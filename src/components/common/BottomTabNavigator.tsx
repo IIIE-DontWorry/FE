@@ -2,10 +2,10 @@
 import React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {Text} from 'react-native';
-import HomeScreen from '../../pages/Home/Home';
-import ReportScreen from '../../pages/Report/Report';
-import GalleryScreen from '../../pages/Gallery/Gallery';
-import MessageScreen from '../../pages/Message/Message';
+import Home from '../../pages/Home/Home';
+import Report from '../../pages/Report/Report';
+import Gallery from '../../pages/Gallery/Gallery';
+import Message from '../../pages/Message/Message';
 import TopNavigationBar from './TopNavigationBar';
 
 // SVG 아이콘 컴포넌트
@@ -23,9 +23,9 @@ const BottomTabNavigator = () => {
         tabBarIcon: ({focused}) => {
           let IconComponent;
           if (route.name === 'Home') IconComponent = HomeIcon;
-          else if (route.name === 'Reports') IconComponent = ReportIcon;
+          else if (route.name === 'Report') IconComponent = ReportIcon;
           else if (route.name === 'Gallery') IconComponent = GalleryIcon;
-          else if (route.name === 'Messages') IconComponent = MessageIcon;
+          else if (route.name === 'Message') IconComponent = MessageIcon;
 
           return IconComponent ? (
             <IconComponent width={24} height={24} />
@@ -34,9 +34,9 @@ const BottomTabNavigator = () => {
         tabBarLabel: ({focused}) => {
           let label;
           if (route.name === 'Home') label = '홈';
-          else if (route.name === 'Reports') label = '간병 보고서';
+          else if (route.name === 'Report') label = '간병 보고서';
           else if (route.name === 'Gallery') label = '갤러리';
-          else if (route.name === 'Messages') label = '쪽지';
+          else if (route.name === 'Message') label = '쪽지';
 
           return (
             <Text style={{color: focused ? '#000' : '#888'}}>{label}</Text>
@@ -49,17 +49,17 @@ const BottomTabNavigator = () => {
         },
         header: () => {
           let title = '';
-          if (route.name === 'Reports') title = '간병 보고서';
+          if (route.name === 'Report') title = '간병 보고서';
           else if (route.name === 'Gallery') title = '갤러리';
-          else if (route.name === 'Messages') title = '쪽지';
+          else if (route.name === 'Message') title = '쪽지';
 
           return <TopNavigationBar title={title} />;
         },
       })}>
-      <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Reports" component={ReportScreen} />
-      <Tab.Screen name="Gallery" component={GalleryScreen} />
-      <Tab.Screen name="Messages" component={MessageScreen} />
+      <Tab.Screen name="Home" component={Home} />
+      <Tab.Screen name="Report" component={Report} />
+      <Tab.Screen name="Gallery" component={Gallery} />
+      <Tab.Screen name="Message" component={Message} />
     </Tab.Navigator>
   );
 };
