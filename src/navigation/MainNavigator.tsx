@@ -12,6 +12,7 @@ import CaregiverInfo from '../pages/Info/CaregiverInfo';
 import AcquaintanceInfo from '../pages/Info/AcquaintanceInfo';
 import ReportDetail from '../pages/Report/ReportDetail';
 import ReportCreate from '../pages/Report/ReportCreate';
+import ReportUpdate from '../pages/Report/ReportUpdate';
 const Stack = createStackNavigator();
 
 const MainNavigator = () => {
@@ -28,6 +29,7 @@ const MainNavigator = () => {
       <Stack.Screen name="Message" component={Message} />
       <Stack.Screen name="ReportCreate" component={ReportCreate} />
       <Stack.Screen name="ReportDetail" component={ReportDetail} />
+      <Stack.Screen name="ReportUpdate" component={ReportUpdate} />
       <Stack.Screen name="ProtectorInfo" component={ProtectorInfo} />
       <Stack.Screen name="CaregiverInfo" component={CaregiverInfo} />
       <Stack.Screen name="AcquaintanceInfo" component={AcquaintanceInfo} />

@@ -2,6 +2,7 @@ import React, {useState, useEffect} from 'react';
 import {Text, View, Modal, TouchableOpacity, StyleSheet} from 'react-native';
 import styled from 'styled-components/native';
 import {useNavigation} from '@react-navigation/native';
+import {useReports} from '../../store/ReportContext'; // useReports 가져오기
 import GalleryIcon from '../../assets/bottomnavigation/gallery.svg';
 import ReportIcon from '../../assets/bottomnavigation/report.svg';
 import MessageIcon from '../../assets/bottomnavigation/message.svg';
@@ -55,6 +56,7 @@ const MessageSection = styled.View`
   border-radius: 10px;
   height: 330px;
 `;
+
 const Section = styled.View`
   margin: 16px;
   padding: 16px;
@@ -101,30 +103,10 @@ const Item = styled.TouchableOpacity`
   width: 90px;
   align-items: center;
 `;
-const ItemImage = styled(MockupImage)`
-  width: 70px;
-  height: 70px;
-  margin-bottom: 4px;
-`;
-// 최근 간병 보고서에 사용될 Book 이미지를 위한 스타일 컴포넌트
-const BookImageContainer = styled.View`
-  width: 70px;
-  height: 70px;
-  margin-bottom: 4px;
-  align-items: center;
-  justify-content: center;
-`;
-
 const ItemInfo = styled.View`
   flex-direction: row;
   align-self: flex-end;
   margin-top: 4px;
-`;
-
-const ItemDate = styled.Text`
-  font-size: 14px;
-  color: #444;
-  margin-left: 4px;
 `;
 
 const ItemAuthor = styled.Text`
@@ -134,11 +116,39 @@ const ItemAuthor = styled.Text`
   margin-top: 4px;
 `;
 
+const ItemImage = styled(MockupImage)`
+  width: 70px;
+  height: 70px;
+  margin-bottom: 4px;
+`;
+const BookImageContainer = styled.View`
+  width: 70px;
+  height: 70px;
+  margin-bottom: 4px;
+  align-items: center;
+  justify-content: center;
+`;
+const EmptyMessageContainer = styled.View`
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+`;
+
+const EmptyMessageText = styled.Text`
+  font-size: 18px;
+  color: #888;
+  font-weight: 600;
+  text-align: center;
+`;
+const ItemDate = styled.Text`
+  font-size: 14px;
+  color: #444;
+`;
+
 const SmallText = styled.Text`
   font-size: 10px;
   color: #444;
   margin-top: 2px;
-  align-self: flex-end;
 `;
 
 const RecentMessageContainer = styled.View`
@@ -193,6 +203,7 @@ const styles = StyleSheet.create({
 
 const Home = () => {
   const navigation = useNavigation();
+  const {reports} = useReports(); // 전역 상태에서 보고서 가져오기
   const [isModalVisible, setModalVisible] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [temperature, setTemperature] = useState(30);
@@ -266,17 +277,33 @@ const Home = () => {
             <MoreText>더보기 &gt;</MoreText>
           </MoreButton>
         </SectionHeader>
-        <ItemContainer>
-          {[1, 2, 3].map((_, index) => (
-            <Item>
-              <BookImageContainer>
-                <Book width={70} height={70} />
-              </BookImageContainer>
-              <ItemDate style={{fontSize: 9}}>10월 15일 간병보고서</ItemDate>
-              <SmallText>간병인</SmallText>
-            </Item>
-          ))}
-        </ItemContainer>
+        {reports.length === 0 ? (
+          <EmptyMessageContainer>
+            <EmptyMessageText>
+              최근 간병보고서가 아직 작성되지 않았어요!
+            </EmptyMessageText>
+          </EmptyMessageContainer>
+        ) : (
+          <ItemContainer>
+            {reports
+              .sort(
+                (a, b) =>
+                  new Date(b.date).getTime() - new Date(a.date).getTime(),
+              )
+              .slice(0, 3)
+              .map((report, index) => (
+                <Item
+                  key={index}
+                  onPress={() => navigation.navigate('ReportDetail', {report})}>
+                  <BookImageContainer>
+                    <Book width={70} height={70} />
+                  </BookImageContainer>
+                  <ItemDate>{report.date}</ItemDate>
+                  <SmallText>간병인</SmallText>
+                </Item>
+              ))}
+          </ItemContainer>
+        )}
       </Section>
 
       {/* 최근 쪽지 섹션 */}
@@ -292,14 +319,10 @@ const Home = () => {
             <MoreText>더보기 &gt;</MoreText>
           </MoreButton>
         </SectionHeader>
-        {[
-          '오늘 어르신 산책 다녀왔어요.',
-          '식사는 잘 하셨나요?',
-          '오늘 운동 하셨어요?',
-        ].map((message, index) => (
+        {[1, 2, 3].map((_, index) => (
           <RecentMessageContainer key={index}>
             <MessageAuthor>작성자</MessageAuthor>
-            <MessageText>{message}</MessageText>
+            <MessageText>쪽지 내용</MessageText>
             <MessageTime>4분 전</MessageTime>
           </RecentMessageContainer>
         ))}
