@@ -10,19 +10,17 @@ import {
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import LogoSvg from '../assets/landing/logo.svg';
-const { width, height } = Dimensions.get('window');
+import LogoSvg from '../../assets/landing/logo.svg';
+const {width, height} = Dimensions.get('window');
 
 // 네비게이션 타입 정의
 type RootStackParamList = {
   Landing: undefined;
   Main: undefined;
-  UserCategory: undefined;  // UserCategory 스크린 타입 추가
+  UserCategory: undefined; // UserCategory 스크린 타입 추가
 };
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
-
-
 
 const Landing = () => {
   const handleKakaoLogin = () => {
@@ -41,7 +39,7 @@ const Landing = () => {
         <View style={styles.logoContainer}>
           <LogoSvg width={width * 0.6} height={width * 0.6} />
         </View>
-        
+
         {/* 텍스트 영역 */}
         <View style={styles.textContainer}>
           <Text style={styles.mainText}>늘 당신 곁에</Text>
@@ -50,12 +48,11 @@ const Landing = () => {
 
         {/* 로그인 버튼 영역 */}
         <View style={styles.buttonContainer}>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.kakaoButton}
-            onPress={handleKakaoLogin}
-          >
+            onPress={handleKakaoLogin}>
             <Image
-              source={require('../assets/landing/kakaoLogin.png')}
+              source={require('../../assets/landing/kakaoLogin.png')}
               style={styles.kakaoButtonImage}
               resizeMode="contain"
             />

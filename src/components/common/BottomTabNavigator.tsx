@@ -2,10 +2,10 @@
 import React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {Text} from 'react-native';
-import HomeScreen from '../../pages/Home';
-import ReportScreen from '../../pages/Report';
-import GalleryScreen from '../../pages/Gallery';
-import MessageScreen from '../../pages/Message';
+import HomeScreen from '../../pages/Home/Home';
+import ReportScreen from '../../pages/Report/Report';
+import GalleryScreen from '../../pages/Gallery/Gallery';
+import MessageScreen from '../../pages/Message/Message';
 import TopNavigationBar from './TopNavigationBar';
 
 // SVG 아이콘 컴포넌트
@@ -56,7 +56,6 @@ const BottomTabNavigator = () => {
           return <TopNavigationBar title={title} />;
         },
       })}>
-      
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Reports" component={ReportScreen} />
       <Tab.Screen name="Gallery" component={GalleryScreen} />
