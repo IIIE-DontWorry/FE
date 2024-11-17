@@ -1,5 +1,5 @@
 // src/pages/UserCategory.tsx
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -7,9 +7,9 @@ import {
   TouchableOpacity,
   SafeAreaView,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import HeartIcon from '../assets/category/heart.svg';
+import {useNavigation} from '@react-navigation/native';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import HeartIcon from '../../assets/category/heart.svg';
 
 type RootStackParamList = {
   Landing: undefined;
@@ -26,18 +26,17 @@ type CategoryOption = '보호자' | '간병인' | '지인';
 
 const UserCategory = () => {
   const navigation = useNavigation<NavigationProp>();
-  const [selectedCategory, setSelectedCategory] = useState<CategoryOption | null>(null);
+  const [selectedCategory, setSelectedCategory] =
+    useState<CategoryOption | null>(null);
 
   const handleCategorySelect = (category: CategoryOption) => {
     setSelectedCategory(category);
     // 카테고리에 따라 다른 화면으로 이동
     if (category === '보호자') {
       navigation.navigate('ProtectorInfo');
-    } 
-    else if (category === '간병인') {
+    } else if (category === '간병인') {
       navigation.navigate('CaregiverInfo');
-    }
-    else {
+    } else {
       navigation.navigate('AcquaintanceInfo');
     }
   };
@@ -50,24 +49,21 @@ const UserCategory = () => {
         <View style={styles.categoryContainer}>
           <TouchableOpacity
             style={styles.categoryButton}
-            onPress={() => handleCategorySelect('보호자')}
-          >
+            onPress={() => handleCategorySelect('보호자')}>
             <HeartIcon width={60} height={60} fill="#00E6AC" />
             <Text style={styles.categoryText}>보호자</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.categoryButton}
-            onPress={() => handleCategorySelect('간병인')}
-          >
+            onPress={() => handleCategorySelect('간병인')}>
             <HeartIcon width={60} height={60} fill="#D0FF36" />
             <Text style={styles.categoryText}>간병인</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.categoryButton}
-            onPress={() => handleCategorySelect('지인')}
-          >
+            onPress={() => handleCategorySelect('지인')}>
             <HeartIcon width={60} height={60} fill="#14AE5C" />
             <Text style={styles.categoryText}>지인</Text>
           </TouchableOpacity>

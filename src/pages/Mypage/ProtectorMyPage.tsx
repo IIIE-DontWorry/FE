@@ -1,8 +1,8 @@
 // src/pages/ProtectorMyPage.tsx
 import React from 'react';
 import styled from 'styled-components/native';
-import { TouchableOpacity } from 'react-native';
-import TopNavigationBar from '../components/common/TopNavigationBar';
+import {TouchableOpacity} from 'react-native';
+import TopNavigationBar from '../../components/common/TopNavigationBar';
 
 const Container = styled.View`
   flex: 1;
@@ -25,7 +25,7 @@ const ProfileImage = styled.View`
   width: 50px;
   height: 50px;
   border-radius: 25px;
-  background-color: #F0F0F0;
+  background-color: #f0f0f0;
   margin-right: 15px;
 `;
 

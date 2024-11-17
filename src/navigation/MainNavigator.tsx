@@ -1,16 +1,16 @@
 import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 import BottomTabNavigator from '../components/common/BottomTabNavigator';
-import Landing from '../pages/Landing';
-import UserCategory from '../pages/UserCategory';
-import HomeScreen from '../pages/Home';
-import GalleryScreen from '../pages/Gallery';
-import ReportScreen from '../pages/Report';
-import MessageScreen from '../pages/Message';
-import ReportCreate from '../pages/ReportCreate';
-import ProtectorInfo from '../pages/ProtectorInfo';
-import CaregiverInfo from '../pages/CaregiverInfo';
-import AcquaintanceInfo from '../pages/AcquaintanceInfo';
+import Landing from '../pages/Landing/Landing';
+import UserCategory from '../pages/UserCategory/UserCategory';
+import HomeScreen from '../pages/Home/Home';
+import GalleryScreen from '../pages/Gallery/Gallery';
+import ReportScreen from '../pages/Report/Report';
+import MessageScreen from '../pages/Message/Message';
+import ReportCreate from '../pages/Report/ReportCreate';
+import ProtectorInfo from '../pages/Info/ProtectorInfo';
+import CaregiverInfo from '../pages/Info/CaregiverInfo';
+import AcquaintanceInfo from '../pages/Info/AcquaintanceInfo';
 
 const Stack = createStackNavigator();
 
