@@ -1,6 +1,7 @@
 // src/components/common/TopNavigationBar.tsx
 import React from 'react';
 import styled from 'styled-components/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {TouchableOpacity} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import DontWorryLogo from '../../assets/topnavigation/logo.svg';
@@ -14,10 +15,33 @@ type TopNavigationProps = {
 function TopNavigationBar({title}: TopNavigationProps) {
   const navigation = useNavigation();
 
+  const handleProfilePress = async () => {
+    try {
+      const userType = await AsyncStorage.getItem('userType');
+      
+      switch(userType) {
+        case '보호자':
+          navigation.navigate('ProtectorMypage');
+          break;
+        case '간병인':
+          navigation.navigate('CaregiverMypage');
+          break;
+        case '지인':
+          navigation.navigate('AcquaintanceMypage');
+          break;
+        default:
+          navigation.navigate('Landing');
+      }
+    } catch (error) {
+      console.error('Error getting user type:', error);
+      navigation.navigate('Landing');
+    }
+  };
+
   return (
     <Container>
       <LeftSection>
-        <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+        <TouchableOpacity onPress={() => navigation.navigate('Main')}>
           <DontWorryLogo width={50} height={50} />
         </TouchableOpacity>
       </LeftSection>
@@ -32,13 +56,7 @@ function TopNavigationBar({title}: TopNavigationProps) {
           }>
           <BellIcon width={30} height={30} />
         </TouchableOpacity>
-        <TouchableOpacity
-          onPress={
-            () =>
-              navigation.navigate(
-                'Landing',
-              ) /**마이 페이지를 구성하기 전 임시 네비게이트*/
-          }>
+        <TouchableOpacity onPress={handleProfilePress}>
           <ProfileIcon width={30} height={30} />
         </TouchableOpacity>
       </RightSection>
