@@ -12,15 +12,7 @@ import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import HeartIcon from '../../assets/category/heart.svg';
 
-
-type RootStackParamList = {
-  Landing: undefined;
-  Main: undefined;
-  UserCategory: undefined;
-  ProtectorInfo: undefined;
-  CaregiverInfo: undefined;
-  AcquaintanceInfo: undefined;
-};
+import {RootStackParamList} from '../../navigation/MainNavigator';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 

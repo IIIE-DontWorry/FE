@@ -1,16 +1,18 @@
-// src/pages/Info/ProtectorInfo.tsx
-import React, { useState } from 'react';
+// src/pages/ProtectorInfo.tsx
+import React, {useState} from 'react';
 import styled from 'styled-components/native';
-import { ScrollView, Modal, Clipboard,TouchableOpacity,Text, View  } from 'react-native';
+import {
+  ScrollView,
+  Modal,
+  Clipboard,
+  TouchableOpacity,
+  Text,
+  View,
+} from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-
-type RootStackParamList = {
-  Landing: undefined;
-  Main: undefined;
-  UserCategory: undefined;
-};
+import {RootStackParamList} from '../../navigation/MainNavigator';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -47,14 +49,14 @@ const Required = styled.Text`
 
 const Input = styled.TextInput`
   border-width: 1px;
-  border-color: #DDDDDD;
+  border-color: #dddddd;
   border-radius: 8px;
   padding: 10px;
-  background-color: #F5F5F5;
+  background-color: #f5f5f5;
 `;
 
 const SubmitButton = styled.TouchableOpacity`
-  background-color: #00D6A3;
+  background-color: #00d6a3;
   padding: 15px;
   border-radius: 8px;
   align-items: center;
@@ -62,7 +64,7 @@ const SubmitButton = styled.TouchableOpacity`
 `;
 
 const SubmitText = styled.Text`
-  color: #FFFFFF;
+  color: #ffffff;
   font-size: 16px;
   font-weight: bold;
 `;
@@ -75,7 +77,7 @@ const ModalOverlay = styled.View`
 `;
 
 const ModalContent = styled.View`
-  background-color: #FFFFFF;
+  background-color: #ffffff;
   padding: 20px;
   border-radius: 10px;
   width: 80%;
@@ -88,7 +90,7 @@ const ModalTitle = styled.Text`
 `;
 
 const ModalContainer = styled.View`
-  background-color: #FFFFFF;
+  background-color: #ffffff;
   padding: 20px;
   border-radius: 10px;
   width: 80%;
@@ -112,13 +114,13 @@ const MatchingCode = styled.Text`
 `;
 
 const ModalButton = styled.TouchableOpacity`
-  background-color: #00D6A3;
+  background-color: #00d6a3;
   padding: 10px 30px;
   border-radius: 8px;
 `;
 
 const ModalButtonText = styled.Text`
-  color: #FFFFFF;
+  color: #ffffff;
   font-size: 16px;
 `;
 
@@ -135,7 +137,7 @@ const MedicineInput = styled(Input)`
 
 const IconButton = styled.TouchableOpacity`
   padding: 5px 10px;
-  background-color: #00D6A3;
+  background-color: #00d6a3;
   border-radius: 5px;
   margin-left: 5px;
 `;
@@ -171,9 +173,9 @@ const CloseButtonText = styled.Text`
 
 const PickerContainer = styled.View`
   border-width: 1px;
-  border-color: #DDDDDD;
+  border-color: #dddddd;
   border-radius: 8px;
-  background-color: #F5F5F5;
+  background-color: #f5f5f5;
   margin-top: 5px;
 `;
 
@@ -192,7 +194,7 @@ const ProtectorInfo = () => {
     hospital: '',
     patientAddress: '',
   });
-  
+
   const addMedicine = () => {
     setMedicines([...medicines, '']);
   };
@@ -231,38 +233,49 @@ const ProtectorInfo = () => {
         <Section>
           <SectionTitle>보호자 정보</SectionTitle>
           <InputGroup>
-            <Label>이름 <Required>*</Required></Label>
-            <Input 
+            <Label>
+              이름 <Required>*</Required>
+            </Label>
+            <Input
               placeholder="예) 홍길동"
               value={formData.protectorName}
-              onChangeText={(text) => setFormData({...formData, protectorPhone: text})}
+              onChangeText={text =>
+                setFormData({...formData, protectorPhone: text})
+              }
             />
           </InputGroup>
           <InputGroup>
-            <Label>연락처 <Required>*</Required></Label>
-            <Input 
+            <Label>
+              연락처 <Required>*</Required>
+            </Label>
+            <Input
               placeholder="예) 010-1234-5678"
               value={formData.protectorName}
-              onChangeText={(text) => setFormData({...formData, protectorName: text})}
+              onChangeText={text =>
+                setFormData({...formData, protectorName: text})
+              }
             />
           </InputGroup>
           <InputGroup>
             <Label>주소</Label>
-            <Input 
+            <Input
               placeholder="예) 경상북도 울릉군 울릉읍 독도이사부길 55"
               value={formData.protectorName}
-              onChangeText={(text) => setFormData({...formData, protectorAddress: text})}
+              onChangeText={text =>
+                setFormData({...formData, protectorAddress: text})
+              }
             />
           </InputGroup>
           <InputGroup>
-            <Label>환자와의 관계 <Required>*</Required></Label>
+            <Label>
+              환자와의 관계 <Required>*</Required>
+            </Label>
             <PickerContainer>
               <Picker
                 selectedValue={formData.relationship}
-                onValueChange={(value: string) => 
+                onValueChange={(value: string) =>
                   setFormData({...formData, relationship: value})
-                }
-              >
+                }>
                 <Picker.Item label="부" value="father" />
                 <Picker.Item label="모" value="mother" />
                 <Picker.Item label="자녀" value="child" />
@@ -276,53 +289,67 @@ const ProtectorInfo = () => {
         <Section>
           <SectionTitle>환자 정보</SectionTitle>
           <InputGroup>
-            <Label>이름 <Required>*</Required></Label>
-            <Input 
+            <Label>
+              이름 <Required>*</Required>
+            </Label>
+            <Input
               placeholder="예) 홍상직"
               value={formData.protectorName}
-              onChangeText={(text) => setFormData({...formData, patientName: text})}
+              onChangeText={text =>
+                setFormData({...formData, patientName: text})
+              }
             />
           </InputGroup>
           <InputGroup>
-            <Label>나이 <Required>*</Required></Label>
-            <Input 
-              placeholder="예) 88" 
+            <Label>
+              나이 <Required>*</Required>
+            </Label>
+            <Input
+              placeholder="예) 88"
               value={formData.protectorName}
-              onChangeText={(text) => setFormData({...formData, patientAge: text})}
+              onChangeText={text =>
+                setFormData({...formData, patientAge: text})
+              }
             />
           </InputGroup>
           <InputGroup>
             <Label>병명</Label>
-            <Input 
+            <Input
               placeholder="예) 알츠하이머, 척추손상"
               value={formData.protectorName}
-              onChangeText={(text) => setFormData({...formData, disease: text})}
+              onChangeText={text => setFormData({...formData, disease: text})}
             />
           </InputGroup>
           <InputGroup>
-            <Label>병원 <Required>*</Required></Label>
-            <Input 
+            <Label>
+              병원 <Required>*</Required>
+            </Label>
+            <Input
               placeholder="예) 치매: OO병원 신경과 / 척추: XO병원 물리치료과"
               value={formData.protectorName}
-              onChangeText={(text) => setFormData({...formData, hospital : text})}
+              onChangeText={text => setFormData({...formData, hospital: text})}
             />
           </InputGroup>
           <InputGroup>
             <Label>주소 </Label>
-            <Input 
+            <Input
               placeholder="예) 서울특별시 중구 필동로1길 30 "
               value={formData.protectorName}
-              onChangeText={(text) => setFormData({...formData, patientAddress : text})}
+              onChangeText={text =>
+                setFormData({...formData, patientAddress: text})
+              }
             />
           </InputGroup>
           <InputGroup>
-            <Label>투약 정보 <Required>*</Required></Label>
+            <Label>
+              투약 정보 <Required>*</Required>
+            </Label>
             {medicines.map((medicine, index) => (
               <MedicineContainer key={index}>
                 <MedicineInput
                   placeholder="예) 도네페질"
                   value={medicine}
-                  onChangeText={(text) => handleMedicineChange(text, index)}
+                  onChangeText={text => handleMedicineChange(text, index)}
                 />
                 {index === medicines.length - 1 ? (
                   <IconButton onPress={addMedicine}>
@@ -338,10 +365,16 @@ const ProtectorInfo = () => {
           </InputGroup>
         </Section>
 
-        <SubmitButton onPress={() => setModalVisible(true)/**이코드는 매칭 코드를 띄우는 버튼 */}>
+        <SubmitButton
+          onPress={
+            () => setModalVisible(true) /**이코드는 매칭 코드를 띄우는 버튼 */
+          }>
           <SubmitText>요양사 매칭 코드 </SubmitText>
         </SubmitButton>
-        <SubmitButton onPress={handleSubmit/**이코드는 작성을 완료해서 DB에 보내고 main으로 가는 버튼 */}>
+        <SubmitButton
+          onPress={
+            handleSubmit /**이코드는 작성을 완료해서 DB에 보내고 main으로 가는 버튼 */
+          }>
           <SubmitText>작성 완료</SubmitText>
         </SubmitButton>
       </ScrollContainer>
@@ -350,13 +383,16 @@ const ProtectorInfo = () => {
         animationType="fade"
         transparent={true}
         visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
+        onRequestClose={() => setModalVisible(false)}>
         <ModalOverlay>
-          <TouchableOpacity 
-            style={{flex: 1, width: '100%', justifyContent: 'center', alignItems: 'center'}}
-            onPress={() => setModalVisible(false)}
-          >
+          <TouchableOpacity
+            style={{
+              flex: 1,
+              width: '100%',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+            onPress={() => setModalVisible(false)}>
             <ModalContainer>
               <CloseButtonWrapper>
                 <TouchableOpacity onPress={() => setModalVisible(false)}>
@@ -365,10 +401,11 @@ const ProtectorInfo = () => {
               </CloseButtonWrapper>
               <ModalTitle>보호자 매칭 코드</ModalTitle>
               <MatchingCode>F3Rr102A</MatchingCode>
-              <ModalButton onPress={() => {
-                copyToClipboard('F3Rr102A');
-                setModalVisible(false);
-              }}>
+              <ModalButton
+                onPress={() => {
+                  copyToClipboard('F3Rr102A');
+                  setModalVisible(false);
+                }}>
                 <ModalButtonText>클립보드에 복사</ModalButtonText>
               </ModalButton>
             </ModalContainer>
