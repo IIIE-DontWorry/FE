@@ -10,15 +10,7 @@ import {
 import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import HeartIcon from '../../assets/category/heart.svg';
-
-type RootStackParamList = {
-  Landing: undefined;
-  Main: undefined;
-  UserCategory: undefined;
-  ProtectorInfo: undefined;
-  CaregiverInfo: undefined;
-  AcquaintanceInfo: undefined;
-};
+import {RootStackParamList} from '../../navigation/MainNavigator';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 

@@ -13,7 +13,28 @@ import AcquaintanceInfo from '../pages/Info/AcquaintanceInfo';
 import ReportDetail from '../pages/Report/ReportDetail';
 import ReportCreate from '../pages/Report/ReportCreate';
 import ReportUpdate from '../pages/Report/ReportUpdate';
-const Stack = createStackNavigator();
+import Callback from '../pages/Auth/Callback';
+
+// RootStackParamList 타입 정의
+export type RootStackParamList = {
+  Landing: undefined;
+  Main: undefined;
+  UserCategory: undefined;
+  ProtectorInfo: undefined;
+  CaregiverInfo: undefined;
+  AcquaintanceInfo: undefined;
+  ReportCreate: undefined;
+  ReportDetail: undefined;
+  ReportUpdate: undefined;
+  Gallery: undefined;
+  Home: undefined;
+  Report: undefined;
+  Message: undefined;
+  Callback: {code: string} | undefined; // Callback 추가
+};
+
+// Stack Navigator 생성
+const Stack = createStackNavigator<RootStackParamList>();
 
 const MainNavigator = () => {
   return (
@@ -33,6 +54,7 @@ const MainNavigator = () => {
       <Stack.Screen name="ProtectorInfo" component={ProtectorInfo} />
       <Stack.Screen name="CaregiverInfo" component={CaregiverInfo} />
       <Stack.Screen name="AcquaintanceInfo" component={AcquaintanceInfo} />
+      <Stack.Screen name="Callback" component={Callback} />
     </Stack.Navigator>
   );
 };
