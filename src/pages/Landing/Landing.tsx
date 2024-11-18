@@ -7,31 +7,35 @@ import {
   Image,
   Dimensions,
   SafeAreaView,
+  Linking,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import LogoSvg from '../../assets/landing/logo.svg';
+import {RootStackParamList} from '../../navigation/MainNavigator';
+
 const {width, height} = Dimensions.get('window');
 
-// 네비게이션 타입 정의
-type RootStackParamList = {
-  Landing: undefined;
-  Main: undefined;
-  UserCategory: undefined; // UserCategory 스크린 타입 추가
-};
-
-type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
-
 const Landing = () => {
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
+  // const handleKakaoLogin = () => {
+  //   const clientId = '77570be15ef8457bbb27ffc965017a74'; // 카카오 REST API 키
+  //   const redirectUri = 'http://{베이스url}/callback'; // 콜백 URL
+  //   const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code`;
+
+  //   // 카카오 로그인 URL로 리다이렉트
+  //   Linking.openURL(kakaoAuthUrl).catch(err =>
+  //     console.error('An error occurred during Kakao Login:', err),
+  //   );
+  // };
   const handleKakaoLogin = () => {
     //추후 카카오 로그인 로직 구현
     console.log('카카오 로그인 시도');
     // 일단 UserCategory 화면으로 이동
     navigation.navigate('UserCategory');
   };
-
-  const navigation = useNavigation<NavigationProp>();
-
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>

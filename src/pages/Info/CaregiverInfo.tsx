@@ -1,15 +1,10 @@
-    // src/pages/CaregiverInfo.tsx
-import React, { useState } from 'react';
+// src/pages/CaregiverInfo.tsx
+import React, {useState} from 'react';
 import styled from 'styled-components/native';
-import { ScrollView, Modal, TouchableOpacity, Text } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-
-type RootStackParamList = {
-  Landing: undefined;
-  Main: undefined;
-  UserCategory: undefined;
-};
+import {ScrollView, Modal, TouchableOpacity, Text} from 'react-native';
+import {useNavigation} from '@react-navigation/native';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {RootStackParamList} from '../../navigation/MainNavigator';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -31,7 +26,7 @@ const SectionTitle = styled.Text`
   font-size: 18px;
   font-weight: bold;
   margin-bottom: 15px;
-  color: #00D6A3
+  color: #00d6a3;
 `;
 
 const InputGroup = styled.View`
@@ -48,10 +43,10 @@ const Required = styled.Text`
 
 const Input = styled.TextInput`
   border-width: 1px;
-  border-color: #DDDDDD;
+  border-color: #dddddd;
   border-radius: 8px;
   padding: 10px;
-  background-color: #F5F5F5;
+  background-color: #f5f5f5;
 `;
 
 const ExperienceContainer = styled.View`
@@ -65,13 +60,12 @@ const ExperienceInput = styled(Input)`
   margin-right: 10px;
 `;
 
-const IconButton = styled.TouchableOpacity<{ remove?: boolean }>`
+const IconButton = styled.TouchableOpacity<{remove?: boolean}>`
   padding: 5px 10px;
-  background-color: ${props => props.remove ? '#C9E270' : '#00D6A3'};
+  background-color: ${props => (props.remove ? '#C9E270' : '#00D6A3')};
   border-radius: 5px;
   margin-left: 5px;
 `;
-
 
 const IconText = styled.Text`
   color: white;
@@ -79,7 +73,7 @@ const IconText = styled.Text`
 `;
 
 const SubmitButton = styled.TouchableOpacity`
-  background-color: #00D6A3;
+  background-color: #00d6a3;
   padding: 15px;
   border-radius: 8px;
   align-items: center;
@@ -87,11 +81,10 @@ const SubmitButton = styled.TouchableOpacity`
 `;
 
 const SubmitText = styled.Text`
-  color: #FFFFFF;
+  color: #ffffff;
   font-size: 16px;
   font-weight: bold;
 `;
-
 
 const CaregiverInfo = () => {
   const navigation = useNavigation<NavigationProp>();
@@ -131,30 +124,36 @@ const CaregiverInfo = () => {
         <Section>
           <SectionTitle>간병인 정보</SectionTitle>
           <InputGroup>
-            <Label>이름 <Required>*</Required></Label>
-            <Input 
+            <Label>
+              이름 <Required>*</Required>
+            </Label>
+            <Input
               placeholder="예) 홍길동"
               value={formData.name}
-              onChangeText={(text) => setFormData({...formData, name: text})}
+              onChangeText={text => setFormData({...formData, name: text})}
             />
           </InputGroup>
           <InputGroup>
-            <Label>연락처 <Required>*</Required></Label>
-            <Input 
+            <Label>
+              연락처 <Required>*</Required>
+            </Label>
+            <Input
               placeholder="예) 010-1234-5678"
               value={formData.phone}
-              onChangeText={(text) => setFormData({...formData, phone: text})}
+              onChangeText={text => setFormData({...formData, phone: text})}
             />
           </InputGroup>
           <InputGroup>
-            <Label>소속 <Required>*</Required></Label>
-            <Input 
+            <Label>
+              소속 <Required>*</Required>
+            </Label>
+            <Input
               placeholder="예) 서울아산병원"
               value={formData.workplace}
-              onChangeText={(text) => setFormData({...formData, workplace: text})}
+              onChangeText={text => setFormData({...formData, workplace: text})}
             />
           </InputGroup>
-          
+
           <InputGroup>
             <Label>경력</Label>
             {experiences.map((experience, index) => (
@@ -162,16 +161,18 @@ const CaregiverInfo = () => {
                 <ExperienceInput
                   placeholder="예) 2020-2023 서울아산병원"
                   value={experience}
-                  onChangeText={(text) => handleExperienceChange(text, index)}
+                  onChangeText={text => handleExperienceChange(text, index)}
                 />
                 {index === experiences.length - 1 ? (
-                <IconButton onPress={addExperience}>
+                  <IconButton onPress={addExperience}>
                     <IconText>+</IconText>
-                </IconButton>
+                  </IconButton>
                 ) : (
-                <IconButton remove={true} onPress={() => removeExperience(index)}>
+                  <IconButton
+                    remove={true}
+                    onPress={() => removeExperience(index)}>
                     <IconText>-</IconText>
-                </IconButton>
+                  </IconButton>
                 )}
               </ExperienceContainer>
             ))}
@@ -181,10 +182,12 @@ const CaregiverInfo = () => {
         <Section>
           <SectionTitle>보호자 매칭 Code</SectionTitle>
           <InputGroup>
-            <Input 
+            <Input
               placeholder="보호자 Code 입력"
               value={formData.matchingCode}
-              onChangeText={(text) => setFormData({...formData, matchingCode: text})}
+              onChangeText={text =>
+                setFormData({...formData, matchingCode: text})
+              }
             />
           </InputGroup>
         </Section>
