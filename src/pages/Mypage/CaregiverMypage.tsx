@@ -1,4 +1,4 @@
-// src/pages/ProtectorMyPage.tsx
+// src/pages/Mypage/ProtectorMyPage.tsx
 import React from 'react';
 import styled from 'styled-components/native';
 import { TouchableOpacity } from 'react-native';
@@ -65,16 +65,16 @@ const MenuText = styled.Text`
   color: #333;
 `;
 
-const ProtectorMypage = () => {
+const CaregiverMyPage = () => {
   return (
     <Container>
-      <TopNavigationBar title="보호자 프로필" />
+      <TopNavigationBar title="간병인 프로필" />
       <ScrollContainer>
         <ProfileSection>
           <ProfileImage />
           <ProfileInfo>
-            <ProfileName>장효제</ProfileName>
-            <ProfileContact>45세, 남{'\n'}010-0000-0000</ProfileContact>
+            <ProfileName>장병인</ProfileName>
+            <ProfileContact>58세, 여{'\n'}010-0000-0000</ProfileContact>
           </ProfileInfo>
         </ProfileSection>
 
@@ -91,7 +91,7 @@ const ProtectorMypage = () => {
             <MenuText>간병인 프로필</MenuText>
           </MenuItem>
           <MenuItem>
-            <MenuText>간병인 평고</MenuText>
+            <MenuText>간병인 해고</MenuText>
           </MenuItem>
         </MenuSection>
 
@@ -118,7 +118,7 @@ const ProtectorMypage = () => {
         <MenuSection>
           <MenuTitle>설정</MenuTitle>
           <MenuItem>
-            <MenuText>그 밖에</MenuText>
+            <MenuText>글씨체</MenuText>
           </MenuItem>
         </MenuSection>
       </ScrollContainer>
@@ -126,4 +126,4 @@ const ProtectorMypage = () => {
   );
 };
 
-export default ProtectorMypage;
+export default CaregiverMyPage;

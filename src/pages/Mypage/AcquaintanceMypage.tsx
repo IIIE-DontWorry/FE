@@ -1,4 +1,4 @@
-// src/pages/ProtectorMyPage.tsx
+// src/pages/Mypage/AcquaintanceMyPage.tsx
 import React from 'react';
 import styled from 'styled-components/native';
 import { TouchableOpacity } from 'react-native';
@@ -65,45 +65,18 @@ const MenuText = styled.Text`
   color: #333;
 `;
 
-const ProtectorMypage = () => {
+const AcquaintanceMyPage = () => {
   return (
     <Container>
-      <TopNavigationBar title="보호자 프로필" />
+      <TopNavigationBar title="지인 프로필" />
       <ScrollContainer>
         <ProfileSection>
           <ProfileImage />
           <ProfileInfo>
-            <ProfileName>장효제</ProfileName>
-            <ProfileContact>45세, 남{'\n'}010-0000-0000</ProfileContact>
+            <ProfileName>김지인</ProfileName>
+            <ProfileContact>35세, 여{'\n'}010-0000-0000</ProfileContact>
           </ProfileInfo>
         </ProfileSection>
-
-        <MenuSection>
-          <MenuTitle>보호자 관리</MenuTitle>
-          <MenuItem>
-            <MenuText>보호자 프로필</MenuText>
-          </MenuItem>
-        </MenuSection>
-
-        <MenuSection>
-          <MenuTitle>간병인 관리</MenuTitle>
-          <MenuItem>
-            <MenuText>간병인 프로필</MenuText>
-          </MenuItem>
-          <MenuItem>
-            <MenuText>간병인 평고</MenuText>
-          </MenuItem>
-        </MenuSection>
-
-        <MenuSection>
-          <MenuTitle>환자 관리</MenuTitle>
-          <MenuItem>
-            <MenuText>환자 프로필</MenuText>
-          </MenuItem>
-          <MenuItem>
-            <MenuText>약 수정</MenuText>
-          </MenuItem>
-        </MenuSection>
 
         <MenuSection>
           <MenuTitle>갤러리</MenuTitle>
@@ -111,14 +84,14 @@ const ProtectorMypage = () => {
             <MenuText>사진 전체 다운로드</MenuText>
           </MenuItem>
           <MenuItem>
-            <MenuText>최근 식제한 사진</MenuText>
+            <MenuText>최근 삭제한 사진</MenuText>
           </MenuItem>
         </MenuSection>
 
         <MenuSection>
           <MenuTitle>설정</MenuTitle>
           <MenuItem>
-            <MenuText>그 밖에</MenuText>
+            <MenuText>글씨체</MenuText>
           </MenuItem>
         </MenuSection>
       </ScrollContainer>
@@ -126,4 +99,4 @@ const ProtectorMypage = () => {
   );
 };
 
-export default ProtectorMypage;
+export default AcquaintanceMyPage;

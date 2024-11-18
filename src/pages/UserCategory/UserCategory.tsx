@@ -9,7 +9,9 @@ import {
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import HeartIcon from '../../assets/category/heart.svg';
+
 import {RootStackParamList} from '../../navigation/MainNavigator';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
@@ -21,18 +23,20 @@ const UserCategory = () => {
   const [selectedCategory, setSelectedCategory] =
     useState<CategoryOption | null>(null);
 
-  const handleCategorySelect = (category: CategoryOption) => {
-    setSelectedCategory(category);
-    // 카테고리에 따라 다른 화면으로 이동
-    if (category === '보호자') {
-      navigation.navigate('ProtectorInfo');
-    } else if (category === '간병인') {
-      navigation.navigate('CaregiverInfo');
-    } else {
-      navigation.navigate('AcquaintanceInfo');
-    }
-  };
-
+    const handleCategorySelect = async (category: CategoryOption) => {
+      try {
+        await AsyncStorage.setItem('userType', category);  // 사용자 타입 저장
+        if (category === '보호자') {
+          navigation.navigate('ProtectorInfo');
+        } else if (category === '간병인') {
+          navigation.navigate('CaregiverInfo');
+        } else {
+          navigation.navigate('AcquaintanceInfo');
+        }
+      } catch (error) {
+        console.error('Error saving user type:', error);
+      }
+    };
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
