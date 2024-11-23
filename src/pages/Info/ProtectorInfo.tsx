@@ -197,7 +197,7 @@ const ProtectorInfo = () => {
               placeholder="예) 홍길동"
               value={formData.protectorName}
               onChangeText={text =>
-                setFormData({...formData, protectorPhone: text})
+                setFormData({...formData, protectorName: text})
               }
             />
           </InputGroup>
@@ -207,9 +207,9 @@ const ProtectorInfo = () => {
             </Label>
             <Input
               placeholder="예) 010-1234-5678"
-              value={formData.protectorName}
+              value={formData.protectorPhone}
               onChangeText={text =>
-                setFormData({...formData, protectorName: text})
+                setFormData({...formData, protectorPhone: text})
               }
             />
           </InputGroup>
@@ -217,7 +217,7 @@ const ProtectorInfo = () => {
             <Label>주소</Label>
             <Input
               placeholder="예) 경상북도 울릉군 울릉읍 독도이사부길 55"
-              value={formData.protectorName}
+              value={formData.protectorAddress}
               onChangeText={text =>
                 setFormData({...formData, protectorAddress: text})
               }
@@ -251,7 +251,7 @@ const ProtectorInfo = () => {
             </Label>
             <Input
               placeholder="예) 홍상직"
-              value={formData.protectorName}
+              value={formData.patientName}
               onChangeText={text =>
                 setFormData({...formData, patientName: text})
               }
@@ -263,7 +263,7 @@ const ProtectorInfo = () => {
             </Label>
             <Input
               placeholder="예) 88"
-              value={formData.protectorName}
+              value={formData.patientAge}
               onChangeText={text =>
                 setFormData({...formData, patientAge: text})
               }
@@ -273,7 +273,7 @@ const ProtectorInfo = () => {
             <Label>병명</Label>
             <Input
               placeholder="예) 알츠하이머, 척추손상"
-              value={formData.protectorName}
+              value={formData.disease}
               onChangeText={text => setFormData({...formData, disease: text})}
             />
           </InputGroup>
@@ -283,7 +283,7 @@ const ProtectorInfo = () => {
             </Label>
             <Input
               placeholder="예) 치매: OO병원 신경과 / 척추: XO병원 물리치료과"
-              value={formData.protectorName}
+              value={formData.hospital}
               onChangeText={text => setFormData({...formData, hospital: text})}
             />
           </InputGroup>
@@ -291,7 +291,7 @@ const ProtectorInfo = () => {
             <Label>주소 </Label>
             <Input
               placeholder="예) 서울특별시 중구 필동로1길 30 "
-              value={formData.protectorName}
+              value={formData.patientAddress}
               onChangeText={text =>
                 setFormData({...formData, patientAddress: text})
               }
