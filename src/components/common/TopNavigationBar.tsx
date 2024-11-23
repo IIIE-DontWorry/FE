@@ -31,8 +31,6 @@ function TopNavigationBar({title}: TopNavigationProps) {
     }
   };
 
-  };
-
   return (
     <Container>
       <LeftSection>
