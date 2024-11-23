@@ -1,4 +1,3 @@
-// src/store/MessageContext.js
 import React, {createContext, useState, useContext} from 'react';
 
 // Context 생성
