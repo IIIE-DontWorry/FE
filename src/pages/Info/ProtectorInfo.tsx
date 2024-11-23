@@ -69,61 +69,6 @@ const SubmitText = styled.Text`
   font-weight: bold;
 `;
 
-const ModalOverlay = styled.View`
-  flex: 1;
-  background-color: rgba(0, 0, 0, 0.5);
-  justify-content: center;
-  align-items: center;
-`;
-
-const ModalContent = styled.View`
-  background-color: #ffffff;
-  padding: 20px;
-  border-radius: 10px;
-  width: 80%;
-  align-items: center;
-`;
-
-const ModalTitle = styled.Text`
-  font-size: 18px;
-  margin-bottom: 15px;
-`;
-
-const ModalContainer = styled.View`
-  background-color: #ffffff;
-  padding: 20px;
-  border-radius: 10px;
-  width: 80%;
-  align-items: center;
-`;
-
-const CloseButtonWrapper = styled.View`
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 30px;
-  height: 30px;
-  justify-content: center;
-  align-items: center;
-`;
-
-const MatchingCode = styled.Text`
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 20px;
-`;
-
-const ModalButton = styled.TouchableOpacity`
-  background-color: #00d6a3;
-  padding: 10px 30px;
-  border-radius: 8px;
-`;
-
-const ModalButtonText = styled.Text`
-  color: #ffffff;
-  font-size: 16px;
-`;
-
 const MedicineContainer = styled.View`
   flex-direction: row;
   align-items: center;
@@ -147,29 +92,6 @@ const IconText = styled.Text`
   font-size: 20px;
 `;
 
-const CloseButton = styled.TouchableOpacity`
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 30px;
-  height: 30px;
-  justify-content: center;
-  align-items: center;
-`;
-
-const CloseButtonContainer = styled.View`
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 30px;
-  height: 30px;
-`;
-
-const CloseButtonText = styled.Text`
-  font-size: 24px;
-  color: #666;
-  text-align: center;
-`;
 
 const PickerContainer = styled.View`
   border-width: 1px;
@@ -177,6 +99,41 @@ const PickerContainer = styled.View`
   border-radius: 8px;
   background-color: #f5f5f5;
   margin-top: 5px;
+`;
+
+const MatchingCodeSection = styled(Section)`
+  background-color: #f8f8f8;
+  padding: 20px;
+  border-radius: 10px;
+  align-items: center;
+`;
+
+const MatchingCodeTitle = styled.Text`
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 15px;
+  color: #333;
+`;
+
+const MatchingCode = styled.Text`
+  font-size: 24px;
+  font-weight: bold;
+  color: #00d6a3;
+  margin-bottom: 15px;
+  letter-spacing: 2px;
+`;
+
+const CopyButton = styled.TouchableOpacity`
+  background-color: #00d6a3;
+  padding: 10px 20px;
+  border-radius: 8px;
+  flex-direction: row;
+  align-items: center;
+`;
+
+const CopyButtonText = styled.Text`
+  color: #ffffff;
+  font-size: 16px;
 `;
 
 const ProtectorInfo = () => {
@@ -215,7 +172,7 @@ const ProtectorInfo = () => {
   const copyToClipboard = async (code: string) => {
     try {
       await Clipboard.setString(code);
-      // 성공 메시지 표시
+      // 여기서 토스트 메시지나 다른 방법으로 복사 완료를 알릴 수 있습니다
     } catch (error) {
       console.error('Failed to copy to clipboard:', error);
     }
@@ -365,53 +322,21 @@ const ProtectorInfo = () => {
           </InputGroup>
         </Section>
 
-        <SubmitButton
-          onPress={
-            () => setModalVisible(true) /**이코드는 매칭 코드를 띄우는 버튼 */
-          }>
-          <SubmitText>요양사 매칭 코드 </SubmitText>
-        </SubmitButton>
-        <SubmitButton
-          onPress={
-            handleSubmit /**이코드는 작성을 완료해서 DB에 보내고 main으로 가는 버튼 */
-          }>
+        {/* 매칭 코드 Section 추가 */}
+        <MatchingCodeSection>
+          <MatchingCodeTitle>보호자 매칭 코드</MatchingCodeTitle>
+          <MatchingCode>F3Rr102A</MatchingCode>
+          <CopyButton onPress={() => copyToClipboard('F3Rr102A')}>
+            <CopyButtonText>복사하기</CopyButtonText>
+          </CopyButton>
+        </MatchingCodeSection>
+
+        {/* 작성 완료 버튼 */}
+        <SubmitButton onPress={handleSubmit}>
           <SubmitText>작성 완료</SubmitText>
         </SubmitButton>
       </ScrollContainer>
 
-      <Modal
-        animationType="fade"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}>
-        <ModalOverlay>
-          <TouchableOpacity
-            style={{
-              flex: 1,
-              width: '100%',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-            onPress={() => setModalVisible(false)}>
-            <ModalContainer>
-              <CloseButtonWrapper>
-                <TouchableOpacity onPress={() => setModalVisible(false)}>
-                  <CloseButtonText>×</CloseButtonText>
-                </TouchableOpacity>
-              </CloseButtonWrapper>
-              <ModalTitle>보호자 매칭 코드</ModalTitle>
-              <MatchingCode>F3Rr102A</MatchingCode>
-              <ModalButton
-                onPress={() => {
-                  copyToClipboard('F3Rr102A');
-                  setModalVisible(false);
-                }}>
-                <ModalButtonText>클립보드에 복사</ModalButtonText>
-              </ModalButton>
-            </ModalContainer>
-          </TouchableOpacity>
-        </ModalOverlay>
-      </Modal>
     </Container>
   );
 };
