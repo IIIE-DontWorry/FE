@@ -9,6 +9,7 @@ import MessageIcon from '../../assets/bottomnavigation/message.svg';
 import MockupImage from '../../assets/home/img_mockup.svg';
 import Heart from '../../assets/home/heart.svg';
 import Book from '../../assets/home/book.svg';
+import {useMessages} from '../../store/MessageContext';
 
 const Container = styled.ScrollView`
   flex: 1;
@@ -207,6 +208,7 @@ const Home = () => {
   const [isModalVisible, setModalVisible] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [temperature, setTemperature] = useState(30);
+  const {messages} = useMessages();
 
   useEffect(() => {
     // 예시 API 호출 (실제 API에서 데이터를 가져오는 로직을 추가해야 함)
@@ -319,13 +321,30 @@ const Home = () => {
             <MoreText>더보기 &gt;</MoreText>
           </MoreButton>
         </SectionHeader>
-        {[1, 2, 3].map((_, index) => (
-          <RecentMessageContainer key={index}>
-            <MessageAuthor>작성자</MessageAuthor>
-            <MessageText>쪽지 내용</MessageText>
-            <MessageTime>4분 전</MessageTime>
-          </RecentMessageContainer>
-        ))}
+        {messages.length === 0 ? (
+          <EmptyMessageContainer>
+            <EmptyMessageText>
+              최근 쪽지가 아직 없어요!
+            </EmptyMessageText>
+          </EmptyMessageContainer>
+        ) : (
+          messages
+            .sort((a, b) => 
+              new Date(b.date + ' ' + b.time).getTime() - 
+              new Date(a.date + ' ' + a.time).getTime()
+            )
+            .reverse()
+            .slice(0, 3)
+            .map((message) => (
+              <RecentMessageContainer key={message.id}>
+                <MessageAuthor>
+                  {message.isMe ? '나' : '간병인'}
+                </MessageAuthor>
+                <MessageText>{message.text}</MessageText>
+                <MessageTime>{message.time}</MessageTime>
+              </RecentMessageContainer>
+            ))
+        )}
       </MessageSection>
 
       {/* 이미지 확대 모달 */}

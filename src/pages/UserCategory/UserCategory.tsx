@@ -1,4 +1,4 @@
-// src/pages/UserCategory.tsx
+// src/pages/UserCategory/UserCategory.tsx
 import React, {useState} from 'react';
 import {
   View,

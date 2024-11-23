@@ -1,16 +1,30 @@
 // src/pages/Message/Message.tsx
-import React, { useState , useRef, useEffect } from 'react';
+import React, {useState} from 'react';
 import styled from 'styled-components/native';
-import { Modal, TouchableOpacity, Clipboard, ScrollView, TextInput, NativeSyntheticEvent, TextInputKeyPressEventData } from 'react-native';
+import {ScrollView, Modal, TouchableOpacity} from 'react-native';
+import {useMessages} from '../../store/MessageContext';
+import MessageBubbleComponent from '../../components/Message/MessageBubble';
+import MessageInput from '../../components/Message/MessageInput';
 
 const Container = styled.View`
   flex: 1;
-  background-color: #F8F9FA;
+  background-color: #ffffff;
 `;
 
-const ChatContainer = styled.ScrollView`
+const MessageList = styled.ScrollView`
   flex: 1;
-  padding: 20px;
+  padding: 16px;
+`;
+
+const EmptyMessageContainer = styled.View`
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+`;
+
+const EmptyMessageText = styled.Text`
+  font-size: 16px;
+  color: #888;
 `;
 
 const DateSeparator = styled.View`
@@ -24,57 +38,6 @@ const DateText = styled.Text`
   padding: 5px 10px;
   border-radius: 10px;
   font-size: 12px;
-`;
-
-const MessageRow = styled.View<{ isMe: boolean }>`
-  flex-direction: row;
-  justify-content: ${props => props.isMe ? 'flex-end' : 'flex-start'};
-  margin-bottom: 15px;
-`;
-
-const MessageBubble = styled.TouchableOpacity<{ isMe: boolean }>`
-  max-width: 70%;
-  padding: 12px 16px;
-  border-radius: 20px;
-  background-color: ${props => props.isMe ? '#00D6A3' : '#FFFFFF'};
-`;
-
-const MessageText = styled.Text<{ isMe: boolean }>`
-  color: ${props => props.isMe ? '#FFFFFF' : '#000000'};
-  font-size: 16px;
-`;
-
-const TimeText = styled.Text`
-  font-size: 12px;
-  color: #666;
-  margin-top: 5px;
-`;
-
-const InputContainer = styled.View`
-  flex-direction: row;
-  padding: 10px;
-  background-color: #FFFFFF;
-  border-top-width: 1px;
-  border-top-color: #E9ECEF;
-`;
-
-const Input = styled.TextInput`
-  flex: 1;
-  padding: 10px;
-  background-color: #F8F9FA;
-  border-radius: 20px;
-  margin-right: 10px;
-`;
-
-const SendButton = styled.TouchableOpacity`
-  justify-content: center;
-  align-items: center;
-  padding: 10px;
-`;
-
-const SendButtonText = styled.Text`
-  color: #00D6A3;
-  font-size: 16px;
 `;
 
 const ModalOverlay = styled.View`
@@ -102,193 +65,81 @@ const ModalButtonText = styled.Text`
   color: #333;
 `;
 
-interface MessageType {
-  id: number;
-  text: string;
-  isMe: boolean;
-  time: string;
-  date: string;
-}
-
+// src/pages/Message/Message.tsx
 const Message = () => {
+  const {messages, deleteMessage} = useMessages(); // deleteMessage 추가
   const [modalVisible, setModalVisible] = useState(false);
-  const [selectedMessage, setSelectedMessage] = useState<string | null>(null);
-  const [messages, setMessages] = useState<MessageType[]>([
-    {
-      id: 1,
-      text: '어르신이 오전에 약을 드셔야할 식사를 거의 안 하셨어요.',
-      isMe: false,
-      time: '오전 8:20',
-      date: '2024년 10월 17일 목요일'
-    },
-    {
-      id: 2,
-      text: '그렇군요. 그럼 저녁엔 죽으로 준비 부탁드릴게요.',
-      isMe: true,
-      time: '오전 9:05',
-      date: '2024년 10월 17일 목요일'
-    },
-    {
-      id: 3,
-      text: '오전에 손자 분들이 왔다 가셨어요.',
-      isMe: false,
-      time: '오전 8:20',
-      date: '2024년 10월 18일 목요일'
-    },
-    {
-      id: 4,
-      text: '네 별다른 일은 없었죠?',
-      isMe: true,
-      time: '오전 8:20',
-      date: '2024년 10월 18일 목요일'
-    },
-  ]);
+  const [selectedMessage, setSelectedMessage] = useState<{
+    id: number;
+    text: string;
+    isMe: boolean;
+    time: string;
+    date: string;
+  } | null>(null); // 타입 정의 추가
 
-  
-  const [isComposing, setIsComposing] = useState(false);
-  const [input, setInput] = useState('');
-  const scrollViewRef = useRef<ScrollView>(null);
-  const inputRef = useRef<TextInput>(null);
-
-  const handleLongPress = (message: string) => {
+  const handleLongPress = (message) => {
     setSelectedMessage(message);
     setModalVisible(true);
   };
 
-  const handleCopy = async () => {
-    if (selectedMessage) {
-      await Clipboard.setString(selectedMessage);
-    }
-    setModalVisible(false);
-  };
-
-  // 삭제 로직 구현
-  const handleDelete = () => {
-    if (selectedMessage) {
-      setMessages(prev => prev.filter(msg => msg.text !== selectedMessage));
-    }
-    setModalVisible(false);
-  };
-
-  // 메시지 자동 스크롤
-  useEffect(() => {
-    scrollViewRef.current?.scrollToEnd({ animated: true });
-  }, [messages]);
-
-  // 메시지 전송 함수
-  const handleSendMessage = () => {
-    if (input.trim()) {
-      const newMessage: MessageType = {
-        id: messages.length + 1,
-        text: input.trim(),
-        isMe: true,
-        time: new Date().toLocaleTimeString('ko-KR', { 
-          hour: 'numeric', 
-          minute: '2-digit',
-          hour12: true 
-        }),
-        date: new Date().toLocaleDateString('ko-KR', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-          weekday: 'long'
-        })
-      };
-
-      setMessages(prev => [...prev, newMessage]);
-      setInput('');
-    }
-  };
-
-  // 키보드 이벤트 처리
-  const handleKeyPress = (e: NativeSyntheticEvent<TextInputKeyPressEventData>) => {
-    if (e.nativeEvent.key === 'Enter') {
-      handleSendMessage();
-    }
-  };
-
-  let currentDate = '';
-
   return (
     <Container>
-      <ScrollView
-        ref={scrollViewRef}
-        onContentSizeChange={() => scrollViewRef.current?.scrollToEnd({ animated: true })}
-      >
-        {messages.map((message, index) => {
-          const showDate = index === 0 || messages[index - 1].date !== message.date;
-          
-          return (
-            <React.Fragment key={message.id}>
-              {showDate && (
-                <DateSeparator>
-                  <DateText>{message.date}</DateText>
-                </DateSeparator>
-              )}
-              <MessageRow isMe={message.isMe}>
-              <MessageBubble 
-                isMe={message.isMe} 
-                onLongPress={() => handleLongPress(message.text)}  // 길게 누르기 이벤트 추가
-              >
-                <MessageText isMe={message.isMe}>
-                  {message.text.split('\n').map((line, i) => (
-                    <React.Fragment key={i}>
-                      {line}
-                      {i !== message.text.split('\n').length - 1 && '\n'}
-                    </React.Fragment>
-                  ))}
-                </MessageText>
-                <TimeText>{message.time}</TimeText>
-              </MessageBubble>
-              </MessageRow>
-            </React.Fragment>
-          );
-        })}
-      </ScrollView>
+      {messages.length > 0 ? (
+        <>
+          <ScrollView>
+            {messages.map((message, index) => {
+              const showDate =
+                index === 0 || messages[index - 1].date !== message.date;
 
-      <InputContainer>
-        <TextInput
-          ref={inputRef}
-          value={input}
-          onChangeText={setInput}
-          placeholder="메시지를 입력해주세요."
-          multiline
-          onKeyPress={handleKeyPress}
-          style={{
-            flex: 1,
-            padding: 10,
-            backgroundColor: '#F8F9FA',
-            borderRadius: 20
-          }}
-        />
-        <SendButton onPress={handleSendMessage}>
-          <SendButtonText>전송</SendButtonText>
-        </SendButton>
-      </InputContainer>
+              return (
+                <React.Fragment key={message.id}>
+                  {showDate && (
+                    <DateSeparator>
+                      <DateText>{message.date}</DateText>
+                    </DateSeparator>
+                  )}
+                  <MessageBubbleComponent 
+                    message={message} 
+                    onLongPress={() => handleLongPress(message)}
+                  />
+                </React.Fragment>
+              );
+            })}
+          </ScrollView>
+          <MessageInput />
 
-      
-      <Modal
-        visible={modalVisible}
-        transparent={true}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <TouchableOpacity 
-          style={{flex: 1}} 
-          onPress={() => setModalVisible(false)}
-        >
-          <ModalOverlay>
-            <ModalContent>
-              <ModalButton onPress={handleCopy}>
-                <ModalButtonText>복사</ModalButtonText>
-              </ModalButton>
-              <ModalButton onPress={handleDelete}>
-                <ModalButtonText>삭제</ModalButtonText>
-              </ModalButton>
-            </ModalContent>
-          </ModalOverlay>
-        </TouchableOpacity>
-      </Modal>
-    
+          <Modal
+            visible={modalVisible}
+            transparent={true}
+            onRequestClose={() => setModalVisible(false)}
+          >
+            <TouchableOpacity 
+              style={{flex: 1}} 
+              onPress={() => setModalVisible(false)}
+            >
+              <ModalOverlay>
+                <ModalContent>
+                  <ModalButton onPress={() => {
+                    if (selectedMessage) {
+                      deleteMessage(selectedMessage.id);
+                    }
+                    setModalVisible(false);
+                  }}>
+                    <ModalButtonText>삭제</ModalButtonText>
+                  </ModalButton>
+                  <ModalButton onPress={() => setModalVisible(false)}>
+                    <ModalButtonText>취소</ModalButtonText>
+                  </ModalButton>
+                </ModalContent>
+              </ModalOverlay>
+            </TouchableOpacity>
+          </Modal>
+        </>
+      ) : (
+        <EmptyMessageContainer>
+          <EmptyMessageText>아직 작성된 메시지가 없어요!</EmptyMessageText>
+        </EmptyMessageContainer>
+      )}
     </Container>
   );
 };

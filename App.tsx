@@ -5,6 +5,7 @@ import styled from 'styled-components/native';
 import SystemNavigationBar from 'react-native-system-navigation-bar';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {ReportProvider} from './src/store/ReportContext'; // Context 추가
+import {MessageProvider} from './src/store/MessageContext'; // MessageProvider import 추가
 
 const AppContainer = styled.SafeAreaView`
   flex: 1;
@@ -21,9 +22,11 @@ const App = () => {
     <SafeAreaProvider>
       <AppContainer>
         <ReportProvider>
-          <NavigationContainer>
-            <MainNavigator />
-          </NavigationContainer>
+          <MessageProvider>
+            <NavigationContainer>
+              <MainNavigator />
+            </NavigationContainer>
+          </MessageProvider>
         </ReportProvider>
       </AppContainer>
     </SafeAreaProvider>
