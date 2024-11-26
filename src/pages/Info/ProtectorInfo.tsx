@@ -101,44 +101,10 @@ const PickerContainer = styled.View`
   margin-top: 5px;
 `;
 
-const MatchingCodeSection = styled(Section)`
-  background-color: #f8f8f8;
-  padding: 20px;
-  border-radius: 10px;
-  align-items: center;
-`;
 
-const MatchingCodeTitle = styled.Text`
-  font-size: 18px;
-  font-weight: bold;
-  margin-bottom: 15px;
-  color: #333;
-`;
-
-const MatchingCode = styled.Text`
-  font-size: 24px;
-  font-weight: bold;
-  color: #00d6a3;
-  margin-bottom: 15px;
-  letter-spacing: 2px;
-`;
-
-const CopyButton = styled.TouchableOpacity`
-  background-color: #00d6a3;
-  padding: 10px 20px;
-  border-radius: 8px;
-  flex-direction: row;
-  align-items: center;
-`;
-
-const CopyButtonText = styled.Text`
-  color: #ffffff;
-  font-size: 16px;
-`;
 
 const ProtectorInfo = () => {
   const navigation = useNavigation();
-  const [modalVisible, setModalVisible] = useState(false);
   const [medicines, setMedicines] = useState(['']); //약 목록을 배열로 관리
   const [formData, setFormData] = useState({
     protectorName: '',
@@ -167,15 +133,6 @@ const ProtectorInfo = () => {
     const newMedicines = [...medicines];
     newMedicines[index] = text;
     setMedicines(newMedicines);
-  };
-
-  const copyToClipboard = async (code: string) => {
-    try {
-      await Clipboard.setString(code);
-      // 여기서 토스트 메시지나 다른 방법으로 복사 완료를 알릴 수 있습니다
-    } catch (error) {
-      console.error('Failed to copy to clipboard:', error);
-    }
   };
 
   const handleSubmit = () => {
@@ -321,15 +278,6 @@ const ProtectorInfo = () => {
             ))}
           </InputGroup>
         </Section>
-
-        {/* 매칭 코드 Section 추가 */}
-        <MatchingCodeSection>
-          <MatchingCodeTitle>보호자 매칭 코드</MatchingCodeTitle>
-          <MatchingCode>F3Rr102A</MatchingCode>
-          <CopyButton onPress={() => copyToClipboard('F3Rr102A')}>
-            <CopyButtonText>복사하기</CopyButtonText>
-          </CopyButton>
-        </MatchingCodeSection>
 
         {/* 작성 완료 버튼 */}
         <SubmitButton onPress={handleSubmit}>

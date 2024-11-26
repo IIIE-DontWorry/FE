@@ -1,7 +1,7 @@
 // src/pages/ProtectorMyPage.tsx
 import React from 'react';
 import styled from 'styled-components/native';
-import { TouchableOpacity } from 'react-native';
+import { Clipboard,TouchableOpacity } from 'react-native';
 import TopNavigationBar from '../../components/common/TopNavigationBar';
 
 const Container = styled.View`
@@ -65,7 +65,52 @@ const MenuText = styled.Text`
   color: #333;
 `;
 
+const CodeSection = styled.View`
+  background-color: #f8f8f8;
+  padding: 20px;
+  border-radius: 10px;
+  align-items: center;
+  margin: 16px;
+`;
+
+const CodeTitle = styled.Text`
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 15px;
+  color: #333;
+`;
+
+const CodeText = styled.Text`
+  font-size: 24px;
+  font-weight: bold;
+  color: #00d6a3;
+  margin-bottom: 15px;
+  letter-spacing: 2px;
+`;
+
+const CopyButton = styled.TouchableOpacity`
+  background-color: #00d6a3;
+  padding: 10px 20px;
+  border-radius: 8px;
+  flex-direction: row;
+  align-items: center;
+`;
+
+const CopyButtonText = styled.Text`
+  color: #ffffff;
+  font-size: 16px;
+`;
+
 const ProtectorMypage = () => {
+  const copyToClipboard = async (code: string) => {
+    try {
+      await Clipboard.setString(code);
+      // 복사 완료 알림
+    } catch (error) {
+      console.error('Failed to copy to clipboard:', error);
+    }
+  };
+
   return (
     <Container>
       <TopNavigationBar title="보호자 프로필" />
@@ -77,6 +122,14 @@ const ProtectorMypage = () => {
             <ProfileContact>45세, 남{'\n'}010-0000-0000</ProfileContact>
           </ProfileInfo>
         </ProfileSection>
+
+        <CodeSection>
+          <CodeTitle>보호자 매칭 코드</CodeTitle>
+          <CodeText>F3Rr102A</CodeText>
+          <CopyButton onPress={() => copyToClipboard('F3Rr102A')}>
+            <CopyButtonText>복사하기</CopyButtonText>
+          </CopyButton>
+        </CodeSection>
 
         <MenuSection>
           <MenuTitle>보호자 관리</MenuTitle>
@@ -118,9 +171,10 @@ const ProtectorMypage = () => {
         <MenuSection>
           <MenuTitle>설정</MenuTitle>
           <MenuItem>
-            <MenuText>그 밖에</MenuText>
+            <MenuText>글씨체</MenuText>
           </MenuItem>
         </MenuSection>
+
       </ScrollContainer>
     </Container>
   );
