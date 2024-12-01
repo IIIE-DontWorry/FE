@@ -23,7 +23,6 @@ api.interceptors.response.use(
     return Promise.reject(error);
   },
 );
-
 // API 함수들
 const ApiService = {
   // GET 요청
@@ -53,6 +52,21 @@ const ApiService = {
   // DELETE 요청
   async delete<T>(url: string, headers?: object): Promise<T> {
     const response = await api.delete(url, {headers});
+    return response.data;
+  },
+
+  // DELETE 요청에 데이터 포함 가능하게 설정
+  async deleteWithBody<T>(
+    url: string,
+    data?: object,
+    headers?: object,
+  ): Promise<T> {
+    const response = await api.request({
+      method: 'DELETE',
+      url,
+      data,
+      headers,
+    });
     return response.data;
   },
 };

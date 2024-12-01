@@ -5,12 +5,11 @@ import {useNavigation} from '@react-navigation/native';
 import {useReports} from '../../store/ReportContext'; // useReports 가져오기
 import GalleryIcon from '../../assets/bottomnavigation/gallery.svg';
 import ReportIcon from '../../assets/bottomnavigation/report.svg';
-import MessageIcon from '../../assets/bottomnavigation/message.svg';
 import MockupImage from '../../assets/home/img_mockup.svg';
 import Heart from '../../assets/home/heart.svg';
 import Book from '../../assets/home/book.svg';
 import {useMessages} from '../../store/MessageContext';
-
+import RecentMessages from '../../components/Home/RecentMessages';
 const Container = styled.ScrollView`
   flex: 1;
   background-color: #ffffff;
@@ -48,14 +47,6 @@ const Triangle = styled.View`
   border-right-color: transparent;
   border-top-color: #a2d5a2;
   margin-top: 2px;
-`;
-
-const MessageSection = styled.View`
-  margin: 16px;
-  padding: 16px;
-  background-color: #f8f8f8;
-  border-radius: 10px;
-  height: 330px;
 `;
 
 const Section = styled.View`
@@ -149,31 +140,6 @@ const ItemDate = styled.Text`
 const SmallText = styled.Text`
   font-size: 10px;
   color: #444;
-  margin-top: 2px;
-`;
-
-const RecentMessageContainer = styled.View`
-  margin-top: 12px;
-  padding-bottom: 12px;
-  border-bottom-width: 1px;
-  border-bottom-color: #e0e0e0;
-`;
-
-const MessageAuthor = styled.Text`
-  font-size: 14px;
-  font-weight: bold;
-  color: #000;
-`;
-
-const MessageText = styled.Text`
-  font-size: 14px;
-  color: #444;
-  margin-top: 4px;
-`;
-
-const MessageTime = styled.Text`
-  font-size: 12px;
-  color: #888;
   margin-top: 2px;
 `;
 
@@ -309,43 +275,7 @@ const Home = () => {
       </Section>
 
       {/* 최근 쪽지 섹션 */}
-      <MessageSection>
-        <SectionHeader>
-          <SectionTitleContainer>
-            <IconContainer>
-              <MessageIcon width={18} height={18} />
-            </IconContainer>
-            <SectionTitle>최근 쪽지</SectionTitle>
-          </SectionTitleContainer>
-          <MoreButton onPress={() => navigation.navigate('Message')}>
-            <MoreText>더보기 &gt;</MoreText>
-          </MoreButton>
-        </SectionHeader>
-        {messages.length === 0 ? (
-          <EmptyMessageContainer>
-            <EmptyMessageText>
-              최근 쪽지가 아직 없어요!
-            </EmptyMessageText>
-          </EmptyMessageContainer>
-        ) : (
-          messages
-            .sort((a, b) => 
-              new Date(b.date + ' ' + b.time).getTime() - 
-              new Date(a.date + ' ' + a.time).getTime()
-            )
-            .reverse()
-            .slice(0, 3)
-            .map((message) => (
-              <RecentMessageContainer key={message.id}>
-                <MessageAuthor>
-                  {message.isMe ? '나' : '간병인'}
-                </MessageAuthor>
-                <MessageText>{message.text}</MessageText>
-                <MessageTime>{message.time}</MessageTime>
-              </RecentMessageContainer>
-            ))
-        )}
-      </MessageSection>
+      <RecentMessages />
 
       {/* 이미지 확대 모달 */}
       <Modal visible={isModalVisible} transparent={true} animationType="fade">
