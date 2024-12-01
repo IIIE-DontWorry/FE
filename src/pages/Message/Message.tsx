@@ -1,11 +1,19 @@
 // src/pages/Message/Message.tsx
-import React, { useState , useRef, useEffect } from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import styled from 'styled-components/native';
-import { Modal, TouchableOpacity, Clipboard, ScrollView, TextInput, NativeSyntheticEvent, TextInputKeyPressEventData } from 'react-native';
+import {
+  Modal,
+  TouchableOpacity,
+  Clipboard,
+  ScrollView,
+  TextInput,
+  NativeSyntheticEvent,
+  TextInputKeyPressEventData,
+} from 'react-native';
 
 const Container = styled.View`
   flex: 1;
-  background-color: #F8F9FA;
+  background-color: #f8f9fa;
 `;
 
 const ChatContainer = styled.ScrollView`
@@ -20,27 +28,29 @@ const DateSeparator = styled.View`
 
 const DateText = styled.Text`
   color: #666;
-  background-color: #E9ECEF;
+  background-color: #e9ecef;
   padding: 5px 10px;
   border-radius: 10px;
   font-size: 12px;
 `;
 
-const MessageRow = styled.View<{ isMe: boolean }>`
+const MessageRow = styled.View<{isMe: boolean}>`
   flex-direction: row;
-  justify-content: ${props => props.isMe ? 'flex-end' : 'flex-start'};
+  justify-content: ${props => (props.isMe ? 'flex-end' : 'flex-start')};
   margin-bottom: 15px;
 `;
 
-const MessageBubble = styled.TouchableOpacity<{ isMe: boolean }>`
+const MessageBubble = styled.TouchableOpacity<{isMe: boolean}>`
   max-width: 70%;
   padding: 12px 16px;
   border-radius: 20px;
-  background-color: ${props => props.isMe ? '#00D6A3' : '#FFFFFF'};
+  margin-left: 7px;
+  margin-right: 7px;
+  background-color: ${props => (props.isMe ? '#00D6A3' : '#FFFFFF')};
 `;
 
-const MessageText = styled.Text<{ isMe: boolean }>`
-  color: ${props => props.isMe ? '#FFFFFF' : '#000000'};
+const MessageText = styled.Text<{isMe: boolean}>`
+  color: ${props => (props.isMe ? '#FFFFFF' : '#000000')};
   font-size: 16px;
 `;
 
@@ -53,15 +63,15 @@ const TimeText = styled.Text`
 const InputContainer = styled.View`
   flex-direction: row;
   padding: 10px;
-  background-color: #FFFFFF;
+  background-color: #ffffff;
   border-top-width: 1px;
-  border-top-color: #E9ECEF;
+  border-top-color: #e9ecef;
 `;
 
 const Input = styled.TextInput`
   flex: 1;
   padding: 10px;
-  background-color: #F8F9FA;
+  background-color: #f8f9fa;
   border-radius: 20px;
   margin-right: 10px;
 `;
@@ -73,7 +83,7 @@ const SendButton = styled.TouchableOpacity`
 `;
 
 const SendButtonText = styled.Text`
-  color: #00D6A3;
+  color: #00d6a3;
   font-size: 16px;
 `;
 
@@ -93,7 +103,7 @@ const ModalContent = styled.View`
 const ModalButton = styled.TouchableOpacity`
   padding: 15px;
   border-bottom-width: 1px;
-  border-bottom-color: #E9ECEF;
+  border-bottom-color: #e9ecef;
 `;
 
 const ModalButtonText = styled.Text`
@@ -119,32 +129,31 @@ const Message = () => {
       text: '어르신이 오전에 약을 드셔야할 식사를 거의 안 하셨어요.',
       isMe: false,
       time: '오전 8:20',
-      date: '2024년 10월 17일 목요일'
+      date: '2024년 10월 17일 목요일',
     },
     {
       id: 2,
       text: '그렇군요. 그럼 저녁엔 죽으로 준비 부탁드릴게요.',
       isMe: true,
       time: '오전 9:05',
-      date: '2024년 10월 17일 목요일'
+      date: '2024년 10월 17일 목요일',
     },
     {
       id: 3,
       text: '오전에 손자 분들이 왔다 가셨어요.',
       isMe: false,
       time: '오전 8:20',
-      date: '2024년 10월 18일 목요일'
+      date: '2024년 10월 18일 목요일',
     },
     {
       id: 4,
       text: '네 별다른 일은 없었죠?',
       isMe: true,
       time: '오전 8:20',
-      date: '2024년 10월 18일 목요일'
+      date: '2024년 10월 18일 목요일',
     },
   ]);
 
-  
   const [isComposing, setIsComposing] = useState(false);
   const [input, setInput] = useState('');
   const scrollViewRef = useRef<ScrollView>(null);
@@ -172,7 +181,7 @@ const Message = () => {
 
   // 메시지 자동 스크롤
   useEffect(() => {
-    scrollViewRef.current?.scrollToEnd({ animated: true });
+    scrollViewRef.current?.scrollToEnd({animated: true});
   }, [messages]);
 
   // 메시지 전송 함수
@@ -182,17 +191,17 @@ const Message = () => {
         id: messages.length + 1,
         text: input.trim(),
         isMe: true,
-        time: new Date().toLocaleTimeString('ko-KR', { 
-          hour: 'numeric', 
+        time: new Date().toLocaleTimeString('ko-KR', {
+          hour: 'numeric',
           minute: '2-digit',
-          hour12: true 
+          hour12: true,
         }),
         date: new Date().toLocaleDateString('ko-KR', {
           year: 'numeric',
           month: 'long',
           day: 'numeric',
-          weekday: 'long'
-        })
+          weekday: 'long',
+        }),
       };
 
       setMessages(prev => [...prev, newMessage]);
@@ -201,7 +210,9 @@ const Message = () => {
   };
 
   // 키보드 이벤트 처리
-  const handleKeyPress = (e: NativeSyntheticEvent<TextInputKeyPressEventData>) => {
+  const handleKeyPress = (
+    e: NativeSyntheticEvent<TextInputKeyPressEventData>,
+  ) => {
     if (e.nativeEvent.key === 'Enter') {
       handleSendMessage();
     }
@@ -213,11 +224,13 @@ const Message = () => {
     <Container>
       <ScrollView
         ref={scrollViewRef}
-        onContentSizeChange={() => scrollViewRef.current?.scrollToEnd({ animated: true })}
-      >
+        onContentSizeChange={() =>
+          scrollViewRef.current?.scrollToEnd({animated: true})
+        }>
         {messages.map((message, index) => {
-          const showDate = index === 0 || messages[index - 1].date !== message.date;
-          
+          const showDate =
+            index === 0 || messages[index - 1].date !== message.date;
+
           return (
             <React.Fragment key={message.id}>
               {showDate && (
@@ -226,20 +239,20 @@ const Message = () => {
                 </DateSeparator>
               )}
               <MessageRow isMe={message.isMe}>
-              <MessageBubble 
-                isMe={message.isMe} 
-                onLongPress={() => handleLongPress(message.text)}  // 길게 누르기 이벤트 추가
-              >
-                <MessageText isMe={message.isMe}>
-                  {message.text.split('\n').map((line, i) => (
-                    <React.Fragment key={i}>
-                      {line}
-                      {i !== message.text.split('\n').length - 1 && '\n'}
-                    </React.Fragment>
-                  ))}
-                </MessageText>
-                <TimeText>{message.time}</TimeText>
-              </MessageBubble>
+                <MessageBubble
+                  isMe={message.isMe}
+                  onLongPress={() => handleLongPress(message.text)} // 길게 누르기 이벤트 추가
+                >
+                  <MessageText isMe={message.isMe}>
+                    {message.text.split('\n').map((line, i) => (
+                      <React.Fragment key={i}>
+                        {line}
+                        {i !== message.text.split('\n').length - 1 && '\n'}
+                      </React.Fragment>
+                    ))}
+                  </MessageText>
+                  <TimeText>{message.time}</TimeText>
+                </MessageBubble>
               </MessageRow>
             </React.Fragment>
           );
@@ -258,7 +271,7 @@ const Message = () => {
             flex: 1,
             padding: 10,
             backgroundColor: '#F8F9FA',
-            borderRadius: 20
+            borderRadius: 20,
           }}
         />
         <SendButton onPress={handleSendMessage}>
@@ -266,16 +279,13 @@ const Message = () => {
         </SendButton>
       </InputContainer>
 
-      
       <Modal
         visible={modalVisible}
         transparent={true}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <TouchableOpacity 
-          style={{flex: 1}} 
-          onPress={() => setModalVisible(false)}
-        >
+        onRequestClose={() => setModalVisible(false)}>
+        <TouchableOpacity
+          style={{flex: 1}}
+          onPress={() => setModalVisible(false)}>
           <ModalOverlay>
             <ModalContent>
               <ModalButton onPress={handleCopy}>
@@ -288,7 +298,6 @@ const Message = () => {
           </ModalOverlay>
         </TouchableOpacity>
       </Modal>
-    
     </Container>
   );
 };

@@ -5,7 +5,7 @@ const Container = styled.View`
   flex: 1;
   justify-content: center;
   align-items: center;
-  background-color: #ffffff;
+  background-color: #f8f9fa;
 `;
 
 const Text = styled.Text`

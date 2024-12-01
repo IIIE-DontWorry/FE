@@ -222,10 +222,24 @@ const ProtectorInfo = () => {
   };
 
   const handleSubmit = () => {
-    // DB 저장 로직
     // 일단 메인페이지로 이동
     navigation.navigate('Main');
   };
+
+  // 카카오 로그인 로직
+  // const handleSubmit = async () => {
+  //   try {
+  //     const response = await axios.post(
+  //       `http://{베이스url}/${userType}/login`,
+  //       formData,
+  //       {headers: {Authorization: `Bearer ${accessToken}`}},
+  //     );
+  //     Alert.alert('회원가입 성공', '로그인되었습니다.');
+  //     navigation.navigate('Main');
+  //   } catch (error) {
+  //     Alert.alert('에러', '회원가입 중 문제가 발생했습니다.');
+  //   }
+  // };
 
   return (
     <Container>

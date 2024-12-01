@@ -22,7 +22,7 @@ const Landing = () => {
 
   // const handleKakaoLogin = () => {
   //   const clientId = '77570be15ef8457bbb27ffc965017a74'; // 카카오 REST API 키
-  //   const redirectUri = 'http://{베이스url}/callback'; // 콜백 URL
+  //   const redirectUri = 'http://localhost:8081//callback'; // 콜백 URL
   //   const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code`;
 
   //   // 카카오 로그인 URL로 리다이렉트

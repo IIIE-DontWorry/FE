@@ -18,8 +18,8 @@ function TopNavigationBar({title}: TopNavigationProps) {
   const handleProfilePress = async () => {
     try {
       const userType = await AsyncStorage.getItem('userType');
-      
-      switch(userType) {
+
+      switch (userType) {
         case '보호자':
           navigation.navigate('ProtectorMypage');
           break;
