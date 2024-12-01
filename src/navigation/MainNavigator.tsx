@@ -23,8 +23,12 @@ export type RootStackParamList = {
   Landing: undefined;
   Main: undefined;
   UserCategory: undefined;
-  ProtectorInfo: undefined;
-  CaregiverInfo: undefined;
+  ProtectorInfo: {
+    scrollTo?: 'patientInfo' | 'medicineInfo';
+  } | undefined;
+  CaregiverInfo: {
+    readOnly?: boolean;
+  } | undefined;
   AcquaintanceInfo: undefined;
   ReportCreate: undefined;
   ReportDetail: undefined;

@@ -1,4 +1,3 @@
-// src/pages/UserCategory.tsx
 import React, {useState} from 'react';
 import {
   View,
@@ -9,34 +8,30 @@ import {
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useUser} from '../../store/UserContext';
 import HeartIcon from '../../assets/category/heart.svg';
-
 import {RootStackParamList} from '../../navigation/MainNavigator';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
-
 type CategoryOption = '보호자' | '간병인' | '지인';
 
 const UserCategory = () => {
   const navigation = useNavigation<NavigationProp>();
+  const {setUserType} = useUser();
   const [selectedCategory, setSelectedCategory] =
     useState<CategoryOption | null>(null);
 
-    const handleCategorySelect = async (category: CategoryOption) => {
-      try {
-        await AsyncStorage.setItem('userType', category);  // 사용자 타입 저장
-        if (category === '보호자') {
-          navigation.navigate('ProtectorInfo');
-        } else if (category === '간병인') {
-          navigation.navigate('CaregiverInfo');
-        } else {
-          navigation.navigate('AcquaintanceInfo');
-        }
-      } catch (error) {
-        console.error('Error saving user type:', error);
-      }
-    };
+  const handleCategorySelect = (category: CategoryOption) => {
+    setUserType(category);
+    
+    if (category === '보호자') {
+      navigation.navigate('ProtectorInfo');
+    } else if (category === '간병인') {
+      navigation.navigate('CaregiverInfo');
+    } else {
+      navigation.navigate('AcquaintanceInfo');
+    }
+  };
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
