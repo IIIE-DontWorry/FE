@@ -1,3 +1,4 @@
+// src/pages/ProtectorInfo.tsx
 import React, {useState} from 'react';
 import styled from 'styled-components/native';
 import {
@@ -13,8 +14,6 @@ import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RootStackParamList} from '../../navigation/MainNavigator';
 import {useUser} from '../../store/UserContext';
-import {useRef, useEffect} from 'react';
-import {useRoute, RouteProp} from '@react-navigation/native';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -49,9 +48,9 @@ const Required = styled.Text`
   color: red;
 `;
 
-const Input = styled.TextInput<{hasError?: boolean}>`
+const Input = styled.TextInput<{ hasError?: boolean }>`
   border-width: 1px;
-  border-color: ${props => (props.hasError ? '#ff0000' : '#dddddd')};
+  border-color: ${props => props.hasError ? '#ff0000' : '#dddddd'};
   border-radius: 8px;
   padding: 10px;
   background-color: #f5f5f5;
@@ -94,9 +93,10 @@ const IconText = styled.Text`
   font-size: 20px;
 `;
 
-const PickerContainer = styled.View<{hasError?: boolean}>`
+
+const PickerContainer = styled.View<{ hasError?: boolean }>`
   border-width: 1px;
-  border-color: ${props => (props.hasError ? '#ff0000' : '#dddddd')};
+  border-color: ${props => props.hasError ? '#ff0000' : '#dddddd'};
   border-radius: 8px;
   background-color: #f5f5f5;
   margin-top: 5px;
@@ -109,7 +109,7 @@ const validations = {
     const phoneRegex = /^010-\d{4}-\d{4}$/;
     return phoneRegex.test(value);
   },
-
+  
   // 이름: 2~5글자 한글
   name: (value: string) => {
     const nameRegex = /^[가-힣]{2,5}$/;
@@ -130,7 +130,7 @@ const validations = {
   // 병원: 최소 2글자 이상
   hospital: (value: string) => {
     return value.trim().length >= 2;
-  },
+  }
 };
 
 // 에러 메시지
@@ -140,7 +140,7 @@ const errorMessages = {
   age: '1~150 사이의 숫자를 입력해주세요',
   address: '최소 10글자 이상 입력해주세요',
   hospital: '최소 2글자 이상 입력해주세요',
-  required: '필수 입력 항목입니다',
+  required: '필수 입력 항목입니다'
 };
 
 // 입력 필드 컴포넌트에 에러 표시 추가
@@ -170,17 +170,8 @@ interface FormData {
 // 필드 이름에 대한 타입 정의
 type FormField = keyof FormData;
 
-const ProtectorInfo = () => {
-  const scrollViewRef = useRef<ScrollView>(null);
-  const route = useRoute<RouteProp<RootStackParamList, 'ProtectorInfo'>>();
 
-  useEffect(() => {
-    if (route.params?.scrollTo === 'patientInfo') {
-      scrollViewRef.current?.scrollTo({y: 500, animated: true});
-    } else if (route.params?.scrollTo === 'medicineInfo') {
-      scrollViewRef.current?.scrollTo({y: 1200, animated: true});
-    }
-  }, [route.params?.scrollTo]);
+const ProtectorInfo = () => {
   const navigation = useNavigation();
   const [medicines, setMedicines] = useState(['']); //약 목록을 배열로 관리
   const [formData, setFormData] = useState<FormData>({
@@ -215,35 +206,26 @@ const ProtectorInfo = () => {
   };
 
   const validateField = (name: FormField, value: string): string => {
-    if (
-      !value &&
-      name !== 'protectorAddress' &&
-      name !== 'patientAddress' &&
-      name !== 'disease'
-    ) {
+    if (!value && name !== 'protectorAddress'&& name !== 'patientAddress' && name !== 'disease') {
       return errorMessages.required;
     }
 
     switch (name) {
       case 'protectorPhone':
         return validations.phone(value) ? '' : errorMessages.phone;
-
+      
       case 'protectorName':
-
+        
       case 'patientName':
         return validations.name(value) ? '' : errorMessages.name;
-
+      
       case 'patientAge':
         return validations.age(value) ? '' : errorMessages.age;
-
+      
       case 'protectorAddress':
       case 'patientAddress':
-        return value
-          ? validations.address(value)
-            ? ''
-            : errorMessages.address
-          : '';
-
+        return value ? (validations.address(value) ? '' : errorMessages.address) : '';
+      
       case 'hospital':
         return validations.hospital(value) ? '' : errorMessages.hospital;
       default:
@@ -260,7 +242,7 @@ const ProtectorInfo = () => {
   const handleSubmit = () => {
     // 전체 폼 유효성 검사
     const newErrors: Partial<Record<FormField, string>> = {};
-
+    
     (Object.keys(formData) as FormField[]).forEach(key => {
       const error = validateField(key, formData[key]);
       if (error) newErrors[key] = error;
@@ -270,32 +252,14 @@ const ProtectorInfo = () => {
 
     // 에러가 없으면 제출
     if (Object.keys(newErrors).length === 0) {
-      setProtectorData(formData); // Context에 데이터 저장
+      setProtectorData(formData);  // Context에 데이터 저장
       navigation.navigate('Main');
     }
   };
 
-  // 카카오 로그인 로직
-  // const handleSubmit = async () => {
-  //   try {
-  //     const response = await axios.post(
-  //       `http://{베이스url}/${userType}/login`,
-  //       formData,
-  //       {headers: {Authorization: `Bearer ${accessToken}`}},
-  //     );
-  //     Alert.alert('회원가입 성공', '로그인되었습니다.');
-  //     navigation.navigate('Main');
-  //   } catch (error) {
-  //     Alert.alert('에러', '회원가입 중 문제가 발생했습니다.');
-  //   }
-  // };
-
   return (
     <Container>
-      <ScrollView
-        ref={scrollViewRef}
-        style={{flex: 1}}
-        contentContainerStyle={{padding: 16}}>
+      <ScrollContainer>
         <Section>
           <SectionTitle>보호자 정보</SectionTitle>
           <InputGroup>
@@ -319,7 +283,7 @@ const ProtectorInfo = () => {
             <Input
               placeholder="예) 010-1234-5678"
               value={formData.protectorPhone}
-              onChangeText={text => handleChange('protectorPhone', text)}
+              onChangeText={text =>  handleChange('protectorPhone', text)}
               hasError={!!errors.protectorPhone}
             />
             {errors.protectorPhone && (
@@ -339,27 +303,27 @@ const ProtectorInfo = () => {
             )}
           </InputGroup>
           <InputGroup>
-            <Label>
-              환자와의 관계 <Required>*</Required>
-            </Label>
-            <PickerContainer hasError={!!errors.relationship}>
-              <Picker
-                selectedValue={formData.relationship}
-                onValueChange={(value: string) =>
-                  handleChange('relationship', value)
-                }>
-                <Picker.Item label="선택해주세요" value="" />
-                <Picker.Item label="부" value="father" />
-                <Picker.Item label="모" value="mother" />
-                <Picker.Item label="자녀" value="child" />
-                <Picker.Item label="형제/자매" value="sibling" />
-                <Picker.Item label="기타" value="other" />
-              </Picker>
-            </PickerContainer>
-            {errors.relationship && (
-              <ErrorText>{errors.relationship}</ErrorText>
-            )}
-          </InputGroup>
+          <Label>
+            환자와의 관계 <Required>*</Required>
+          </Label>
+          <PickerContainer hasError={!!errors.relationship}>
+            <Picker
+              selectedValue={formData.relationship}
+              onValueChange={(value: string) =>
+                handleChange('relationship', value)
+              }>
+              <Picker.Item label="선택해주세요" value="" />
+              <Picker.Item label="부" value="father" />
+              <Picker.Item label="모" value="mother" />
+              <Picker.Item label="자녀" value="child" />
+              <Picker.Item label="형제/자매" value="sibling" />
+              <Picker.Item label="기타" value="other" />
+            </Picker>
+          </PickerContainer>
+          {errors.relationship && (
+            <ErrorText>{errors.relationship}</ErrorText>
+          )}
+        </InputGroup>
         </Section>
 
         <Section>
@@ -374,7 +338,9 @@ const ProtectorInfo = () => {
               onChangeText={text => handleChange('patientName', text)}
               hasError={!!errors.patientName}
             />
-            {errors.patientName && <ErrorText>{errors.patientName}</ErrorText>}
+            {errors.patientName && (
+              <ErrorText>{errors.patientName}</ErrorText>
+            )}
           </InputGroup>
           <InputGroup>
             <Label>
@@ -386,7 +352,9 @@ const ProtectorInfo = () => {
               onChangeText={text => handleChange('patientAge', text)}
               hasError={!!errors.patientAge}
             />
-            {errors.patientAge && <ErrorText>{errors.patientAge}</ErrorText>}
+            {errors.patientAge && (
+              <ErrorText>{errors.patientAge}</ErrorText>
+            )}
           </InputGroup>
           <InputGroup>
             <Label>병명</Label>
@@ -396,7 +364,9 @@ const ProtectorInfo = () => {
               onChangeText={text => handleChange('disease', text)}
               hasError={!!errors.disease}
             />
-            {errors.disease && <ErrorText>{errors.disease}</ErrorText>}
+            {errors.disease && (
+              <ErrorText>{errors.disease}</ErrorText>
+            )}
           </InputGroup>
           <InputGroup>
             <Label>
@@ -408,10 +378,12 @@ const ProtectorInfo = () => {
               onChangeText={text => handleChange('hospital', text)}
               hasError={!!errors.hospital}
             />
-            {errors.hospital && <ErrorText>{errors.hospital}</ErrorText>}
+            {errors.hospital && (
+              <ErrorText>{errors.hospital}</ErrorText>
+            )}
           </InputGroup>
           <InputGroup>
-            <Label>주소 </Label>
+            <Label>주소 </Label> 
             <Input
               placeholder="예) 서울특별시 중구 필동로1길 30 "
               value={formData.patientAddress}
@@ -423,7 +395,9 @@ const ProtectorInfo = () => {
             )}
           </InputGroup>
           <InputGroup>
-            <Label>투약 정보</Label>
+            <Label>
+              투약 정보
+            </Label>
             {medicines.map((medicine, index) => (
               <MedicineContainer key={index}>
                 <MedicineInput
@@ -449,7 +423,8 @@ const ProtectorInfo = () => {
         <SubmitButton onPress={handleSubmit}>
           <SubmitText>작성 완료</SubmitText>
         </SubmitButton>
-      </ScrollView>
+      </ScrollContainer>
+
     </Container>
   );
 };

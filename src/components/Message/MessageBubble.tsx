@@ -13,7 +13,7 @@ const Bubble = styled.TouchableOpacity<{isMe: boolean}>`
   max-width: 70%;
   padding: 12px 16px;
   border-radius: 20px;
-  background-color: ${props => (props.isMe ? '#00D6A3' : '#FFFFFF')};
+  background-color: ${props => (props.isMe ? '#00D6A3' : '#f8f8f8')};
 `;
 
 const MessageText = styled.Text<{isMe: boolean}>`
