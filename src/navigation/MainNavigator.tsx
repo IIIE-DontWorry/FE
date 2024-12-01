@@ -21,6 +21,10 @@ import ViewProtectorProfile from '../pages/ProtectorDo/ViewProtectorProfile';
 import EditProtectorProfile from '../pages/ProtectorDo/EditProtectorProfile';
 import ViewCaregiverProfile from '../pages/ProtectorDo/ViewCaregiverProfile';
 import DeleteProtectorAccount from '../pages/ProtectorDo/DeleteProtectorAccount';
+import Caregiver_ViewCaregiverProfile from'../pages/CaregiverDo/ViewCaregiverProfile';
+import Caregiver_ViewProtectorProfile from'../pages/CaregiverDo/ViewProtectorProfile';
+import EditCaregiverProfile from'../pages/CaregiverDo/EditCaregiverProfile';
+import DeleteCaregiverAccount from'../pages/CaregiverDo/DeleteCaregiverAccount';
 
 import GalleryCreate from '../pages/Gallery/GalleryCreate';
 // RootStackParamList 타입 정의
@@ -34,6 +38,10 @@ export type RootStackParamList = {
   ViewCaregiverProfile: undefined;
   DeleteProtectorAccount: undefined;
   CaregiverInfo: undefined;
+  Caregiver_ViewCaregiverProfile: undefined;
+  Caregiver_ViewProtectorProfile: undefined;
+  EditCaregiverProfile: undefined;
+  DeleteCaregiverAccount: undefined;
   AcquaintanceInfo: undefined;
   ReportCreate: undefined;
   ReportDetail: undefined;
@@ -74,6 +82,10 @@ const MainNavigator = () => {
       <Stack.Screen name="EditProtectorProfile" component={EditProtectorProfile} />
       <Stack.Screen name="DeleteProtectorAccount" component={DeleteProtectorAccount} />
       <Stack.Screen name="CaregiverInfo" component={CaregiverInfo} />
+      <Stack.Screen name="Caregiver_ViewCaregiverProfile" component={Caregiver_ViewCaregiverProfile} />
+      <Stack.Screen name="Caregiver_ViewProtectorProfile" component={Caregiver_ViewProtectorProfile} />
+      <Stack.Screen name="EditCaregiverProfile" component={EditCaregiverProfile} />
+      <Stack.Screen name="DeleteCaregiverAccount" component={DeleteCaregiverAccount} />
       <Stack.Screen name="AcquaintanceInfo" component={AcquaintanceInfo} />
       <Stack.Screen name="Callback" component={Callback} />
       <Stack.Screen name="ProtectorMypage" component={ProtectorMypage} />

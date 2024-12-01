@@ -2,6 +2,12 @@ import React from 'react';
 import styled from 'styled-components/native';
 import {TouchableOpacity} from 'react-native';
 import TopNavigationBar from '../../components/common/TopNavigationBar';
+import {useNavigation} from '@react-navigation/native';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {RootStackParamList} from '../../navigation/MainNavigator';
+import ApiService from '../../utils/api';
+
+type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 const Container = styled.View`
   flex: 1;
@@ -65,6 +71,7 @@ const MenuText = styled.Text`
 `;
 
 const CaregiverMyPage = () => {
+  const navigation = useNavigation<NavigationProp>();
   return (
     <Container>
       <TopNavigationBar title="간병인 프로필" />
@@ -78,29 +85,19 @@ const CaregiverMyPage = () => {
         </ProfileSection>
 
         <MenuSection>
-          <MenuTitle>보호자 관리</MenuTitle>
-          <MenuItem>
-            <MenuText>보호자 프로필</MenuText>
-          </MenuItem>
-        </MenuSection>
-
-        <MenuSection>
           <MenuTitle>간병인 관리</MenuTitle>
-          <MenuItem>
-            <MenuText>간병인 프로필</MenuText>
+          <MenuItem onPress={() => navigation.navigate('Caregiver_ViewCaregiverProfile')}>
+            <MenuText>간병인 프로필 조회</MenuText>
           </MenuItem>
-          <MenuItem>
-            <MenuText>간병인 계약 해지</MenuText>
+          <MenuItem onPress={() => navigation.navigate('EditCaregiverProfile')}>
+            <MenuText>간병인 프로필 수정</MenuText>
           </MenuItem>
         </MenuSection>
 
         <MenuSection>
-          <MenuTitle>환자 관리</MenuTitle>
-          <MenuItem>
-            <MenuText>환자 프로필</MenuText>
-          </MenuItem>
-          <MenuItem>
-            <MenuText>약 수정</MenuText>
+          <MenuTitle>보호자와 환자 관리</MenuTitle>
+          <MenuItem onPress={() => navigation.navigate('Caregiver_ViewProtectorProfile')}>
+            <MenuText>보호자와 환자 프로필 조회</MenuText>
           </MenuItem>
         </MenuSection>
 
@@ -118,6 +115,9 @@ const CaregiverMyPage = () => {
           <MenuTitle>설정</MenuTitle>
           <MenuItem>
             <MenuText>글씨체</MenuText>
+          </MenuItem>
+          <MenuItem onPress={() => navigation.navigate('DeleteCaregiverAccount')}>
+            <MenuText>계정 탈퇴</MenuText>
           </MenuItem>
         </MenuSection>
       </ScrollContainer>
