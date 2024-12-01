@@ -34,16 +34,6 @@ export type RootStackParamList = {
   ViewCaregiverProfile: undefined;
   DeleteProtectorAccount: undefined;
   CaregiverInfo: undefined;
-  ProtectorInfo:
-    | {
-        scrollTo?: 'patientInfo' | 'medicineInfo';
-      }
-    | undefined;
-  CaregiverInfo:
-    | {
-        readOnly?: boolean;
-      }
-    | undefined;
   AcquaintanceInfo: undefined;
   ReportCreate: undefined;
   ReportDetail: undefined;
