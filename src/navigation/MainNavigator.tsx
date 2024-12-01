@@ -17,18 +17,22 @@ import Callback from '../pages/Auth/Callback';
 import ProtectorMypage from '../pages/Mypage/ProtectorMyPage';
 import CaregiverMypage from '../pages/Mypage/CaregiverMypage';
 import AcquaintanceMypage from '../pages/Mypage/AcquaintanceMypage';
+import ViewProtectorProfile from '../pages/ProtectorDo/ViewProtectorProfile';
+import EditProtectorProfile from '../pages/ProtectorDo/EditProtectorProfile';
+import ViewCaregiverProfile from '../pages/ProtectorDo/ViewCaregiverProfile';
+import DeleteProtectorAccount from '../pages/ProtectorDo/DeleteProtectorAccount';
 
 // RootStackParamList 타입 정의
 export type RootStackParamList = {
   Landing: undefined;
   Main: undefined;
   UserCategory: undefined;
-  ProtectorInfo: {
-    scrollTo?: 'patientInfo' | 'medicineInfo';
-  } | undefined;
-  CaregiverInfo: {
-    readOnly?: boolean;
-  } | undefined;
+  ProtectorInfo: undefined;
+  ViewProtectorProfile: undefined;
+  EditProtectorProfile: undefined;
+  ViewCaregiverProfile: undefined;
+  DeleteProtectorAccount: undefined;
+  CaregiverInfo: undefined;
   AcquaintanceInfo: undefined;
   ReportCreate: undefined;
   ReportDetail: undefined;
@@ -62,6 +66,10 @@ const MainNavigator = () => {
       <Stack.Screen name="ReportDetail" component={ReportDetail} />
       <Stack.Screen name="ReportUpdate" component={ReportUpdate} />
       <Stack.Screen name="ProtectorInfo" component={ProtectorInfo} />
+      <Stack.Screen name="ViewProtectorProfile" component={ViewProtectorProfile} />
+      <Stack.Screen name="ViewCaregiverProfile" component={ViewCaregiverProfile} />
+      <Stack.Screen name="EditProtectorProfile" component={EditProtectorProfile} />
+      <Stack.Screen name="DeleteProtectorAccount" component={DeleteProtectorAccount} />
       <Stack.Screen name="CaregiverInfo" component={CaregiverInfo} />
       <Stack.Screen name="AcquaintanceInfo" component={AcquaintanceInfo} />
       <Stack.Screen name="Callback" component={Callback} />
