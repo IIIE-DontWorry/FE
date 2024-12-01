@@ -1,4 +1,3 @@
-// src/pages/ProtectorInfo.tsx
 import React, {useState} from 'react';
 import styled from 'styled-components/native';
 import {
@@ -14,6 +13,8 @@ import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RootStackParamList} from '../../navigation/MainNavigator';
 import {useUser} from '../../store/UserContext';
+import {useRef, useEffect} from 'react';
+import { useRoute, RouteProp } from '@react-navigation/native';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -172,6 +173,16 @@ type FormField = keyof FormData;
 
 
 const ProtectorInfo = () => {
+  const scrollViewRef = useRef<ScrollView>(null);
+  const route = useRoute<RouteProp<RootStackParamList, 'ProtectorInfo'>>();
+
+  useEffect(() => {
+    if (route.params?.scrollTo === 'patientInfo') {
+      scrollViewRef.current?.scrollTo({ y: 500, animated: true });
+    } else if (route.params?.scrollTo === 'medicineInfo') {
+      scrollViewRef.current?.scrollTo({ y: 1200, animated: true });
+    }
+  }, [route.params?.scrollTo]);
   const navigation = useNavigation();
   const [medicines, setMedicines] = useState(['']); //약 목록을 배열로 관리
   const [formData, setFormData] = useState<FormData>({
@@ -259,7 +270,11 @@ const ProtectorInfo = () => {
 
   return (
     <Container>
-      <ScrollContainer>
+      <ScrollView 
+        ref={scrollViewRef}
+        style={{flex: 1}}
+        contentContainerStyle={{padding: 16}}
+      >
         <Section>
           <SectionTitle>보호자 정보</SectionTitle>
           <InputGroup>
@@ -423,7 +438,7 @@ const ProtectorInfo = () => {
         <SubmitButton onPress={handleSubmit}>
           <SubmitText>작성 완료</SubmitText>
         </SubmitButton>
-      </ScrollContainer>
+      </ScrollView>
 
     </Container>
   );

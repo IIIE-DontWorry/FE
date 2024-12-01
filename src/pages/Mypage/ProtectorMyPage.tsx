@@ -3,6 +3,12 @@ import React from 'react';
 import styled from 'styled-components/native';
 import { Clipboard,TouchableOpacity } from 'react-native';
 import TopNavigationBar from '../../components/common/TopNavigationBar';
+import {useUser} from '../../store/UserContext';
+import {useNavigation} from '@react-navigation/native';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {RootStackParamList} from '../../navigation/MainNavigator';
+
+type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 const Container = styled.View`
   flex: 1;
@@ -102,6 +108,8 @@ const CopyButtonText = styled.Text`
 `;
 
 const ProtectorMypage = () => {
+  const navigation = useNavigation<NavigationProp>();
+  const {protectorData} = useUser();
   const copyToClipboard = async (code: string) => {
     try {
       await Clipboard.setString(code);
@@ -118,8 +126,10 @@ const ProtectorMypage = () => {
         <ProfileSection>
           <ProfileImage />
           <ProfileInfo>
-            <ProfileName>장효제</ProfileName>
-            <ProfileContact>45세, 남{'\n'}010-0000-0000</ProfileContact>
+            <ProfileName>{protectorData?.protectorName || '이름 없음'}</ProfileName>
+            <ProfileContact>
+            {protectorData ? `${protectorData.patientName}환자(${protectorData.patientAge}세)의 ${protectorData.relationship} \n${protectorData.protectorPhone}` : '정보 없음'}
+            </ProfileContact>
           </ProfileInfo>
         </ProfileSection>
 
@@ -133,27 +143,36 @@ const ProtectorMypage = () => {
 
         <MenuSection>
           <MenuTitle>보호자 관리</MenuTitle>
-          <MenuItem>
+          <MenuItem onPress={() => navigation.navigate('ProtectorInfo')}>
             <MenuText>보호자 프로필</MenuText>
           </MenuItem>
         </MenuSection>
 
         <MenuSection>
           <MenuTitle>간병인 관리</MenuTitle>
-          <MenuItem>
+          <MenuItem onPress={() => 
+            navigation.navigate('CaregiverInfo', { readOnly: true })
+          }>
             <MenuText>간병인 프로필</MenuText>
           </MenuItem>
+          {/*
           <MenuItem>
-            <MenuText>간병인 평고</MenuText>
+           기능 구현 질문 없으면 지우고 
+            <MenuText>간병인 평가</MenuText>
           </MenuItem>
+          */}
         </MenuSection>
 
         <MenuSection>
           <MenuTitle>환자 관리</MenuTitle>
-          <MenuItem>
+          <MenuItem onPress={() => 
+            navigation.navigate('ProtectorInfo', { scrollTo: 'patientInfo' })
+          }>
             <MenuText>환자 프로필</MenuText>
           </MenuItem>
-          <MenuItem>
+          <MenuItem onPress={() => 
+            navigation.navigate('ProtectorInfo', { scrollTo: 'medicineInfo' })
+          }>
             <MenuText>약 수정</MenuText>
           </MenuItem>
         </MenuSection>
@@ -164,7 +183,7 @@ const ProtectorMypage = () => {
             <MenuText>사진 전체 다운로드</MenuText>
           </MenuItem>
           <MenuItem>
-            <MenuText>최근 식제한 사진</MenuText>
+            <MenuText>최근 삭제한 사진</MenuText>
           </MenuItem>
         </MenuSection>
 
