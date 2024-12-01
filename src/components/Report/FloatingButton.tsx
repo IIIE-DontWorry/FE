@@ -1,7 +1,7 @@
 import React from 'react';
-import {TouchableOpacity} from 'react-native'; // 정확한 임포트
+import {TouchableOpacity} from 'react-native'; 
 import styled from 'styled-components/native';
-import BtnFloating from '../../assets/report/btn_floating.svg'; // SVG 파일 임포트
+import BtnFloating from '../../assets/report/btn_floating.svg'; 
 
 const FloatingButtonContainer = styled(TouchableOpacity)`
   position: absolute;

@@ -16,7 +16,7 @@ function TopNavigationBar({title}: TopNavigationProps) {
   const {userType} = useUser();
 
   const handleProfilePress = () => {
-    switch(userType) {
+    switch (userType) {
       case '보호자':
         navigation.navigate('ProtectorMypage');
         break;

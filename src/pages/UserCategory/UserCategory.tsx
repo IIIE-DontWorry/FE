@@ -23,7 +23,7 @@ const UserCategory = () => {
 
   const handleCategorySelect = (category: CategoryOption) => {
     setUserType(category);
-    
+
     if (category === '보호자') {
       navigation.navigate('ProtectorInfo');
     } else if (category === '간병인') {

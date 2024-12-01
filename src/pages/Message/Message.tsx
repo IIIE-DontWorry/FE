@@ -5,7 +5,25 @@ import {ScrollView, Modal, TouchableOpacity} from 'react-native';
 import {useMessages} from '../../store/MessageContext';
 import MessageBubbleComponent from '../../components/Message/MessageBubble';
 import MessageInput from '../../components/Message/MessageInput';
+import ApiService from '../../utils/api';
 
+const fetchUserData = async () => {
+  try {
+    const userData = await ApiService.get('/notes/latest');
+    console.log('User Data:', userData);
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+  }
+};
+
+const submitForm = async (formData: object) => {
+  try {
+    const response = await ApiService.post('/notes', formData);
+    console.log('Form Submission Response:', response);
+  } catch (error) {
+    console.error('Error submitting form:', error);
+  }
+};
 const Container = styled.View`
   flex: 1;
   background-color: #ffffff;
@@ -34,7 +52,7 @@ const DateSeparator = styled.View`
 
 const DateText = styled.Text`
   color: #666;
-  background-color: #E9ECEF;
+  background-color: #e9ecef;
   padding: 5px 10px;
   border-radius: 10px;
   font-size: 12px;
@@ -56,7 +74,7 @@ const ModalContent = styled.View`
 const ModalButton = styled.TouchableOpacity`
   padding: 15px;
   border-bottom-width: 1px;
-  border-bottom-color: #E9ECEF;
+  border-bottom-color: #e9ecef;
 `;
 
 const ModalButtonText = styled.Text`
@@ -77,7 +95,7 @@ const Message = () => {
     date: string;
   } | null>(null); // 타입 정의 추가
 
-  const handleLongPress = (message) => {
+  const handleLongPress = message => {
     setSelectedMessage(message);
     setModalVisible(true);
   };
@@ -98,8 +116,8 @@ const Message = () => {
                       <DateText>{message.date}</DateText>
                     </DateSeparator>
                   )}
-                  <MessageBubbleComponent 
-                    message={message} 
+                  <MessageBubbleComponent
+                    message={message}
                     onLongPress={() => handleLongPress(message)}
                   />
                 </React.Fragment>
@@ -111,20 +129,19 @@ const Message = () => {
           <Modal
             visible={modalVisible}
             transparent={true}
-            onRequestClose={() => setModalVisible(false)}
-          >
-            <TouchableOpacity 
-              style={{flex: 1}} 
-              onPress={() => setModalVisible(false)}
-            >
+            onRequestClose={() => setModalVisible(false)}>
+            <TouchableOpacity
+              style={{flex: 1}}
+              onPress={() => setModalVisible(false)}>
               <ModalOverlay>
                 <ModalContent>
-                  <ModalButton onPress={() => {
-                    if (selectedMessage) {
-                      deleteMessage(selectedMessage.id);
-                    }
-                    setModalVisible(false);
-                  }}>
+                  <ModalButton
+                    onPress={() => {
+                      if (selectedMessage) {
+                        deleteMessage(selectedMessage.id);
+                      }
+                      setModalVisible(false);
+                    }}>
                     <ModalButtonText>삭제</ModalButtonText>
                   </ModalButton>
                   <ModalButton onPress={() => setModalVisible(false)}>

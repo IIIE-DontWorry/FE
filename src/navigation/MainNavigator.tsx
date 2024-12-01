@@ -14,7 +14,7 @@ import ReportDetail from '../pages/Report/ReportDetail';
 import ReportCreate from '../pages/Report/ReportCreate';
 import ReportUpdate from '../pages/Report/ReportUpdate';
 import Callback from '../pages/Auth/Callback';
-import ProtectorMypage from '../pages/Mypage/ProtectorMypage';
+import ProtectorMypage from '../pages/Mypage/ProtectorMyPage';
 import CaregiverMypage from '../pages/Mypage/CaregiverMypage';
 import AcquaintanceMypage from '../pages/Mypage/AcquaintanceMypage';
 
@@ -38,9 +38,9 @@ export type RootStackParamList = {
   Report: undefined;
   Message: undefined;
   Callback: {code: string} | undefined; // Callback 추가
-  ProtectorMypage : undefined;
-  CaregiverMypage : undefined;
-  AcquaintanceMypage : undefined;
+  ProtectorMypage: undefined;
+  CaregiverMypage: undefined;
+  AcquaintanceMypage: undefined;
 };
 
 // Stack Navigator 생성

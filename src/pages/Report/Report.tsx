@@ -7,7 +7,7 @@ import {useReports} from '../../store/ReportContext'; // Context 사용
 
 const Container = styled.View`
   flex: 1;
-  background-color: #ffffff;
+  background-color: #f8f9fa;
 `;
 
 const HeaderText = styled.Text`

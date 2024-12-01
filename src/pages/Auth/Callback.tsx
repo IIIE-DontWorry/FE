@@ -1,57 +1,47 @@
 import React, {useEffect} from 'react';
-import {View, Text, ActivityIndicator, Alert, StyleSheet} from 'react-native';
+import {ActivityIndicator, Alert, StyleSheet, View} from 'react-native';
 import {useNavigation, useRoute} from '@react-navigation/native';
-import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RootStackParamList} from '../../navigation/MainNavigator';
 
-const Callback = () => {
-  const navigation =
-    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const route = useRoute();
+type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
-  const {code} = route.params || {};
+const Callback = () => {
+  const navigation = useNavigation<NavigationProp>();
+  const route = useRoute();
+  const {accessToken, isNew} = route.params as {
+    accessToken: string;
+    isNew: boolean;
+  };
 
   useEffect(() => {
-    const fetchKakaoToken = async () => {
-      if (!code) {
-        Alert.alert('Error', '로그인 코드가 제공되지 않았습니다.');
-        navigation.navigate('Landing');
-        return;
-      }
-
+    const processLogin = async () => {
       try {
-        // 서버로 로그인 코드 전송
-        const response = await axios.post(
-          'http://{서버 베이스 URL}/auth/kakao',
-          {
-            code,
-          },
-        );
+        // accessToken 저장
+        await AsyncStorage.setItem('accessToken', accessToken);
 
-        const {accessToken, isNew} = response.data;
-
+        // isNew 값에 따라 분기 처리
         if (isNew) {
-          // 신규 회원: 사용자 유형 선택 페이지로 이동
-          navigation.replace('UserCategory', {accessToken});
+          Alert.alert('회원가입 필요', '추가 정보를 입력해주세요.');
+          navigation.replace('UserCategory'); // 회원가입 플로우로 이동
         } else {
-          // 기존 회원: 메인 페이지로 이동
-          navigation.replace('Main');
+          Alert.alert('로그인 완료', '환영합니다!');
+          navigation.replace('Home'); // 기존 회원은 홈으로 이동
         }
       } catch (error) {
-        console.error('로그인 처리 중 오류 발생:', error);
-        Alert.alert('Error', '로그인 처리 중 오류가 발생했습니다.');
-        navigation.navigate('Landing');
+        console.error('Error processing login:', error);
+        Alert.alert('오류 발생', '로그인에 실패했습니다.');
+        navigation.replace('Landing'); // 실패 시 Landing 페이지로
       }
     };
 
-    fetchKakaoToken();
-  }, [code, navigation]);
+    processLogin();
+  }, [accessToken, isNew, navigation]);
 
   return (
     <View style={styles.container}>
-      <ActivityIndicator size="large" color="#00E6AC" />
-      <Text style={styles.text}>로그인 처리 중...</Text>
+      <ActivityIndicator size="large" color="#00d6a3" />
     </View>
   );
 };
@@ -61,11 +51,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  text: {
-    marginTop: 20,
-    fontSize: 16,
-    color: '#333',
+    backgroundColor: '#ffffff',
   },
 });
 
