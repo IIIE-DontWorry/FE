@@ -50,7 +50,7 @@ const MenuSection = styled.View`
 `;
 
 const MenuTitle = styled.Text`
-  font-size: 16px;
+  font-size: 18px;
   font-weight: bold;
   padding: 0 20px 10px 20px;
 `;
