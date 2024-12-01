@@ -6,7 +6,6 @@ import {
   Image,
   FlatList,
   TextInput,
-  ScrollView,
   Alert,
 } from 'react-native';
 import styled from 'styled-components/native';
@@ -37,7 +36,7 @@ const HeaderText = styled.Text`
 
 const ImageWrapper = styled.View<{isSelected: boolean}>`
   width: 22%;
-  margin: 8px;
+  margin: 6px;
   border-width: 2px;
   border-color: ${props => (props.isSelected ? '#D0FE35' : 'transparent')};
   position: relative;
@@ -156,59 +155,56 @@ const GalleryCreate = () => {
         <HeaderText>사진 첨부</HeaderText>
       </Header>
 
-      <ScrollView contentContainerStyle={{paddingBottom: 80}}>
-        {/* Image Grid */}
-        <FlatList
-          data={selectedImages}
-          keyExtractor={(item, index) => index.toString()}
-          numColumns={4}
-          contentContainerStyle={{marginHorizontal: 8}}
-          renderItem={({item}) => (
-            <ImageWrapper isSelected={selectedImages.includes(item)}>
-              <CloseButton onPress={() => removeImage(item)}>
-                <CloseIcon width={16} height={16} fill="#fff" />
-              </CloseButton>
-              <TouchableOpacity onPress={() => setSelectedImage(item)}>
-                <Image
-                  source={{uri: item}}
-                  style={{width: '100%', height: '100%', borderRadius: 8}}
-                />
-              </TouchableOpacity>
-            </ImageWrapper>
-          )}
-        />
-
-        {/* Large Image and Description */}
-        {selectedImage && (
-          <View>
+      {/* Image Grid and Large Image */}
+      <FlatList
+        data={selectedImages}
+        keyExtractor={(item, index) => index.toString()}
+        numColumns={4}
+        contentContainerStyle={{marginHorizontal: 8, paddingBottom: 180}}
+        renderItem={({item}) => (
+          <ImageWrapper isSelected={selectedImages.includes(item)}>
+            <CloseButton onPress={() => removeImage(item)}>
+              <CloseIcon width={16} height={16} fill="#fff" />
+            </CloseButton>
+            <TouchableOpacity onPress={() => setSelectedImage(item)}>
+              <Image
+                source={{uri: item}}
+                style={{width: '100%', height: '100%', borderRadius: 8}}
+              />
+            </TouchableOpacity>
+          </ImageWrapper>
+        )}
+        ListHeaderComponent={
+          selectedImage && (
             <LargeImageContainer>
               <Image
                 source={{uri: selectedImage}}
                 style={{width: '80%', height: 300, borderRadius: 8}}
               />
             </LargeImageContainer>
-
-            <DescriptionContainer>
-              <DescriptionTitle>
-                <PenIcon>🖊</PenIcon>
-                <Text style={{fontSize: 16, fontWeight: 'bold', color: '#333'}}>
-                  사진 설명 작성
-                </Text>
-              </DescriptionTitle>
-              <DescriptionInput
-                placeholder="사진에 대한 설명을 입력해주세요."
-                value={description}
-                onChangeText={setDescription}
-                maxLength={100}
-                multiline
-              />
-              <Text style={{marginTop: 8, textAlign: 'right', color: '#888'}}>
-                {description.length}/100
+          )
+        }
+        ListFooterComponent={
+          <DescriptionContainer>
+            <DescriptionTitle>
+              <PenIcon>🖊</PenIcon>
+              <Text style={{fontSize: 16, fontWeight: 'bold', color: '#333'}}>
+                사진 설명 작성
               </Text>
-            </DescriptionContainer>
-          </View>
-        )}
-      </ScrollView>
+            </DescriptionTitle>
+            <DescriptionInput
+              placeholder="사진에 대한 설명을 입력해주세요."
+              value={description}
+              onChangeText={setDescription}
+              maxLength={100}
+              multiline
+            />
+            <Text style={{marginTop: 8, textAlign: 'right', color: '#888'}}>
+              {description.length}/100
+            </Text>
+          </DescriptionContainer>
+        }
+      />
 
       {/* Bottom Bar */}
       <BottomBar>
