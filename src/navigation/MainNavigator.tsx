@@ -17,23 +17,28 @@ import Callback from '../pages/Auth/Callback';
 import ProtectorMypage from '../pages/Mypage/ProtectorMyPage';
 import CaregiverMypage from '../pages/Mypage/CaregiverMypage';
 import AcquaintanceMypage from '../pages/Mypage/AcquaintanceMypage';
-
+import GalleryCreate from '../pages/Gallery/GalleryCreate';
 // RootStackParamList 타입 정의
 export type RootStackParamList = {
   Landing: undefined;
   Main: undefined;
   UserCategory: undefined;
-  ProtectorInfo: {
-    scrollTo?: 'patientInfo' | 'medicineInfo';
-  } | undefined;
-  CaregiverInfo: {
-    readOnly?: boolean;
-  } | undefined;
+  ProtectorInfo:
+    | {
+        scrollTo?: 'patientInfo' | 'medicineInfo';
+      }
+    | undefined;
+  CaregiverInfo:
+    | {
+        readOnly?: boolean;
+      }
+    | undefined;
   AcquaintanceInfo: undefined;
   ReportCreate: undefined;
   ReportDetail: undefined;
   ReportUpdate: undefined;
   Gallery: undefined;
+  GalleryCreate: undefined;
   Home: undefined;
   Report: undefined;
   Message: undefined;
@@ -56,6 +61,7 @@ const MainNavigator = () => {
       <Stack.Screen name="Main" component={BottomTabNavigator} />
       <Stack.Screen name="Home" component={Home} />
       <Stack.Screen name="Gallery" component={Gallery} />
+      <Stack.Screen name="GalleryCreate" component={GalleryCreate} />
       <Stack.Screen name="Report" component={Report} />
       <Stack.Screen name="Message" component={Message} />
       <Stack.Screen name="ReportCreate" component={ReportCreate} />
