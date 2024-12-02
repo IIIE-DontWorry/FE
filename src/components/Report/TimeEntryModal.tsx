@@ -1,4 +1,3 @@
-//시간에 따른 일지 작성 모달
 import React, {useState} from 'react';
 import {
   View,
@@ -48,10 +47,10 @@ const CloseText = styled.Text`
 
 const TimeEntryModal = ({visible, onClose, onAddEntry}) => {
   const [time, setTime] = useState(new Date());
-  const [content, setContent] = useState('');
+  const [description, setDescription] = useState('');
   const [showTimePicker, setShowTimePicker] = useState(false);
 
-  const handleTimeChange = (event: any, selectedTime?: Date) => {
+  const handleTimeChange = (event, selectedTime) => {
     setShowTimePicker(false);
     if (selectedTime) {
       setTime(selectedTime);
@@ -59,9 +58,21 @@ const TimeEntryModal = ({visible, onClose, onAddEntry}) => {
   };
 
   const handleAdd = () => {
-    const formattedTime = `${time.getHours()}시 ${time.getMinutes()}분`;
-    onAddEntry(`${formattedTime} - ${content}`);
-    setContent('');
+    if (!description || !time) {
+      Alert.alert('오류', '시간과 내용을 입력해주세요.');
+      return;
+    }
+
+    const timeEntry = {
+      description,
+      activityAt: {
+        hour: time.getHours(),
+        minute: time.getMinutes(),
+      },
+    };
+
+    onAddEntry(timeEntry); // 부모 컴포넌트로 전달
+    setDescription('');
     onClose();
   };
 
@@ -70,7 +81,7 @@ const TimeEntryModal = ({visible, onClose, onAddEntry}) => {
       <ModalContainer>
         <ModalContent>
           <ModalHeader>
-            <ModalTitle>시간에 따른 일지 내용 추가</ModalTitle>
+            <ModalTitle>시간에 따른 일지 추가</ModalTitle>
             <CloseButton onPress={onClose}>
               <CloseText>×</CloseText>
             </CloseButton>
@@ -92,8 +103,8 @@ const TimeEntryModal = ({visible, onClose, onAddEntry}) => {
 
           <TextInput
             placeholder="내용을 입력하세요."
-            value={content}
-            onChangeText={setContent}
+            value={description}
+            onChangeText={setDescription}
             style={{
               height: 80,
               borderColor: '#ddd',

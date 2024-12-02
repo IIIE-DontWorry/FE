@@ -1,35 +1,44 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
-  Alert,
   ScrollView,
+  Alert,
 } from 'react-native';
 import styled from 'styled-components/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import CheckBox from 'react-native-check-box';
 import BtnAdd from '../../assets/report/btn_add.svg';
-import {format, parseISO, isValid} from 'date-fns';
+import {format} from 'date-fns';
 import TimeEntryModal from '../../components/Report/TimeEntryModal';
-import {useReports} from '../../store/ReportContext';
-
+import CheckBox from 'react-native-check-box';
+import ApiService from '../../utils/api';
+import BackIcon from '../../assets/common/back-icon.svg';
 const Container = styled.ScrollView`
   flex: 1;
   background-color: #ffffff;
 `;
 
 const Header = styled.View`
-  padding: 16px;
+  flex-direction: row;
   align-items: center;
+  padding: 16px;
   border-bottom-width: 1px;
   border-bottom-color: #ddd;
+  justify-content: space-between;
 `;
 
 const HeaderText = styled.Text`
   font-size: 18px;
   font-weight: bold;
+  text-align: center;
+  flex: 1;
+  margin-right: 45px;
+`;
+
+const BackButton = styled(TouchableOpacity)`
+  padding: 8px;
 `;
 
 const Section = styled.View`
@@ -42,237 +51,322 @@ const Section = styled.View`
 const SectionTitle = styled.Text`
   font-size: 16px;
   font-weight: bold;
-  margin-bottom: 8px;
-`;
-
-const ButtonSection = styled.View`
-  align-items: center;
-  margin-top: 16px;
   margin-bottom: 10px;
 `;
 
-const ButtonRow = styled.View`
-  flex-direction: row;
-  justify-content: space-between;
-  margin-top: 16px;
-  width: 80%;
+const EntryContainer = styled.View`
+  padding: 12px 0;
+  border-bottom-width: 1px;
+  border-bottom-color: #ddd;
 `;
 
-const StyledButton = styled.TouchableOpacity`
-  flex: 1;
-  margin: 0 8px;
-  padding: 12px;
-  border-radius: 8px;
-  align-items: center;
-  background: ${props => (props.bgColor ? props.bgColor : '#6adec0')};
-`;
-
-const StyledButtonText = styled.Text`
-  color: #fff;
+const EntryText = styled.Text`
   font-size: 14px;
-  font-weight: bold;
+  color: #333;
+`;
+
+const BtnRow = styled.View`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const Button = styled.TouchableOpacity`
+  margin-top: 20px;
+  padding: 10px;
+  border-radius: 8px;
+  width: 200px;
+  align-items: center;
+  margin-bottom: 20px;
+`;
+
+const SaveButton = styled(Button)`
+  background: #6adec0;
+`;
+
+const ButtonText = styled.Text`
+  color: #fff;
+  font-size: 16px;
+`;
+const Row = styled.View`
+  flex-direction: row;
+  align-items: center;
+  gap: 30px;
+  margin-bottom: 6px; /* 간격 줄이기 */
+`;
+const ButtonSection = styled.View`
+  align-items: center;
+  margin-bottom: 10px;
 `;
 
 const ReportUpdate = ({route, navigation}) => {
-  const {report} = route.params;
-  const {updateReport, deleteReport} = useReports();
+  const [reportData, setReportData] = useState({
+    id: null,
+    date: format(new Date(), 'yyyy-MM-dd'),
+    mealExcretionResponse: {
+      mealMorningTakenStatus: false,
+      mealAfternoonTakenStatus: false,
+      mealEveningTakenStatus: false,
+      excretionMorningTakenStatus: false,
+      excretionAfternoonTakenStatus: false,
+      excretionEveningTakenStatus: false,
+    },
+    medications: [],
+    notes: '',
+    guardianRequests: [],
+    careScheduleResponses: [],
+  });
 
-  // 안전한 날짜 처리
-  const initialDate = isValid(parseISO(report.date))
-    ? parseISO(report.date)
-    : new Date();
-
-  const [date, setDate] = useState(initialDate);
-  const [timeEntries, setTimeEntries] = useState(report.timeEntries || []);
-  const [activities, setActivities] = useState(report.activities);
-  const [medications, setMedications] = useState(report.medications);
-  const [notes, setNotes] = useState(report.notes || '');
-  const [specialRequests, setSpecialRequests] = useState(
-    report.specialRequests || {},
-  );
-  const [showDatePicker, setShowDatePicker] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-
-  const onDateChange = (event, selectedDate) => {
-    setShowDatePicker(false);
-    if (selectedDate) {
-      setDate(selectedDate);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [timeEntries, setTimeEntries] = useState([]);
+  const fetchReportDetails = async careReportId => {
+    try {
+      const response = await ApiService.get(
+        `care-reports/details/${careReportId}`,
+      );
+      if (response.status === 'success') {
+        const data = response.data;
+        setReportData({
+          id: data.id,
+          date: data.postedDate,
+          mealExcretionResponse: data.mealExcretionResponse || {},
+          medications: data.medicationCheckResponse || [],
+          notes: data.specialNote || '',
+          guardianRequests: data.guardianResponses || [],
+          careScheduleResponses: data.careScheduleResponses || [],
+        });
+      } else {
+        throw new Error(response.message);
+      }
+    } catch (error) {
+      Alert.alert('오류', '보고서를 가져오는 중 문제가 발생했습니다.');
+      console.error(error);
     }
   };
 
-  const addTimeEntry = entry => {
-    setTimeEntries(prev => [...prev, entry]);
-  };
+  const addTimeEntry = async entry => {
+    try {
+      console.log('Time Entry:', entry); // 디버깅용 로그
+      if (
+        !entry.activityAt ||
+        entry.activityAt.hour === undefined ||
+        entry.activityAt.minute === undefined
+      ) {
+        throw new Error('activityAt 데이터가 유효하지 않습니다.');
+      }
 
-  const toggleCheckbox = (category, itemKey, time) => {
-    if (category === 'activities') {
-      setActivities(prev => ({
-        ...prev,
-        [itemKey]: {
-          ...prev[itemKey],
-          [time]: !prev[itemKey][time],
+      const response = await ApiService.post(
+        `care-schedules/${reportData.id}`,
+        {
+          description: entry.description,
+          hour: entry.activityAt.hour,
+          minute: entry.activityAt.minute,
         },
-      }));
-    } else if (category === 'medications') {
-      setMedications(prev => ({
-        ...prev,
-        [itemKey]: {
-          ...prev[itemKey],
-          [time]: !prev[itemKey][time],
-        },
-      }));
+      );
+
+      if (response.status === 'success') {
+        const {id, description, activityAt} = response.data;
+        const [hour, minute] = activityAt.split(':').map(Number);
+        setTimeEntries(prev => [
+          ...prev,
+          {
+            id,
+            description,
+            hour,
+            minute,
+          },
+        ]);
+      } else {
+        Alert.alert('오류', '시간에 따른 일지 추가 중 문제가 발생했습니다.');
+      }
+    } catch (error) {
+      console.error('Time Entry Error:', error.message);
+      Alert.alert(
+        '오류',
+        '시간에 따른 일지를 추가하는 중 문제가 발생했습니다.',
+      );
     }
   };
-
-  const toggleSpecialRequest = key => {
-    setSpecialRequests(prev => ({
+  const toggleMealExcretion = (category, time) => {
+    setReportData(prev => ({
       ...prev,
-      [key]: !prev[key],
+      mealExcretionResponse: {
+        ...prev.mealExcretionResponse,
+        [`${category}${time}TakenStatus`]:
+          !prev.mealExcretionResponse[`${category}${time}TakenStatus`],
+      },
     }));
   };
 
-  const handleUpdate = () => {
-    const updatedReport = {
-      ...report,
-      date: format(date, 'yyyy-MM-dd'),
-      timeEntries,
-      activities,
-      medications,
-      notes,
-      specialRequests,
-    };
-
-    updateReport(updatedReport);
-    Alert.alert('수정 완료', '보고서가 성공적으로 수정되었습니다.', [
-      {text: '확인', onPress: () => navigation.goBack()},
-    ]);
+  useEffect(() => {
+    if (route.params?.careReportId) {
+      fetchReportDetails(route.params.careReportId);
+    }
+  }, [route.params]);
+  const handleBack = () => {
+    navigation.goBack();
   };
+  const handleSave = async () => {
+    try {
+      const payload = {
+        patchCareScheduleRequests: reportData.careScheduleResponses.map(
+          entry => ({
+            id: entry.id,
+            description: entry.description,
+            hour: parseInt(entry.activityAt.split(':')[0], 10),
+            minute: parseInt(entry.activityAt.split(':')[1], 10),
+          }),
+        ),
+        medicationCheckRequests: reportData.medications.map(med => ({
+          id: med.id,
+          name: med.name,
+          morningTakenStatus: med.morningTakenStatus,
+          afternoonTakenStatus: med.afternoonTakenStatus,
+          eveningTakenStatus: med.eveningTakenStatus,
+        })),
+        mealExcretionRequest: reportData.mealExcretionResponse,
+        specialNote: reportData.notes,
+        guardianRequests: reportData.guardianRequests.map(req => ({
+          id: req.id,
+          request: req.request,
+          isCheck: req.isCheck,
+        })),
+        postedDate: reportData.date,
+      };
 
-  const handleDelete = () => {
-    Alert.alert(
-      '보고서 삭제',
-      '이 보고서를 정말 삭제하시겠습니까?',
-      [
-        {text: '취소', style: 'cancel'},
-        {
-          text: '삭제',
-          style: 'destructive',
-          onPress: () => {
-            deleteReport(report.id);
-            Alert.alert('삭제 완료', '보고서가 성공적으로 삭제되었습니다.', [
-              {text: '확인', onPress: () => navigation.goBack()},
-            ]);
-          },
-        },
-      ],
-      {cancelable: true},
-    );
+      const response = await ApiService.patch(
+        `care-reports/${reportData.id}`,
+        payload,
+      );
+      if (response.status === 'success') {
+        Alert.alert('성공', '보고서가 성공적으로 수정되었습니다.');
+        navigation.navigate('Report', {shouldReload: true});
+      } else {
+        throw new Error(response.message);
+      }
+    } catch (error) {
+      Alert.alert('오류', '보고서를 수정하는 중 문제가 발생했습니다.');
+      console.error(error);
+    }
   };
 
   return (
     <Container>
       <Header>
+        <BackButton onPress={() => navigation.goBack()}>
+          <BackIcon width={24} height={24} />
+        </BackButton>
         <HeaderText>간병 보고서 수정</HeaderText>
       </Header>
 
       <Section>
         <SectionTitle>날짜</SectionTitle>
         <TouchableOpacity onPress={() => setShowDatePicker(true)}>
-          <Text>{format(date, 'yyyy-MM-dd')}</Text>
+          <Text>{reportData.date}</Text>
         </TouchableOpacity>
         {showDatePicker && (
           <DateTimePicker
-            value={date}
+            value={new Date(reportData.date)}
             mode="date"
             display="default"
-            onChange={onDateChange}
+            onChange={(event, selectedDate) => {
+              setShowDatePicker(false);
+              if (selectedDate) {
+                setReportData(prev => ({
+                  ...prev,
+                  date: format(selectedDate, 'yyyy-MM-dd'),
+                }));
+              }
+            }}
           />
         )}
       </Section>
 
       <Section>
         <SectionTitle>시간에 따른 일지</SectionTitle>
-        {timeEntries.map((entry, index) => (
-          <Text key={index} style={{marginTop: 8}}>
-            {entry}
-          </Text>
+        {reportData.careScheduleResponses.map(entry => (
+          <EntryContainer key={entry.id}>
+            <EntryText>
+              {entry.activityAt} - {entry.description}
+            </EntryText>
+          </EntryContainer>
         ))}
-        <View style={{alignItems: 'center', marginTop: 8}}>
+        <BtnRow>
           <TouchableOpacity onPress={() => setModalVisible(true)}>
             <BtnAdd width={24} height={24} />
           </TouchableOpacity>
-        </View>
+        </BtnRow>
+        <TimeEntryModal
+          visible={modalVisible}
+          onClose={() => setModalVisible(false)}
+          onAddEntry={addTimeEntry}
+        />
       </Section>
 
       <Section>
-        <SectionTitle>배변활동 및 식사여부</SectionTitle>
-        {['배변활동', '식사여부'].map((type, idx) => (
-          <View key={idx}>
-            <Text style={{fontWeight: 'bold', marginBottom: 4}}>{type}</Text>
-            <View
-              style={{flexDirection: 'row', flexWrap: 'wrap', marginTop: 8}}>
-              {['morning', 'afternoon', 'evening'].map(time => (
-                <View
-                  key={`${type}-${time}`}
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    marginRight: 16,
-                    marginBottom: 8,
-                  }}>
+        <SectionTitle>식사 및 배변활동</SectionTitle>
+        <Text style={{color: '#888', fontSize: 12, marginBottom: 8}}>
+          ※ 아침, 점심, 저녁 순서대로 확인해주세요
+        </Text>
+        {['meal', 'excretion'].map(category => (
+          <View key={category}>
+            <Text style={{color: 'black', fontSize: 14, marginBottom: 8}}>
+              {category === 'meal' ? '식사 여부' : '배변 활동'}
+            </Text>
+            <Row>
+              {['Morning', 'Afternoon', 'Evening'].map(time => (
+                <View key={`${category}${time}`} style={{flexDirection: 'row'}}>
                   <CheckBox
                     isChecked={
-                      activities[type === '배변활동' ? 'bowel' : 'meal'][time]
+                      reportData.mealExcretionResponse[
+                        `${category}${time}TakenStatus`
+                      ] || false
                     }
-                    onClick={() =>
-                      toggleCheckbox(
-                        'activities',
-                        type === '배변활동' ? 'bowel' : 'meal',
-                        time,
-                      )
-                    }
+                    onClick={() => toggleMealExcretion(category, time)}
                   />
                   <Text>
-                    {time === 'morning'
+                    {time === 'Morning'
                       ? '아침'
-                      : time === 'afternoon'
+                      : time === 'Afternoon'
                       ? '점심'
                       : '저녁'}
                   </Text>
                 </View>
               ))}
-            </View>
+            </Row>
           </View>
         ))}
       </Section>
 
       <Section>
-        <SectionTitle>투약 체크 리스트</SectionTitle>
-        {Object.entries(medications).map(([key, value]) => (
-          <View key={key}>
-            <Text style={{fontWeight: 'bold', marginBottom: 4}}>
-              {key === 'protein'
-                ? '단백질'
-                : key === 'arginine'
-                ? '아르기닌'
-                : key === 'creatine'
-                ? '크레아틴'
-                : '베타알라닌'}
+        <SectionTitle>투약 정보</SectionTitle>
+        <Text style={{color: '#888', fontSize: 12, marginBottom: 8}}>
+          ※ 아침, 점심, 저녁 순서대로 확인해주세요
+        </Text>
+        {reportData.medications.map(med => (
+          <View key={med.id}>
+            <Text style={{color: 'black', fontSize: 14, marginBottom: 8}}>
+              {med.name}
             </Text>
-            <View
-              style={{flexDirection: 'row', flexWrap: 'wrap', marginTop: 8}}>
+            <Row>
               {['morning', 'afternoon', 'evening'].map(time => (
                 <View
-                  key={`${key}-${time}`}
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    marginRight: 16,
-                    marginBottom: 8,
-                  }}>
+                  key={`${med.id}-${time}`}
+                  style={{flexDirection: 'row', alignItems: 'center'}}>
                   <CheckBox
-                    isChecked={value[time]}
-                    onClick={() => toggleCheckbox('medications', key, time)}
+                    isChecked={med[`${time}TakenStatus`]}
+                    onClick={() =>
+                      setReportData(prev => {
+                        const updatedMedications = [...prev.medications];
+                        const index = updatedMedications.findIndex(
+                          m => m.id === med.id,
+                        );
+                        updatedMedications[index][`${time}TakenStatus`] =
+                          !updatedMedications[index][`${time}TakenStatus`];
+                        return {...prev, medications: updatedMedications};
+                      })
+                    }
                   />
                   <Text>
                     {time === 'morning'
@@ -283,7 +377,7 @@ const ReportUpdate = ({route, navigation}) => {
                   </Text>
                 </View>
               ))}
-            </View>
+            </Row>
           </View>
         ))}
       </Section>
@@ -291,34 +385,46 @@ const ReportUpdate = ({route, navigation}) => {
       <Section>
         <SectionTitle>특이사항</SectionTitle>
         <TextInput
+          value={reportData.notes}
+          onChangeText={text => setReportData(prev => ({...prev, notes: text}))}
           multiline
-          value={notes}
-          onChangeText={setNotes}
+          placeholder="특이사항을 입력하세요."
           style={{
-            height: 80,
-            borderColor: '#ddd',
             borderWidth: 1,
-            padding: 8,
+            borderColor: '#ddd',
             borderRadius: 8,
+            padding: 8,
+            height: 80,
           }}
         />
       </Section>
-
+      <Section>
+        <SectionTitle>보호자 요청 사항</SectionTitle>
+        {reportData.guardianRequests.map(request => (
+          <Row key={request.id}>
+            <CheckBox
+              isChecked={request.isCheck}
+              onClick={() =>
+                setReportData(prev => {
+                  const updatedRequests = [...prev.guardianRequests];
+                  const index = updatedRequests.findIndex(
+                    r => r.id === request.id,
+                  );
+                  updatedRequests[index].isCheck =
+                    !updatedRequests[index].isCheck;
+                  return {...prev, guardianRequests: updatedRequests};
+                })
+              }
+            />
+            <Text>{request.request}</Text>
+          </Row>
+        ))}
+      </Section>
       <ButtonSection>
-        <ButtonRow>
-          <StyledButton onPress={handleUpdate}>
-            <StyledButtonText>수정</StyledButtonText>
-          </StyledButton>
-          <StyledButton bgColor="#FF4D4D" onPress={handleDelete}>
-            <StyledButtonText>삭제</StyledButtonText>
-          </StyledButton>
-        </ButtonRow>
+        <SaveButton onPress={handleSave}>
+          <ButtonText>수정</ButtonText>
+        </SaveButton>
       </ButtonSection>
-      <TimeEntryModal
-        visible={modalVisible}
-        onClose={() => setModalVisible(false)}
-        onAddEntry={addTimeEntry}
-      />
     </Container>
   );
 };

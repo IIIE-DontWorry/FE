@@ -29,9 +29,14 @@ const SendButtonText = styled.Text`
   font-size: 16px;
 `;
 
-const MessageInput = ({onMessageSent}: {onMessageSent: () => void}) => {
-  const [input, setInput] = useState('');
-  const [isSending, setIsSending] = useState(false);
+// Props 타입 정의
+interface MessageInputProps {
+  onMessageSent: () => void; // 메시지 전송 후 호출되는 콜백 함수
+}
+
+const MessageInput: React.FC<MessageInputProps> = ({onMessageSent}) => {
+  const [input, setInput] = useState<string>(''); // 입력 상태
+  const [isSending, setIsSending] = useState<boolean>(false); // 전송 상태
 
   const handleSend = async () => {
     if (!input.trim() || isSending) return;
@@ -48,7 +53,11 @@ const MessageInput = ({onMessageSent}: {onMessageSent: () => void}) => {
 
       console.log('전송할 데이터:', payload);
 
-      const response = await ApiService.post('notes/add', payload, {
+      const response = await ApiService.post<{
+        status: string;
+        message: string;
+        data?: any;
+      }>('notes/add', payload, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -64,7 +73,7 @@ const MessageInput = ({onMessageSent}: {onMessageSent: () => void}) => {
         console.error('쪽지 추가 실패:', response.message);
         alert(`쪽지 추가 실패: ${response.message}`);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('API 호출 오류:', error.response || error);
 
       // 서버에서 반환된 에러 메시지 표시
