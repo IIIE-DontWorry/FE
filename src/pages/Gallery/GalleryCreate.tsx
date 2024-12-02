@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -7,12 +7,13 @@ import {
   FlatList,
   TextInput,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import styled from 'styled-components/native';
-import {launchImageLibrary} from 'react-native-image-picker';
-import BackIcon from '../../assets/common/back-icon.svg'; // 뒤로가기 아이콘
 import CloseIcon from '../../assets/common/close-icon.svg'; // 닫기 아이콘
-
+import ApiService from '../../utils/api'; // API 요청 유틸리티
+import BackIcon from '../../assets/common/back-icon.svg'; // 뒤로가기 아이콘
+import RNFS from 'react-native-fs'; // Import react-native-fs
 const Container = styled.View`
   flex: 1;
   background-color: #ffffff;
@@ -32,6 +33,11 @@ const HeaderText = styled.Text`
   color: #222;
   flex: 1;
   text-align: center;
+  margin-right: 40px;
+`;
+
+const BackButton = styled(TouchableOpacity)`
+  padding: 8px;
 `;
 
 const ImageWrapper = styled.View<{isSelected: boolean}>`
@@ -49,7 +55,6 @@ const CloseButton = styled.TouchableOpacity`
   top: -10px;
   right: -10px;
   z-index: 1;
-  background-color: rgba(0, 0, 0, 0.6);
   border-radius: 12px;
   padding: 2px;
 `;
@@ -71,12 +76,6 @@ const DescriptionTitle = styled.View`
   margin-bottom: 8px;
 `;
 
-const PenIcon = styled.Text`
-  font-size: 16px;
-  color: #80d0ff;
-  margin-right: 8px;
-`;
-
 const DescriptionInput = styled.TextInput`
   border: 1px solid #ddd;
   padding: 8px;
@@ -88,14 +87,20 @@ const DescriptionInput = styled.TextInput`
 
 const BottomBar = styled.View`
   position: absolute;
-  bottom: 16px; /* 위로 약간 띄워서 둥근 효과 */
+  bottom: 16px;
   left: 20px;
   right: 20px;
   padding: 16px;
   background-color: #6adec0;
-  border-radius: 12px; /* 둥근 모서리 */
+  border-radius: 12px;
   align-items: center;
-  elevation: 5; /* 그림자 효과 */
+  elevation: 5;
+`;
+
+const PenIcon = styled.Text`
+  font-size: 16px;
+  color: #80d0ff;
+  margin-right: 8px;
 `;
 
 const BottomBarText = styled.Text`
@@ -104,44 +109,108 @@ const BottomBarText = styled.Text`
   color: #ffffff;
 `;
 
-const GalleryCreate = () => {
-  const [galleryImages, setGalleryImages] = useState<string[]>([]);
-  const [selectedImages, setSelectedImages] = useState<string[]>([]);
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [description, setDescription] = useState('');
-
-  useEffect(() => {
-    fetchGalleryImages();
-  }, []);
-
-  const fetchGalleryImages = () => {
-    launchImageLibrary(
-      {
-        mediaType: 'photo',
-        selectionLimit: 0, // No limit for images
-      },
-      response => {
-        if (response.assets) {
-          const images = response.assets.map(asset => asset.uri || '');
-          setGalleryImages(images);
-          setSelectedImages(images); // 모든 이미지를 기본 선택 상태로 설정
-          setSelectedImage(images[0] || null); // 첫 번째 이미지를 큰 이미지로 디폴트 설정
-        }
-      },
-    );
+type GalleryCreateProps = {
+  route: {
+    params: {
+      selectedImages: {
+        base64: string;
+        uri: string;
+        type: string;
+        extension: string; // 확장자 추가
+      }[];
+    };
   };
+  navigation: any;
+};
 
-  const removeImage = (image: string) => {
-    if (selectedImages.length === 1) {
-      Alert.alert('경고', '최소 1개 이상의 사진을 선택해야합니다.');
+const GalleryCreate: React.FC<GalleryCreateProps> = ({route, navigation}) => {
+  const {selectedImages} = route.params;
+  const [galleryImages, setGalleryImages] = useState(selectedImages);
+  const [selectedImage, setSelectedImage] = useState<string | null>(
+    galleryImages[0]?.uri || null,
+  );
+  const [description, setDescription] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
+
+  const removeImage = (index: number) => {
+    if (galleryImages.length === 1) {
+      Alert.alert('경고', '최소 한 장 이상의 이미지를 업로드 해야합니다.');
       return;
     }
-    const updatedImages = selectedImages.filter(item => item !== image);
-    setSelectedImages(updatedImages);
-    if (selectedImage === image && updatedImages.length > 0) {
-      setSelectedImage(updatedImages[0]); // 삭제 후 첫 번째 이미지 선택
-    } else if (updatedImages.length === 0) {
-      setSelectedImage(null); // 이미지가 없으면 선택된 이미지 제거
+
+    const updatedImages = galleryImages.filter((_, i) => i !== index);
+    setGalleryImages(updatedImages);
+
+    // 삭제된 이미지가 선택된 이미지인 경우, 새로운 이미지를 선택
+    if (galleryImages[index].uri === selectedImage) {
+      setSelectedImage(updatedImages[0]?.uri || null);
+    }
+  };
+
+  const convertToBase64 = async (uri: string): Promise<string> => {
+    try {
+      console.log('Converting image to base64:', uri);
+      const base64 = await RNFS.readFile(uri, 'base64'); // Read file and convert to base64
+      console.log('Conversion successful');
+      return base64;
+    } catch (error) {
+      console.error('Error converting image to base64:', error);
+      throw error;
+    }
+  };
+
+  const uploadImages = async () => {
+    if (galleryImages.length === 0) {
+      Alert.alert('오류', '업로드할 이미지를 선택하세요.');
+      return;
+    }
+    if (!description.trim()) {
+      Alert.alert('오류', '사진에 대한 설명을 입력하세요.');
+      return;
+    }
+
+    setIsUploading(true);
+
+    try {
+      const base64Images = await Promise.all(
+        galleryImages.map(async img => {
+          const base64 = await convertToBase64(img.uri); // Convert uri to base64
+          return `data:image/${img.extension};base64,${base64}`;
+        }),
+      );
+
+      const payload = {
+        createdBy: '보호자',
+        images: base64Images,
+        title: description,
+      };
+
+      console.log('Upload Payload:', JSON.stringify(payload, null, 2)); // Debugging
+
+      const patientId = 1; // Example patientId
+      const response = await ApiService.post(
+        `/gallery/upload/${patientId}`,
+        payload,
+      );
+
+      if (response.status === 'success') {
+        Alert.alert('성공', '사진이 성공적으로 업로드되었습니다.', [
+          {
+            text: '확인',
+            onPress: () => {
+              navigation.navigate('Gallery', {refresh: true});
+            },
+          },
+        ]);
+      } else {
+        Alert.alert('오류', '업로드에 실패했습니다.');
+        console.error('Upload Error:', response.message);
+      }
+    } catch (error) {
+      Alert.alert('오류', '업로드 중 문제가 발생했습니다.');
+      console.error('Upload Error:', error);
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -149,26 +218,29 @@ const GalleryCreate = () => {
     <Container>
       {/* Header */}
       <Header>
-        <TouchableOpacity onPress={() => console.log('뒤로가기')}>
+        <BackButton onPress={() => navigation.goBack()}>
           <BackIcon width={24} height={24} />
-        </TouchableOpacity>
+        </BackButton>
         <HeaderText>사진 첨부</HeaderText>
       </Header>
 
       {/* Image Grid and Large Image */}
       <FlatList
-        data={selectedImages}
-        keyExtractor={(item, index) => index.toString()}
+        data={galleryImages}
+        keyExtractor={(_, index) => index.toString()}
         numColumns={4}
         contentContainerStyle={{marginHorizontal: 8, paddingBottom: 180}}
-        renderItem={({item}) => (
-          <ImageWrapper isSelected={selectedImages.includes(item)}>
-            <CloseButton onPress={() => removeImage(item)}>
+        renderItem={({item, index}) => (
+          <ImageWrapper
+            isSelected={galleryImages[index]?.uri === selectedImage}>
+            <CloseButton onPress={() => removeImage(index)}>
               <CloseIcon width={16} height={16} fill="#fff" />
             </CloseButton>
-            <TouchableOpacity onPress={() => setSelectedImage(item)}>
+            <TouchableOpacity onPress={() => setSelectedImage(item.uri)}>
               <Image
-                source={{uri: item}}
+                source={{
+                  uri: item.uri,
+                }}
                 style={{width: '100%', height: '100%', borderRadius: 8}}
               />
             </TouchableOpacity>
@@ -189,11 +261,11 @@ const GalleryCreate = () => {
             <DescriptionTitle>
               <PenIcon>🖊</PenIcon>
               <Text style={{fontSize: 16, fontWeight: 'bold', color: '#333'}}>
-                사진 설명 작성
+                사진 제목 작성
               </Text>
             </DescriptionTitle>
             <DescriptionInput
-              placeholder="사진에 대한 설명을 입력해주세요."
+              placeholder="사진에 대한 제목을 입력해주세요."
               value={description}
               onChangeText={setDescription}
               maxLength={100}
@@ -208,9 +280,15 @@ const GalleryCreate = () => {
 
       {/* Bottom Bar */}
       <BottomBar>
-        <BottomBarText>
-          {selectedImages.length}장의 사진을 업로드합니다.
-        </BottomBarText>
+        {isUploading ? (
+          <ActivityIndicator size="small" color="#fff" />
+        ) : (
+          <TouchableOpacity onPress={uploadImages}>
+            <BottomBarText>
+              {galleryImages.length}장의 사진 업로드
+            </BottomBarText>
+          </TouchableOpacity>
+        )}
       </BottomBar>
     </Container>
   );

@@ -31,7 +31,7 @@ const Report: React.FC<{navigation: any}> = ({navigation}) => {
 
   const fetchReports = async () => {
     try {
-      const careGiverId = 1;
+      const careGiverId = 3;
       const page = 0;
       const size = 3;
       const sort = 'postedDate,desc';
@@ -66,7 +66,7 @@ const Report: React.FC<{navigation: any}> = ({navigation}) => {
 
   const handleCreateReport = async () => {
     try {
-      const careGiverId = 1;
+      const careGiverId = 3;
       const response = await ApiService.post(
         `care-reports/${careGiverId}/init`,
       );

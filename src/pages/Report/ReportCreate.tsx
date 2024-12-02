@@ -201,6 +201,15 @@ const ReportCreate = ({route, navigation}) => {
         guardianRequests,
       } = reportData;
 
+      // ID 검증: ID가 null 또는 잘못된 값일 경우 요청 중단
+      if (!id || id <= 0) {
+        Alert.alert(
+          '오류',
+          '유효하지 않은 보고서 ID입니다. 다시 시도해주세요.',
+        );
+        return;
+      }
+
       const payload = {
         patchCareScheduleRequests: timeEntries.map(entry => ({
           id: entry.id || 0, // 기존 ID 또는 새 항목은 0으로 설정
@@ -227,7 +236,7 @@ const ReportCreate = ({route, navigation}) => {
 
       console.log('Payload:', JSON.stringify(payload, null, 2)); // 디버깅용 로그
 
-      const response = await ApiService.patch(`care-reports/${id}`, payload);
+      const response = await ApiService.patch(`care-reports/3`, payload);
       if (response.status === 'success') {
         Alert.alert('성공', '보고서가 성공적으로 저장되었습니다.');
         navigation.navigate('Report', {shouldReload: true}); // 리로드 트리거 전달
