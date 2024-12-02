@@ -145,7 +145,7 @@ const CaregiverMyPage = () => {
         <MenuSection>
           <MenuTitle>설정</MenuTitle>
           <MenuItem>
-            <MenuText>글씨체</MenuText>
+            <MenuText>글씨 크기 변경</MenuText>
           </MenuItem>
           <MenuItem onPress={() => navigation.navigate('DeleteCaregiverAccount')}>
             <MenuText>계정 탈퇴</MenuText>

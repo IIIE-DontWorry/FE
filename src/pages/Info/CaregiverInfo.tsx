@@ -63,7 +63,7 @@ const ExperienceInput = styled(Input)`
 
 const IconButton = styled.TouchableOpacity<{remove?: boolean}>`
   padding: 5px 10px;
-  background-color: ${props => (props.remove ? '#C9E270' : '#00D6A3')};
+  background-color: ${props => (props.remove ? '#00D6A3' : '#00D6A3')};
   border-radius: 5px;
   margin-left: 5px;
 `;
