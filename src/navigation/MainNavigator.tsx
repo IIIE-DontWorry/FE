@@ -17,6 +17,7 @@ import Callback from '../pages/Auth/Callback';
 import ProtectorMypage from '../pages/Mypage/ProtectorMyPage';
 import CaregiverMypage from '../pages/Mypage/CaregiverMypage';
 import AcquaintanceMypage from '../pages/Mypage/AcquaintanceMypage';
+import FontSizeChange from '../pages/Mypage/FontSizeChange';
 import ViewProtectorProfile from '../pages/ProtectorDo/ViewProtectorProfile';
 import EditProtectorProfile from '../pages/ProtectorDo/EditProtectorProfile';
 import ViewCaregiverProfile from '../pages/ProtectorDo/ViewCaregiverProfile';
@@ -55,6 +56,7 @@ export type RootStackParamList = {
   ProtectorMypage: undefined;
   CaregiverMypage: undefined;
   AcquaintanceMypage: undefined;
+  FontSizeChange: undefined;
 };
 
 // Stack Navigator 생성
@@ -91,6 +93,7 @@ const MainNavigator = () => {
       <Stack.Screen name="ProtectorMypage" component={ProtectorMypage} />
       <Stack.Screen name="CaregiverMypage" component={CaregiverMypage} />
       <Stack.Screen name="AcquaintanceMypage" component={AcquaintanceMypage} />
+      <Stack.Screen name="FontSizeChange" component={FontSizeChange} />
     </Stack.Navigator>
   );
 };
