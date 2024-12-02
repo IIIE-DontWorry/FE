@@ -22,12 +22,12 @@ import ViewProtectorProfile from '../pages/ProtectorDo/ViewProtectorProfile';
 import EditProtectorProfile from '../pages/ProtectorDo/EditProtectorProfile';
 import ViewCaregiverProfile from '../pages/ProtectorDo/ViewCaregiverProfile';
 import DeleteProtectorAccount from '../pages/ProtectorDo/DeleteProtectorAccount';
-import Caregiver_ViewCaregiverProfile from'../pages/CaregiverDo/ViewCaregiverProfile';
-import Caregiver_ViewProtectorProfile from'../pages/CaregiverDo/ViewProtectorProfile';
-import EditCaregiverProfile from'../pages/CaregiverDo/EditCaregiverProfile';
-import DeleteCaregiverAccount from'../pages/CaregiverDo/DeleteCaregiverAccount';
-
+import Caregiver_ViewCaregiverProfile from '../pages/CaregiverDo/ViewCaregiverProfile';
+import Caregiver_ViewProtectorProfile from '../pages/CaregiverDo/ViewProtectorProfile';
+import EditCaregiverProfile from '../pages/CaregiverDo/EditCaregiverProfile';
+import DeleteCaregiverAccount from '../pages/CaregiverDo/DeleteCaregiverAccount';
 import GalleryCreate from '../pages/Gallery/GalleryCreate';
+import GalleryDetail from '../pages/Gallery/GalleryDetail';
 // RootStackParamList 타입 정의
 export type RootStackParamList = {
   Landing: undefined;
@@ -49,6 +49,7 @@ export type RootStackParamList = {
   ReportUpdate: undefined;
   Gallery: undefined;
   GalleryCreate: undefined;
+  GalleryDetail: undefined;
   Home: undefined;
   Report: undefined;
   Message: undefined;
@@ -73,21 +74,46 @@ const MainNavigator = () => {
       <Stack.Screen name="Home" component={Home} />
       <Stack.Screen name="Gallery" component={Gallery} />
       <Stack.Screen name="GalleryCreate" component={GalleryCreate} />
+      <Stack.Screen name="GalleryDetail" component={GalleryDetail} />
       <Stack.Screen name="Report" component={Report} />
       <Stack.Screen name="Message" component={Message} />
       <Stack.Screen name="ReportCreate" component={ReportCreate} />
       <Stack.Screen name="ReportDetail" component={ReportDetail} />
       <Stack.Screen name="ReportUpdate" component={ReportUpdate} />
       <Stack.Screen name="ProtectorInfo" component={ProtectorInfo} />
-      <Stack.Screen name="ViewProtectorProfile" component={ViewProtectorProfile} />
-      <Stack.Screen name="ViewCaregiverProfile" component={ViewCaregiverProfile} />
-      <Stack.Screen name="EditProtectorProfile" component={EditProtectorProfile} />
-      <Stack.Screen name="DeleteProtectorAccount" component={DeleteProtectorAccount} />
+      <Stack.Screen
+        name="ViewProtectorProfile"
+        component={ViewProtectorProfile}
+      />
+      <Stack.Screen
+        name="ViewCaregiverProfile"
+        component={ViewCaregiverProfile}
+      />
+      <Stack.Screen
+        name="EditProtectorProfile"
+        component={EditProtectorProfile}
+      />
+      <Stack.Screen
+        name="DeleteProtectorAccount"
+        component={DeleteProtectorAccount}
+      />
       <Stack.Screen name="CaregiverInfo" component={CaregiverInfo} />
-      <Stack.Screen name="Caregiver_ViewCaregiverProfile" component={Caregiver_ViewCaregiverProfile} />
-      <Stack.Screen name="Caregiver_ViewProtectorProfile" component={Caregiver_ViewProtectorProfile} />
-      <Stack.Screen name="EditCaregiverProfile" component={EditCaregiverProfile} />
-      <Stack.Screen name="DeleteCaregiverAccount" component={DeleteCaregiverAccount} />
+      <Stack.Screen
+        name="Caregiver_ViewCaregiverProfile"
+        component={Caregiver_ViewCaregiverProfile}
+      />
+      <Stack.Screen
+        name="Caregiver_ViewProtectorProfile"
+        component={Caregiver_ViewProtectorProfile}
+      />
+      <Stack.Screen
+        name="EditCaregiverProfile"
+        component={EditCaregiverProfile}
+      />
+      <Stack.Screen
+        name="DeleteCaregiverAccount"
+        component={DeleteCaregiverAccount}
+      />
       <Stack.Screen name="AcquaintanceInfo" component={AcquaintanceInfo} />
       <Stack.Screen name="Callback" component={Callback} />
       <Stack.Screen name="ProtectorMypage" component={ProtectorMypage} />

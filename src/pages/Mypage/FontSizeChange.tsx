@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, {useState} from 'react';
+import {View, Text, StyleSheet} from 'react-native';
 import Slider from '@react-native-community/slider';
-import { useFontSize } from '../../store/FontSizeContext';
+import {useFontSize} from '../../store/FontSizeContext';
 
 const FontSizeChange = () => {
-  const { setScale } = useFontSize();
+  const {setScale} = useFontSize();
   const [sliderValue, setSliderValue] = useState<number>(1); // 초기값 설정 (1 = 기본)
 
   const handleFontSizeChange = (value: number) => {
@@ -22,14 +22,10 @@ const FontSizeChange = () => {
         maximumValue={2}
         step={1}
         value={sliderValue} // 초기값 설정
-        onValueChange={(value) => handleFontSizeChange(value)} // 값 변경 핸들러
+        onValueChange={value => handleFontSizeChange(value)} // 값 변경 핸들러
       />
       <Text style={styles.label}>
-        {sliderValue === 0
-          ? '기본'
-          : sliderValue === 1
-          ? '크게'
-          : '많이 크게'}
+        {sliderValue === 0 ? '기본' : sliderValue === 1 ? '크게' : '많이 크게'}
       </Text>
     </View>
   );

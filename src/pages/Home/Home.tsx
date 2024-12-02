@@ -11,6 +11,7 @@ import Book from '../../assets/home/book.svg';
 import {useMessages} from '../../store/MessageContext';
 import RecentMessages from '../../components/Home/RecentMessages';
 import RecentReports from '../../components/Home/RecentReports';
+import RecentGallery from '../../components/Home/RecentGallery';
 const Container = styled.ScrollView`
   flex: 1;
   background-color: #ffffff;
@@ -207,7 +208,7 @@ const Home = () => {
         </ProgressContainer>
       </MannerSection>
 
-      <Section>
+      {/* <Section>
         <SectionHeader>
           <SectionTitleContainer>
             <IconContainer>
@@ -231,8 +232,8 @@ const Home = () => {
             </Item>
           ))}
         </ItemContainer>
-      </Section>
-
+      </Section> */}
+      <RecentGallery />
       {/* 최근 간병 보고서 섹션 */}
       {/* <Section>
         <SectionHeader>

@@ -3,7 +3,7 @@ import styled from 'styled-components/native';
 import CheckBox from 'react-native-check-box';
 import Pen from '../../assets/report/pen.svg';
 import Book from '../../assets/home/book.svg';
-import {TouchableOpacity, Text} from 'react-native';
+import {TouchableOpacity, Text, View} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 
 // Styled Components
@@ -63,7 +63,7 @@ const CheckText = styled.Text`
   color: #555;
 `;
 
-const DetailButton = styled(TouchableOpacity)`
+const DetailButton = styled.TouchableOpacity`
   margin-top: 12px;
   background-color: #8ce;
   padding: 10px;
@@ -98,14 +98,10 @@ interface ReportSummaryProps {
       eveningTakenStatus: boolean;
     }[];
   };
-  onDetailPress: () => void;
 }
 
 // Main Component
-const ReportSummary: React.FC<ReportSummaryProps> = ({
-  report,
-  onDetailPress,
-}) => {
+const ReportSummary: React.FC<ReportSummaryProps> = ({report}) => {
   const navigation = useNavigation();
 
   return (
@@ -131,18 +127,21 @@ const ReportSummary: React.FC<ReportSummaryProps> = ({
           <CheckItem>
             <CheckBox
               isChecked={report.mealExcretionResponse.mealMorningTakenStatus}
+              disabled={true}
             />
             <CheckText>아침</CheckText>
           </CheckItem>
           <CheckItem>
             <CheckBox
               isChecked={report.mealExcretionResponse.mealAfternoonTakenStatus}
+              disabled={true}
             />
             <CheckText>점심</CheckText>
           </CheckItem>
           <CheckItem>
             <CheckBox
               isChecked={report.mealExcretionResponse.mealEveningTakenStatus}
+              disabled={true}
             />
             <CheckText>저녁</CheckText>
           </CheckItem>
@@ -157,6 +156,7 @@ const ReportSummary: React.FC<ReportSummaryProps> = ({
               isChecked={
                 report.mealExcretionResponse.excretionMorningTakenStatus
               }
+              disabled={true}
             />
             <CheckText>아침</CheckText>
           </CheckItem>
@@ -165,6 +165,7 @@ const ReportSummary: React.FC<ReportSummaryProps> = ({
               isChecked={
                 report.mealExcretionResponse.excretionAfternoonTakenStatus
               }
+              disabled={true}
             />
             <CheckText>점심</CheckText>
           </CheckItem>
@@ -173,6 +174,7 @@ const ReportSummary: React.FC<ReportSummaryProps> = ({
               isChecked={
                 report.mealExcretionResponse.excretionEveningTakenStatus
               }
+              disabled={true}
             />
             <CheckText>저녁</CheckText>
           </CheckItem>
@@ -187,15 +189,18 @@ const ReportSummary: React.FC<ReportSummaryProps> = ({
             <SectionTitle>{medication.name}</SectionTitle>
             <CheckBoxGroup>
               <CheckItem>
-                <CheckBox isChecked={medication.morningTakenStatus} />
+                <CheckBox isChecked={medication.morningTakenStatus} disabled />
                 <CheckText>아침</CheckText>
               </CheckItem>
               <CheckItem>
-                <CheckBox isChecked={medication.afternoonTakenStatus} />
+                <CheckBox
+                  isChecked={medication.afternoonTakenStatus}
+                  disabled
+                />
                 <CheckText>점심</CheckText>
               </CheckItem>
               <CheckItem>
-                <CheckBox isChecked={medication.eveningTakenStatus} />
+                <CheckBox isChecked={medication.eveningTakenStatus} disabled />
                 <CheckText>저녁</CheckText>
               </CheckItem>
             </CheckBoxGroup>

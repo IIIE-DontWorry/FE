@@ -46,8 +46,8 @@ const MessageInput: React.FC<MessageInputProps> = ({onMessageSent}) => {
     try {
       // JSON 문자열로 요청 데이터 생성
       const payload = JSON.stringify({
-        guardianId: 1, // 수신자 ID
-        caregiverId: null, // 작성자 ID
+        guardianId: null, // 수신자 ID
+        caregiverId: 3, // 작성자 ID
         noteContent: input.trim(), // 메시지 내용
       });
 
