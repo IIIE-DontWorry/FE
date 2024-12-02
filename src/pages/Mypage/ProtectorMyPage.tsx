@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components/native';
 import {Clipboard, TouchableOpacity} from 'react-native';
 import TopNavigationBar from '../../components/common/TopNavigationBar';
@@ -9,6 +9,26 @@ import {RootStackParamList} from '../../navigation/MainNavigator';
 import ApiService from '../../utils/api';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
+
+//상단에 미니 프로필을 위한 api 연결
+interface ApiResponse {
+  status: string;
+  message: string;
+  data: {
+    guardianInfo: {
+      name: string;
+      phone: string;
+      address: string;
+    };
+    patientInfo: {
+      name: string;
+      age: number;
+      diseaseName: string;
+      hospitalName: string;
+      medicationInfos: any[];
+    };
+  };
+}
 
 const Container = styled.View`
   flex: 1;
@@ -108,10 +128,9 @@ const CopyButtonText = styled.Text`
 `;
 
 
-
 const ProtectorMypage = () => {
   const navigation = useNavigation<NavigationProp>();
-  const {protectorData} = useUser();
+  const {protectorData} = useUser();//유저컨텍스트
   const copyToClipboard = async (code: string) => {
     try {
       await Clipboard.setString(code);
@@ -121,6 +140,21 @@ const ProtectorMypage = () => {
     }
   };
 
+  const [profileData, setProfileData] = useState<ApiResponse['data'] | null>(null);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await ApiService.get('/guardian/myPage/1');
+        setProfileData(response.data);
+      } catch (error) {
+        console.error('Error fetching profile:', error);
+      }
+    };
+    fetchProfile();
+  }, []);
+
+
   return (
     <Container>
       <TopNavigationBar title="보호자 프로필" />
@@ -129,11 +163,11 @@ const ProtectorMypage = () => {
           <ProfileImage />
           <ProfileInfo>
             <ProfileName>
-              {protectorData?.protectorName || '이름 없음'}
+              {profileData?.guardianInfo?.name || '이름 없음'}
             </ProfileName>
             <ProfileContact>
-              {protectorData
-                ? `${protectorData.patientName}환자(${protectorData.patientAge}세)의 ${protectorData.relationship} \n${protectorData.protectorPhone}`
+              {profileData ? 
+                `${profileData.patientInfo.name}(${profileData.patientInfo.age})님의 보호자\n${profileData.guardianInfo.phone}` 
                 : '정보 없음'}
             </ProfileContact>
           </ProfileInfo>

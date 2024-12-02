@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components/native';
 import {TouchableOpacity} from 'react-native';
 import TopNavigationBar from '../../components/common/TopNavigationBar';
@@ -8,6 +8,18 @@ import {RootStackParamList} from '../../navigation/MainNavigator';
 import ApiService from '../../utils/api';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
+
+interface ApiResponse {
+  status: string;
+  message: string;
+  data: {
+    name: string;
+    phone: string;
+    hospital: string;
+    patientName: string;
+    careerHistories: { career: string }[];
+  };
+}
 
 const Container = styled.View`
   flex: 1;
@@ -72,6 +84,21 @@ const MenuText = styled.Text`
 
 const CaregiverMyPage = () => {
   const navigation = useNavigation<NavigationProp>();
+  const [profileData, setProfileData] = useState<ApiResponse['data'] | null>(null);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await ApiService.get('/care-givers/myPage/1'); // caregiverId는 실제 값으로 대체 필요
+        setProfileData(response.data);
+      } catch (error) {
+        console.error('Error fetching profile:', error);
+      }
+    };
+
+    fetchProfile();
+  }, []);
+  
   return (
     <Container>
       <TopNavigationBar title="간병인 프로필" />
@@ -79,8 +106,12 @@ const CaregiverMyPage = () => {
         <ProfileSection>
           <ProfileImage />
           <ProfileInfo>
-            <ProfileName>장병인</ProfileName>
-            <ProfileContact>58세, 여{'\n'}010-0000-0000</ProfileContact>
+            <ProfileName>
+              {profileData?.name || '이름 없음'}
+            </ProfileName>
+            <ProfileContact>
+              {profileData? `${profileData.patientName}님의 간병인\n${profileData.phone}`: '정보 없음'}
+            </ProfileContact>
           </ProfileInfo>
         </ProfileSection>
 
@@ -107,7 +138,7 @@ const CaregiverMyPage = () => {
             <MenuText>사진 전체 다운로드</MenuText>
           </MenuItem>
           <MenuItem>
-            <MenuText>최근 식제한 사진</MenuText>
+            <MenuText>최근 삭제한 사진</MenuText>
           </MenuItem>
         </MenuSection>
 
