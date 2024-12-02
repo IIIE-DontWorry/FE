@@ -7,6 +7,7 @@ import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {ReportProvider} from './src/store/ReportContext'; // Context 추가
 import {MessageProvider} from './src/store/MessageContext';
 import {UserProvider} from './src/store/UserContext';
+import { FontSizeProvider } from './src/store/FontSizeContext';
 
 const AppContainer = styled.SafeAreaView`
   flex: 1;
@@ -22,15 +23,17 @@ const App = () => {
   return (
     <SafeAreaProvider>
       <AppContainer>
-        <UserProvider>
-          <ReportProvider>
-            <MessageProvider>
-              <NavigationContainer>
-                <MainNavigator />
-              </NavigationContainer>
-            </MessageProvider>
-          </ReportProvider>
-        </UserProvider>
+        <FontSizeProvider>
+          <UserProvider>
+            <ReportProvider>
+              <MessageProvider>
+                <NavigationContainer>
+                  <MainNavigator />
+                </NavigationContainer>
+              </MessageProvider>
+            </ReportProvider>
+          </UserProvider>
+        </FontSizeProvider>
       </AppContainer>
     </SafeAreaProvider>
   );
