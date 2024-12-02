@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import styled from 'styled-components/native';
-import { ActivityIndicator, Alert } from 'react-native';
+import {ActivityIndicator, Alert} from 'react-native';
 import TopNavigationBar from '../../components/common/TopNavigationBar';
 import ApiService from '../../utils/api';
 
@@ -84,18 +84,25 @@ const MedicationItem = styled.Text`
 
 const ViewProtectorProfile = () => {
   const [loading, setLoading] = useState(true);
-  const [profileData, setProfileData] = useState<ApiResponse['data'] | null>(null);
+  const [profileData, setProfileData] = useState<ApiResponse['data'] | null>(
+    null,
+  );
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await ApiService.get<ApiResponse>('/guardian/myPage/1'); // guardianId는 실제 값으로 대체 필요
+        const response = await ApiService.get<ApiResponse>(
+          '/guardian/myPage/1',
+        ); // guardianId는 실제 값으로 대체 필요
         if (response.status === 'success') {
           setProfileData(response.data);
         }
       } catch (error) {
         console.error('Error fetching profile:', error);
-        Alert.alert('오류 발생', '보호자 프로필 정보를 가져오는데 실패했습니다.');
+        Alert.alert(
+          '오류 발생',
+          '보호자 프로필 정보를 가져오는데 실패했습니다.',
+        );
       } finally {
         setLoading(false);
       }
@@ -124,11 +131,15 @@ const ViewProtectorProfile = () => {
           </InputGroup>
           <InputGroup>
             <Label>연락처</Label>
-            <InfoText>{profileData?.guardianInfo.phone || '정보 없음'}</InfoText>
+            <InfoText>
+              {profileData?.guardianInfo.phone || '정보 없음'}
+            </InfoText>
           </InputGroup>
           <InputGroup>
             <Label>주소</Label>
-            <InfoText>{profileData?.guardianInfo.address || '정보 없음'}</InfoText>
+            <InfoText>
+              {profileData?.guardianInfo.address || '정보 없음'}
+            </InfoText>
           </InputGroup>
         </Section>
 
@@ -144,11 +155,15 @@ const ViewProtectorProfile = () => {
           </InputGroup>
           <InputGroup>
             <Label>질병명</Label>
-            <InfoText>{profileData?.patientInfo.diseaseName || '정보 없음'}</InfoText>
+            <InfoText>
+              {profileData?.patientInfo.diseaseName || '정보 없음'}
+            </InfoText>
           </InputGroup>
           <InputGroup>
             <Label>병원명</Label>
-            <InfoText>{profileData?.patientInfo.hospitalName || '정보 없음'}</InfoText>
+            <InfoText>
+              {profileData?.patientInfo.hospitalName || '정보 없음'}
+            </InfoText>
           </InputGroup>
           <InputGroup>
             <Label>복용 약물</Label>

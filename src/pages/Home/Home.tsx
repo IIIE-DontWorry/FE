@@ -10,6 +10,7 @@ import Heart from '../../assets/home/heart.svg';
 import Book from '../../assets/home/book.svg';
 import {useMessages} from '../../store/MessageContext';
 import RecentMessages from '../../components/Home/RecentMessages';
+import RecentReports from '../../components/Home/RecentReports';
 const Container = styled.ScrollView`
   flex: 1;
   background-color: #ffffff;
@@ -233,7 +234,7 @@ const Home = () => {
       </Section>
 
       {/* 최근 간병 보고서 섹션 */}
-      <Section>
+      {/* <Section>
         <SectionHeader>
           <SectionTitleContainer>
             <IconContainer>
@@ -272,7 +273,8 @@ const Home = () => {
               ))}
           </ItemContainer>
         )}
-      </Section>
+      </Section> */}
+      <RecentReports />
 
       {/* 최근 쪽지 섹션 */}
       <RecentMessages />

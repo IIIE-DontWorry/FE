@@ -1,9 +1,24 @@
 import React, {useState, useEffect} from 'react';
+import {
+  ScrollView,
+  Alert,
+  RefreshControl,
+  ActivityIndicator,
+} from 'react-native';
 import styled from 'styled-components/native';
-import {ScrollView, Alert} from 'react-native';
 import MessageBubbleComponent from '../../components/Message/MessageBubble';
 import MessageInput from '../../components/Message/MessageInput';
 import ApiService from '../../utils/api';
+
+// 메시지 타입 정의
+interface MessageType {
+  id: number;
+  text: string;
+  isMe: boolean;
+  time: string;
+  date: string;
+  author: string;
+}
 
 // Styled Components
 const Container = styled.View`
@@ -35,24 +50,40 @@ const DateText = styled.Text`
   font-size: 12px;
 `;
 
-const Message = () => {
-  const [messages, setMessages] = useState([]);
+const LoadingIndicator = styled(ActivityIndicator)`
+  margin-top: 20px;
+`;
+
+const Message: React.FC = () => {
+  const [messages, setMessages] = useState<MessageType[]>([]);
+  const [refreshing, setRefreshing] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const careGiverId = 1;
   const guardianId = 1;
 
   const fetchMessages = async () => {
     try {
-      const response = await ApiService.post('notes', {
+      setLoading(true);
+      const response = await ApiService.post<{
+        status: string;
+        message: string;
+        data: {
+          id: number;
+          createdBy: string;
+          createdAt: string;
+          noteContent: string;
+        }[];
+      }>('notes', {
         careGiverId,
         guardianId,
       });
 
       if (response.status === 'success') {
-        const formattedMessages = response.data.map(message => ({
+        const formattedMessages: MessageType[] = response.data.map(message => ({
           id: message.id,
           text: message.noteContent,
-          isMe: message.createdBy === 'caregiver', // 내가 보낸 메시지 여부
+          isMe: message.createdBy === 'caregiver',
           time: new Date(message.createdAt).toLocaleTimeString('ko-KR', {
             hour: '2-digit',
             minute: '2-digit',
@@ -64,7 +95,6 @@ const Message = () => {
           }),
           author: message.createdBy === 'caregiver' ? '간병인' : '보호자',
         }));
-
         setMessages(formattedMessages);
       } else {
         Alert.alert(
@@ -75,7 +105,17 @@ const Message = () => {
     } catch (error) {
       console.error('쪽지 조회 오류:', error);
       Alert.alert('오류', '쪽지 목록을 가져오는 중 문제가 발생했습니다.');
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const onRefresh = async () => {
+    console.log('새로고침 시작'); // 디버깅 로그
+    setRefreshing(true);
+    await fetchMessages();
+    setRefreshing(false);
+    console.log('새로고침 종료'); // 디버깅 로그
   };
 
   useEffect(() => {
@@ -84,8 +124,19 @@ const Message = () => {
 
   return (
     <Container>
-      {messages.length > 0 ? (
-        <ScrollView>
+      {loading ? (
+        <LoadingIndicator size="large" color="#00d6a3" />
+      ) : messages.length > 0 ? (
+        <ScrollView
+          contentContainerStyle={{flexGrow: 1}}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={['#00d6a3']}
+              progressBackgroundColor="#f8f9fa"
+            />
+          }>
           {messages.map((message, index) => {
             const showDate =
               index === 0 || messages[index - 1].date !== message.date;

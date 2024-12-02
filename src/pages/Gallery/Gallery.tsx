@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -12,7 +12,7 @@ import styled from 'styled-components/native';
 import {useNavigation} from '@react-navigation/native';
 import FloatingButton from '../../components/Report/FloatingButton';
 import Pen from '../../assets/report/pen.svg';
-import {requestGalleryPermission} from '../../utils/requestGalleryPermission'; // 권한 요청 컴포넌트 임포트
+import ApiService from '../../utils/api';
 
 const Container = styled.View`
   flex: 1;
@@ -85,6 +85,17 @@ const FloatingButtonContainer = styled.View`
   right: 0px;
 `;
 
+const EmptyMessageContainer = styled.View`
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+`;
+
+const EmptyMessageText = styled.Text`
+  font-size: 18px;
+  color: #888;
+`;
+
 const formatDate = (date: string) => {
   const givenDate = new Date(date);
   const year = givenDate.getFullYear();
@@ -108,38 +119,28 @@ const timeFromNow = (date: string) => {
   }
 };
 
-const mockupData = [
-  {
-    id: 1,
-    author: '보호자',
-    date: '2024-11-30T10:30:00',
-    description: '오늘 산책 다녀오신 사진 첨부해요.',
-    images: [
-      'https://via.placeholder.com/150',
-      'https://via.placeholder.com/150/0000FF',
-      'https://via.placeholder.com/150/FF0000',
-      'https://via.placeholder.com/150',
-      'https://via.placeholder.com/150/0000FF',
-      'https://via.placeholder.com/150/FF0000',
-    ],
-  },
-  {
-    id: 2,
-    author: '간병인',
-    date: '2024-11-29T18:00:00',
-    description: '오늘 드신 아침식사 사진입니다.',
-    images: [
-      'https://via.placeholder.com/150/00FF00',
-      'https://via.placeholder.com/150/FFFF00',
-      'https://via.placeholder.com/150/FF00FF',
-    ],
-  },
-];
-
 const Gallery = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [galleryData, setGalleryData] = useState([]);
   const navigation = useNavigation();
+
+  const fetchGalleryData = async () => {
+    try {
+      const response = await ApiService.post('/gallery/1/1/1', {}); // Example IDs with POST method
+      if (response.status === 'success') {
+        setGalleryData(response.data);
+      } else {
+        console.error('Failed to fetch gallery:', response.message);
+      }
+    } catch (error) {
+      console.error('Error fetching gallery:', error.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchGalleryData();
+  }, []);
 
   const openModal = (image: string) => {
     setSelectedImage(image);
@@ -150,47 +151,53 @@ const Gallery = () => {
     setModalVisible(false);
   };
 
-  const handleFloatingButtonPress = async () => {
+  const handleFloatingButtonPress = () => {
     navigation.navigate('GalleryCreate');
   };
 
   return (
     <Container>
-      <ScrollContainer>
-        {mockupData.map(item => (
-          <GalleryItem key={item.id}>
-            <PenIconContainer onPress={() => console.log('Edit post')}>
-              <Pen width={18} height={18} />
-            </PenIconContainer>
-            <ItemHeader>
-              <ItemTitle>{item.author}</ItemTitle>
-            </ItemHeader>
-            <ItemDate>
-              {timeFromNow(item.date)} | {formatDate(item.date)}
-            </ItemDate>
-            <Divider />
-            <DescriptionText>{item.description}</DescriptionText>
-            <ImageSlider>
-              <FlatList
-                horizontal
-                data={item.images}
-                keyExtractor={(_, index) => index.toString()}
-                renderItem={({item: image}) => (
-                  <TouchableOpacity
-                    onLongPress={() => openModal(image)}
-                    style={{marginRight: 8}}>
-                    <Image
-                      source={{uri: image}}
-                      style={{width: 100, height: 100, borderRadius: 8}}
-                    />
-                  </TouchableOpacity>
-                )}
-                showsHorizontalScrollIndicator={false}
-              />
-            </ImageSlider>
-          </GalleryItem>
-        ))}
-      </ScrollContainer>
+      {galleryData.length > 0 ? (
+        <ScrollContainer>
+          {galleryData.map(item => (
+            <GalleryItem key={item.galleryId}>
+              <PenIconContainer onPress={() => console.log('Edit post')}>
+                <Pen width={18} height={18} />
+              </PenIconContainer>
+              <ItemHeader>
+                <ItemTitle>{item.createdBy}</ItemTitle>
+              </ItemHeader>
+              <ItemDate>
+                {timeFromNow(item.createdAt)} | {formatDate(item.createdAt)}
+              </ItemDate>
+              <Divider />
+              <DescriptionText>{item.title}</DescriptionText>
+              <ImageSlider>
+                <FlatList
+                  horizontal
+                  data={item.images}
+                  keyExtractor={image => image.imageId.toString()}
+                  renderItem={({item: image}) => (
+                    <TouchableOpacity
+                      onLongPress={() => openModal(image.imageUrl)}
+                      style={{marginRight: 8}}>
+                      <Image
+                        source={{uri: image.imageUrl}}
+                        style={{width: 100, height: 100, borderRadius: 8}}
+                      />
+                    </TouchableOpacity>
+                  )}
+                  showsHorizontalScrollIndicator={false}
+                />
+              </ImageSlider>
+            </GalleryItem>
+          ))}
+        </ScrollContainer>
+      ) : (
+        <EmptyMessageContainer>
+          <EmptyMessageText>아직 업로드된 사진이 없어요.</EmptyMessageText>
+        </EmptyMessageContainer>
+      )}
 
       <Modal visible={modalVisible} transparent={true} animationType="fade">
         <TouchableOpacity style={styles.modalBackground} onPress={closeModal}>
@@ -198,7 +205,6 @@ const Gallery = () => {
         </TouchableOpacity>
       </Modal>
 
-      {/* 플로팅 버튼 */}
       <FloatingButtonContainer>
         <FloatingButton onPress={handleFloatingButtonPress} />
       </FloatingButtonContainer>

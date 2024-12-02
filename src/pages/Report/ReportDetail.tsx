@@ -1,7 +1,9 @@
-import React from 'react';
-import {ScrollView, Text, View, TextInput} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {ScrollView, Text, Alert, View, TouchableOpacity} from 'react-native';
 import styled from 'styled-components/native';
 import CheckBox from 'react-native-check-box';
+import ApiService from '../../utils/api';
+import BackIcon from '../../assets/common/back-icon.svg'; // Back-icon 추가
 
 const Container = styled.ScrollView`
   flex: 1;
@@ -10,9 +12,21 @@ const Container = styled.ScrollView`
 
 const Header = styled.View`
   padding: 16px;
+  flex-direction: row;
   align-items: center;
+  justify-content: space-between; /* 좌우 배치 */
   border-bottom-width: 1px;
   border-bottom-color: #ddd;
+`;
+
+const BackButton = styled.TouchableOpacity`
+  flex: 1;
+  justify-content: flex-start; /* 왼쪽 정렬 */
+`;
+
+const HeaderTitleContainer = styled.View`
+  flex: 2;
+  margin-right: 70px;
 `;
 
 const HeaderText = styled.Text`
@@ -33,142 +47,172 @@ const SectionTitle = styled.Text`
   margin-bottom: 8px;
 `;
 
-const ReadOnlyTextInput = styled(TextInput)`
-  height: 80px;
-  border-color: #ddd;
-  border-width: 1px;
-  padding: 8px;
-  border-radius: 8px;
-  background-color: #f3f3f3; /* 수정 불가 영역의 배경 색 */
-  color: #555; /* 텍스트 색상 */
-`;
-
 const TimeEntry = styled.View`
-  margin-bottom: 8px;
-  padding: 8px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background-color: #f3f3f3;
+  border-bottom-width: 1px;
+  border-bottom-color: #ddd;
+  padding: 8px 0;
 `;
 
 const TimeText = styled.Text`
   color: #333;
 `;
 
-const CheckBoxWrapper = styled.View`
+const Row = styled.View`
   flex-direction: row;
   align-items: center;
-  margin-right: 16px;
+  justify-content: space-between;
   margin-bottom: 8px;
 `;
 
-const ReportDetail = ({route}) => {
-  const {report} = route.params;
+const CheckBoxGroup = styled.View`
+  flex-direction: row;
+  margin-bottom: 8px;
+`;
+
+const CheckItem = styled.View`
+  flex-direction: row;
+  align-items: center;
+  margin-right: 25px;
+`;
+
+const CheckText = styled.Text`
+  margin-left: 8px;
+  color: #555;
+`;
+
+const ReadOnlyText = styled.Text`
+  color: #555;
+  margin-bottom: 8px;
+`;
+
+const ReportDetail = ({route, navigation}) => {
+  const {careReportId} = route.params;
+  const [report, setReport] = useState(null);
+
+  useEffect(() => {
+    console.log('Received reportId:', careReportId); // 디버깅
+    const fetchReportDetails = async () => {
+      try {
+        const response = await ApiService.get(
+          `care-reports/details/${careReportId}`,
+        );
+        if (response.status === 'success') {
+          setReport(response.data);
+        } else {
+          throw new Error(response.message);
+        }
+      } catch (error) {
+        console.error('Error fetching report details:', error);
+        Alert.alert('오류', '보고서를 가져오는 중 문제가 발생했습니다.');
+        navigation.goBack();
+      }
+    };
+
+    fetchReportDetails();
+  }, [careReportId]);
+
+  if (!report) {
+    return (
+      <Container>
+        <Header>
+          <BackButton onPress={() => navigation.goBack()}>
+            <BackIcon width={24} height={24} />
+          </BackButton>
+          <HeaderTitleContainer>
+            <HeaderText>로딩 중...</HeaderText>
+          </HeaderTitleContainer>
+        </Header>
+      </Container>
+    );
+  }
 
   return (
     <Container>
       <Header>
-        <HeaderText>{report.date} 보고서</HeaderText>
+        <BackButton onPress={() => navigation.goBack()}>
+          <BackIcon width={24} height={24} />
+        </BackButton>
+        <HeaderTitleContainer>
+          <HeaderText>{report.createdAt} 간병 보고서</HeaderText>
+        </HeaderTitleContainer>
       </Header>
 
       {/* 날짜 섹션 */}
       <Section>
         <SectionTitle>날짜</SectionTitle>
-        <Text>{report.date}</Text>
+        <ReadOnlyText>{report.createdAt}</ReadOnlyText>
       </Section>
 
-      {/* 시간에 따른 일지 섹션 */}
+      {/* 시간에 따른 일지 */}
       <Section>
         <SectionTitle>시간에 따른 일지</SectionTitle>
-        {report.timeEntries && report.timeEntries.length > 0 ? (
-          report.timeEntries.map((entry, index) => (
-            <TimeEntry key={index}>
-              <TimeText>{entry}</TimeText>
-            </TimeEntry>
-          ))
-        ) : (
-          <Text>작성된 일지가 없습니다.</Text>
-        )}
+        {report.careScheduleResponses.map(entry => (
+          <TimeEntry key={entry.id}>
+            <TimeText>
+              {entry.activityAt} - {entry.description}
+            </TimeText>
+          </TimeEntry>
+        ))}
       </Section>
 
-      {/* 배변활동 및 식사여부 */}
+      {/* 식사 및 배변 여부 */}
       <Section>
-        <SectionTitle>배변활동 및 식사여부</SectionTitle>
-        <Text style={{color: '#888', fontSize: 12, marginBottom: 8}}>
-          ※ 아침, 점심, 저녁 순서대로 확인해주세요
-        </Text>
-        {['배변활동', '식사여부'].map((type, idx) => (
-          <View key={idx}>
-            <Text style={{fontWeight: 'bold', marginBottom: 4}}>{type}</Text>
-            <View
-              style={{
-                flexDirection: 'row',
-                flexWrap: 'wrap',
-                marginTop: 8,
-              }}>
-              {['morning', 'afternoon', 'evening'].map(time => (
-                <CheckBoxWrapper key={`${type}-${time}`}>
+        <SectionTitle>식사 및 배변 여부</SectionTitle>
+        {['meal', 'excretion'].map(category => (
+          <View key={category}>
+            <Text style={{fontWeight: 'bold', marginBottom: 4}}>
+              {category === 'meal' ? '식사 여부' : '배변 활동'}
+            </Text>
+            <CheckBoxGroup>
+              {['Morning', 'Afternoon', 'Evening'].map(time => (
+                <CheckItem key={`${category}${time}`}>
                   <CheckBox
                     isChecked={
-                      report.activities[type === '배변활동' ? 'bowel' : 'meal'][
-                        time
-                      ]
+                      report.mealExcretionResponse[
+                        `${category}${time}TakenStatus`
+                      ] || false
                     }
-                    disabled={true} // 체크박스 수정 불가
+                    disabled={true}
                   />
-                  <Text>
-                    {time === 'morning'
+                  <CheckText>
+                    {time === 'Morning'
                       ? '아침'
-                      : time === 'afternoon'
+                      : time === 'Afternoon'
                       ? '점심'
                       : '저녁'}
-                  </Text>
-                </CheckBoxWrapper>
+                  </CheckText>
+                </CheckItem>
               ))}
-            </View>
+            </CheckBoxGroup>
           </View>
         ))}
       </Section>
 
-      {/* 투약 체크 리스트 */}
+      {/* 투약 정보 */}
       <Section>
-        <SectionTitle>투약 체크 리스트</SectionTitle>
-        <Text style={{color: '#888', fontSize: 12, marginBottom: 8}}>
-          ※ 아침, 점심, 저녁 순서대로 확인해주세요
-        </Text>
-        {Object.entries(report.medications).map(([key, value]) => (
-          <View key={key}>
+        <SectionTitle>투약 정보</SectionTitle>
+        {report.medicationCheckResponse.map(med => (
+          <View key={med.id}>
             <Text style={{fontWeight: 'bold', marginBottom: 4}}>
-              {key === 'protein'
-                ? '단백질'
-                : key === 'arginine'
-                ? '아르기닌'
-                : key === 'creatine'
-                ? '크레아틴'
-                : '베타알라닌'}
+              {med.name}
             </Text>
-            <View
-              style={{
-                flexDirection: 'row',
-                flexWrap: 'wrap',
-                marginTop: 8,
-              }}>
+            <CheckBoxGroup>
               {['morning', 'afternoon', 'evening'].map(time => (
-                <CheckBoxWrapper key={`${key}-${time}`}>
+                <CheckItem key={`${med.id}-${time}`}>
                   <CheckBox
-                    isChecked={value[time]}
-                    disabled={true} // 체크박스 수정 불가
+                    isChecked={med[`${time}TakenStatus`]}
+                    disabled={true}
                   />
-                  <Text>
+                  <CheckText>
                     {time === 'morning'
                       ? '아침'
                       : time === 'afternoon'
                       ? '점심'
                       : '저녁'}
-                  </Text>
-                </CheckBoxWrapper>
+                  </CheckText>
+                </CheckItem>
               ))}
-            </View>
+            </CheckBoxGroup>
           </View>
         ))}
       </Section>
@@ -176,28 +220,22 @@ const ReportDetail = ({route}) => {
       {/* 특이사항 */}
       <Section>
         <SectionTitle>특이사항</SectionTitle>
-        <ReadOnlyTextInput
-          value={report.notes || '없음'}
-          editable={false} // 텍스트 수정 불가
-          multiline={true}
-        />
+        <ReadOnlyText>{report.specialNote || '없음'}</ReadOnlyText>
       </Section>
 
-      {/* 보호자 특별 요청 사항 */}
+      {/* 보호자 요청사항 */}
       <Section>
-        <SectionTitle>보호자 특별 요청 사항</SectionTitle>
-        {Object.entries(report.specialRequests).map(([key, value]) => (
-          <CheckBoxWrapper key={key}>
-            <CheckBox isChecked={value} disabled={true} />
-            <Text>
-              {key === 'massage'
-                ? '마사지 추가'
-                : key === 'additionalCare'
-                ? '추가 케어 요청'
-                : '영양제 추가'}
-            </Text>
-          </CheckBoxWrapper>
-        ))}
+        <SectionTitle>보호자 특별 요청사항</SectionTitle>
+        {report.guardianResponses.length > 0 ? (
+          report.guardianResponses.map(req => (
+            <CheckItem key={req.id}>
+              <CheckBox isChecked={req.isCheck} disabled={true} />
+              <CheckText>{req.request}</CheckText>
+            </CheckItem>
+          ))
+        ) : (
+          <ReadOnlyText>특별 요청사항 없음</ReadOnlyText>
+        )}
       </Section>
     </Container>
   );

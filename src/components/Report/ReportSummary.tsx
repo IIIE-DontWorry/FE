@@ -6,6 +6,7 @@ import Book from '../../assets/home/book.svg';
 import {TouchableOpacity, Text} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 
+// Styled Components
 const Container = styled.View`
   background-color: #f8f8f8;
   padding: 16px;
@@ -75,7 +76,36 @@ const ButtonText = styled.Text`
   font-size: 14px;
 `;
 
-const ReportSummary = ({report, onDetailPress}) => {
+// Props Type
+interface ReportSummaryProps {
+  report: {
+    id: number;
+    createdAt: string;
+    specialNote: string;
+    mealExcretionResponse: {
+      mealMorningTakenStatus: boolean;
+      mealAfternoonTakenStatus: boolean;
+      mealEveningTakenStatus: boolean;
+      excretionMorningTakenStatus: boolean;
+      excretionAfternoonTakenStatus: boolean;
+      excretionEveningTakenStatus: boolean;
+    };
+    medicationCheckResponse: {
+      id: number;
+      name: string;
+      morningTakenStatus: boolean;
+      afternoonTakenStatus: boolean;
+      eveningTakenStatus: boolean;
+    }[];
+  };
+  onDetailPress: () => void;
+}
+
+// Main Component
+const ReportSummary: React.FC<ReportSummaryProps> = ({
+  report,
+  onDetailPress,
+}) => {
   const navigation = useNavigation();
 
   return (
@@ -84,85 +114,106 @@ const ReportSummary = ({report, onDetailPress}) => {
       <Header>
         <TitleContainer>
           <BookIcon width={20} height={20} />
-          <Title>{report.date}</Title>
+          <Title>{report.createdAt}</Title>
         </TitleContainer>
         <TouchableOpacity
-          onPress={
-            () => navigation.navigate('ReportUpdate', {report}) // 'ReportUpdate'로 이동
+          onPress={() =>
+            navigation.navigate('ReportUpdate', {careReportId: report.id})
           }>
           <Pen width={20} height={20} />
         </TouchableOpacity>
       </Header>
 
-      {/* 배변활동 */}
+      {/* Meal and Excretion */}
       <Section>
-        <SectionTitle>배변활동</SectionTitle>
+        <SectionTitle>식사 여부</SectionTitle>
         <CheckBoxGroup>
           <CheckItem>
-            <CheckBox isChecked={report.activities.bowel.morning} />
+            <CheckBox
+              isChecked={report.mealExcretionResponse.mealMorningTakenStatus}
+            />
             <CheckText>아침</CheckText>
           </CheckItem>
           <CheckItem>
-            <CheckBox isChecked={report.activities.bowel.afternoon} />
+            <CheckBox
+              isChecked={report.mealExcretionResponse.mealAfternoonTakenStatus}
+            />
             <CheckText>점심</CheckText>
           </CheckItem>
           <CheckItem>
-            <CheckBox isChecked={report.activities.bowel.evening} />
+            <CheckBox
+              isChecked={report.mealExcretionResponse.mealEveningTakenStatus}
+            />
             <CheckText>저녁</CheckText>
           </CheckItem>
         </CheckBoxGroup>
       </Section>
 
-      {/* 식사여부 */}
       <Section>
-        <SectionTitle>식사여부</SectionTitle>
+        <SectionTitle>배변 여부</SectionTitle>
         <CheckBoxGroup>
           <CheckItem>
-            <CheckBox isChecked={report.activities.meal.morning} />
+            <CheckBox
+              isChecked={
+                report.mealExcretionResponse.excretionMorningTakenStatus
+              }
+            />
             <CheckText>아침</CheckText>
           </CheckItem>
           <CheckItem>
-            <CheckBox isChecked={report.activities.meal.afternoon} />
+            <CheckBox
+              isChecked={
+                report.mealExcretionResponse.excretionAfternoonTakenStatus
+              }
+            />
             <CheckText>점심</CheckText>
           </CheckItem>
           <CheckItem>
-            <CheckBox isChecked={report.activities.meal.evening} />
+            <CheckBox
+              isChecked={
+                report.mealExcretionResponse.excretionEveningTakenStatus
+              }
+            />
             <CheckText>저녁</CheckText>
           </CheckItem>
         </CheckBoxGroup>
       </Section>
 
-      {/* 투약 여부 */}
+      {/* Medication */}
       <Section>
-        <SectionTitle>투약여부</SectionTitle>
-        <CheckBoxGroup>
-          <CheckItem>
-            <CheckBox isChecked={report.medications.protein.morning} />
-            <CheckText>단백질</CheckText>
-          </CheckItem>
-          <CheckItem>
-            <CheckBox isChecked={report.medications.arginine.morning} />
-            <CheckText>아르기닌</CheckText>
-          </CheckItem>
-          <CheckItem>
-            <CheckBox isChecked={report.medications.creatine.morning} />
-            <CheckText>크레아틴</CheckText>
-          </CheckItem>
-          <CheckItem>
-            <CheckBox isChecked={report.medications.betaAlanine.morning} />
-            <CheckText>베타알라닌</CheckText>
-          </CheckItem>
-        </CheckBoxGroup>
+        <SectionTitle>투약 정보</SectionTitle>
+        {report.medicationCheckResponse.map(medication => (
+          <Section key={medication.id}>
+            <SectionTitle>{medication.name}</SectionTitle>
+            <CheckBoxGroup>
+              <CheckItem>
+                <CheckBox isChecked={medication.morningTakenStatus} />
+                <CheckText>아침</CheckText>
+              </CheckItem>
+              <CheckItem>
+                <CheckBox isChecked={medication.afternoonTakenStatus} />
+                <CheckText>점심</CheckText>
+              </CheckItem>
+              <CheckItem>
+                <CheckBox isChecked={medication.eveningTakenStatus} />
+                <CheckText>저녁</CheckText>
+              </CheckItem>
+            </CheckBoxGroup>
+          </Section>
+        ))}
       </Section>
 
-      {/* 특이사항 */}
+      {/* Special Note */}
       <Section>
         <SectionTitle>특이사항</SectionTitle>
-        <Text>{report.notes || '없음'}</Text>
+        <Text>{report.specialNote || '없음'}</Text>
       </Section>
 
       {/* 자세히 보기 버튼 */}
-      <DetailButton onPress={onDetailPress}>
+      <DetailButton
+        onPress={() =>
+          navigation.navigate('ReportDetail', {careReportId: report.id})
+        }>
         <ButtonText>자세히 보기</ButtonText>
       </DetailButton>
     </Container>
