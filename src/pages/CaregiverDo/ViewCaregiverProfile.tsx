@@ -99,7 +99,7 @@ const ViewCaregiverProfile = () => {
         setError(null);
         
         // TODO: 실제 caregiverId와 patientId를 동적으로 받아와야 함
-        const response = await ApiService.get<ApiResponse>('/care-givers/myPage/3/1');
+        const response = await ApiService.get<ApiResponse>('/care-givers/myPage/1/1');
         
         if (response.status === 'success' && response.data) {
           setProfileData(response.data);
