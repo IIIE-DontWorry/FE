@@ -93,7 +93,7 @@ const ViewProtectorProfile = () => {
       try {
         // API 호출
         const response = await ApiService.get<ApiResponse>(
-          '/guardian/myPage/3',
+          '/guardian/myPage/1',
         );
 
         // 응답 상태 확인

@@ -151,7 +151,7 @@ const EditProtectorProfile = () => {
     const fetchProfile = async () => {
       try {
         const response = await ApiService.get<ApiResponse>(
-          '/guardian/myPage/4',
+          '/guardian/myPage/1',
         );
         const {guardianInfo, patientInfo} = response.data;
         setFormData({guardianInfo, patientInfo});

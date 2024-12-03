@@ -163,7 +163,7 @@ const ProtectorMypage = () => {
         setLoading(true);
         setError(null);
         const response = await ApiService.get<ApiResponse>(
-          '/guardian/myPage/3',
+          '/guardian/myPage/1',
         );
 
         if (response.status === 'success' && response.data) {
