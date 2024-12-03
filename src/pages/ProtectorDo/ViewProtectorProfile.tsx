@@ -90,7 +90,7 @@ const ViewProtectorProfile = () => {
     const fetchProfile = async () => {
       try {
         // API 호출
-        const response = await ApiService.get<ApiResponse>('/guardian/myPage/3');
+        const response = await ApiService.get<ApiResponse>('/guardian/myPage/1');
         
         // 응답 상태 확인
         if (response.status === 'success') {

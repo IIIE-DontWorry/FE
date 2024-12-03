@@ -90,7 +90,7 @@ const ViewProtectorProfile = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await ApiService.get<ApiResponse>('/care-givers/myPage/guardianProfile/3');
+        const response = await ApiService.get<ApiResponse>('/care-givers/myPage/guardianProfile/1');
         if (response.status === 'success') {
           setProfileData(response.data);
         }

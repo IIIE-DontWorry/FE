@@ -12,6 +12,18 @@ import {useMessages} from '../../store/MessageContext';
 import RecentMessages from '../../components/Home/RecentMessages';
 import RecentReports from '../../components/Home/RecentReports';
 import RecentGallery from '../../components/Home/RecentGallery';
+import {useUser} from '../../store/UserContext'; // useUser 추가
+import ApiService from '../../utils/api'; // API 서비스 추가
+
+// 매너 온도 API 응답 타입 정의
+interface ScoreResponse {
+  status: string;
+  message: string;
+  data: {
+    score: number;
+  };
+}
+
 const Container = styled.ScrollView`
   flex: 1;
   background-color: #ffffff;
@@ -145,12 +157,18 @@ const SmallText = styled.Text`
   margin-top: 2px;
 `;
 
-const ScoreIndicator = ({temperature}: {temperature: number}) => {
-  const progressWidth = `${(temperature / 50) * 100}%`;
+const ScoreIndicator = ({score}: {score: number}) => {
+  const progressPosition = (score / 100) * 100;
 
   return (
-    <View style={[styles.scoreIndicator, {left: progressWidth}]}>
-      <Text style={styles.scoreText}>{temperature.toFixed(1)}도</Text>
+    <View style={[
+      styles.scoreIndicator, 
+      {
+        left: `${progressPosition}%`,
+        transform: [{translateX: -20}]
+      }
+    ]}>
+      <Text style={styles.scoreText}>{score.toFixed(1)}도</Text>
       <Triangle />
     </View>
   );
@@ -161,7 +179,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     alignItems: 'center',
     top: -25,
-    transform: [{translateX: -20}],
   },
   scoreText: {
     fontSize: 12,
@@ -177,10 +194,38 @@ const Home = () => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [temperature, setTemperature] = useState(30);
   const {messages} = useMessages();
+  const {userType} = useUser();
+  const [score, setScore] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // 예시 API 호출 (실제 API에서 데이터를 가져오는 로직을 추가해야 함)
-  }, []);
+    const fetchMannerScore = async () => {
+      try {
+        let response: ScoreResponse;
+        
+        // userType에 따라 하드코딩된 ID로 API 호출
+        if (userType === '보호자') {
+          response = await ApiService.get<ScoreResponse>('/notes/score/guardian/1');
+        } else if (userType === '간병인') {
+          response = await ApiService.get<ScoreResponse>('/notes/score/caregiver/2');
+        } else {
+          setScore(0);
+          return;
+        }
+
+        if (response.status === 'success') {
+          setScore(response.data.score);
+        }
+      } catch (error) {
+        console.error('Error fetching manner score:', error);
+        setScore(0);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMannerScore();
+  }, [userType]);
 
   const openModal = (image: string) => {
     setSelectedImage(image);
@@ -191,20 +236,24 @@ const Home = () => {
     setModalVisible(false);
   };
 
-  const progressWidth = `${(temperature / 50) * 100}%`;
+  const progressWidth = `${(score / 100) * 100}%`;
 
   return (
     <Container>
       <MannerSection>
         <SectionHeader>
           <SectionTitleContainer>
-            <SectionTitle>매너 점수</SectionTitle>
+            <SectionTitle>매너 온도</SectionTitle>
           </SectionTitleContainer>
         </SectionHeader>
-        <Text>간병인이 당신의 매너 점수를 다음과 같이 판단할 수 있어요.</Text>
+        <Text>
+          {userType === '보호자' 
+            ? '간병인이 당신의 매너 온도를 다음과 같이 판단했어요.'
+            : '보호자가 당신의 매너 온도를 다음과 같이 판단했어요.'}
+        </Text>
         <ProgressContainer>
           <ProgressBar width={progressWidth} />
-          <ScoreIndicator temperature={temperature} />
+          <ScoreIndicator score={score} />
         </ProgressContainer>
       </MannerSection>
 

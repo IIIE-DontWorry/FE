@@ -96,7 +96,7 @@ const CaregiverMyPage = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await ApiService.get<ApiResponse>('/care-givers/myPage/3/1');
+        const response = await ApiService.get<ApiResponse>('/care-givers/myPage/1/1');
         if (response.status === 'success') {
           setProfileData(response.data);
         }
