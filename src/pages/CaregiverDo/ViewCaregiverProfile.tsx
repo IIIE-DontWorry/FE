@@ -5,20 +5,32 @@ import TopNavigationBar from '../../components/common/TopNavigationBar';
 import ApiService from '../../utils/api';
 
 // 인터페이스 정의
-interface CareerHistory {
-  career: string;
+interface ProfileData {
+  caregiverName: string;
+  phone: string;
+  hospital: string;
+  carrierHistory: string[];
+  patientName: string;
+  age: number;
+  diseaseName: string;
+  hospitalName: string;
+  address: string;
+}
+
+interface ErrorResponse {
+  status: string;
+  message: string;
+  errors: Array<{
+    code: string;
+    message: string;
+    details: string;
+  }>;
 }
 
 interface ApiResponse {
   status: string;
   message: string;
-  data: {
-    name: string;
-    phone: string;
-    hospital: string;
-    patientName: string;
-    careerHistories: CareerHistory[];
-  };
+  data: ProfileData;
 }
 
 const Container = styled.View`
@@ -77,18 +89,34 @@ const CareerItem = styled.Text`
 
 const ViewCaregiverProfile = () => {
   const [loading, setLoading] = useState(true);
-  const [profileData, setProfileData] = useState<ApiResponse['data'] | null>(null);
+  const [profileData, setProfileData] = useState<ProfileData | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await ApiService.get<ApiResponse>('/care-givers/myPage/1'); // caregiverId를 실제 값으로 대체 필요
-        if (response.status === 'success') {
+        setLoading(true);
+        setError(null);
+        
+        // TODO: 실제 caregiverId와 patientId를 동적으로 받아와야 함
+        const response = await ApiService.get<ApiResponse>('/care-givers/myPage/3/1');
+        
+        if (response.status === 'success' && response.data) {
           setProfileData(response.data);
         }
-      } catch (error) {
-        console.error('Error fetching profile:', error);
-        Alert.alert('오류 발생', '간병인 프로필 정보를 가져오는데 실패했습니다.');
+      } catch (err: any) {
+        console.error('Error fetching profile:', err);
+        
+        // API 에러 응답 처리
+        if (err.response?.data) {
+          const errorData = err.response.data as ErrorResponse;
+          const errorMessage = errorData.errors?.[0]?.message || errorData.message || '알 수 없는 오류가 발생했습니다.';
+          setError(errorMessage);
+          Alert.alert('오류 발생', errorMessage);
+        } else {
+          setError('서버와의 통신 중 오류가 발생했습니다.');
+          Alert.alert('오류 발생', '서버와의 통신 중 오류가 발생했습니다.\n잠시 후 다시 시도해주세요.');
+        }
       } finally {
         setLoading(false);
       }
@@ -104,6 +132,17 @@ const ViewCaregiverProfile = () => {
       </LoadingContainer>
     );
   }
+  
+  if (error) {
+    return (
+      <Container>
+        <TopNavigationBar title="간병인 프로필 조회" />
+        <LoadingContainer>
+          <InfoText>{error}</InfoText>
+        </LoadingContainer>
+      </Container>
+    );
+  }
 
   return (
     <Container>
@@ -113,7 +152,7 @@ const ViewCaregiverProfile = () => {
           <SectionTitle>간병인 정보</SectionTitle>
           <InputGroup>
             <Label>이름</Label>
-            <InfoText>{profileData?.name || '정보 없음'}</InfoText>
+            <InfoText>{profileData?.caregiverName || '정보 없음'}</InfoText>
           </InputGroup>
           <InputGroup>
             <Label>연락처</Label>
@@ -131,13 +170,29 @@ const ViewCaregiverProfile = () => {
             <Label>환자 이름</Label>
             <InfoText>{profileData?.patientName || '정보 없음'}</InfoText>
           </InputGroup>
+          <InputGroup>
+            <Label>나이</Label>
+            <InfoText>{profileData?.age || '정보 없음'}</InfoText>
+          </InputGroup>
+          <InputGroup>
+            <Label>질병명</Label>
+            <InfoText>{profileData?.diseaseName || '정보 없음'}</InfoText>
+          </InputGroup>
+          <InputGroup>
+            <Label>병원명</Label>
+            <InfoText>{profileData?.hospitalName || '정보 없음'}</InfoText>
+          </InputGroup>
+          <InputGroup>
+            <Label>주소</Label>
+            <InfoText>{profileData?.address || '정보 없음'}</InfoText>
+          </InputGroup>
         </Section>
 
         <Section>
           <SectionTitle>경력</SectionTitle>
           <CareerList>
-            {profileData?.careerHistories.map((career, index) => (
-              <CareerItem key={index}>• {career.career}</CareerItem>
+            {profileData?.carrierHistory.map((career, index) => (
+              <CareerItem key={index}>• {career}</CareerItem>
             )) || <InfoText>정보 없음</InfoText>}
           </CareerList>
         </Section>
