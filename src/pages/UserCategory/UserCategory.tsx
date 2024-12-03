@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {useUser} from '../../store/UserContext';
 import HeartIcon from '../../assets/category/heart.svg';
@@ -14,24 +14,34 @@ import {RootStackParamList} from '../../navigation/MainNavigator';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 type CategoryOption = '보호자' | '간병인' | '지인';
+type RouteProp = {
+  params: {
+    kakaoAccessToken: string;
+  };
+};
 
 const UserCategory = () => {
   const navigation = useNavigation<NavigationProp>();
+  const route = useRoute<RouteProp>(); // useRoute 훅으로 kakaoAccessToken 가져오기
+  const {kakaoAccessToken} = route.params; // route.params에서 kakaoAccessToken 추출
   const {setUserType} = useUser();
   const [selectedCategory, setSelectedCategory] =
     useState<CategoryOption | null>(null);
 
   const handleCategorySelect = (category: CategoryOption) => {
-    setUserType(category);
+    setUserType(category); // 선택한 카테고리를 UserContext에 설정
 
-    if (category === '보호자') {
-      navigation.navigate('ProtectorInfo');
-    } else if (category === '간병인') {
-      navigation.navigate('CaregiverInfo');
-    } else {
-      navigation.navigate('AcquaintanceInfo');
-    }
+    const targetScreen =
+      category === '보호자'
+        ? 'ProtectorInfo'
+        : category === '간병인'
+        ? 'CaregiverInfo'
+        : 'AcquaintanceInfo';
+
+    // 선택한 카테고리와 kakaoAccessToken 전달
+    navigation.navigate(targetScreen, {kakaoAccessToken});
   };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>

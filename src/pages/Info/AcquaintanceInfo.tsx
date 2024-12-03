@@ -35,9 +35,9 @@ const Required = styled.Text`
   color: red;
 `;
 
-const Input = styled.TextInput<{ hasError?: boolean }>`
+const Input = styled.TextInput<{hasError?: boolean}>`
   border-width: 1px;
-  border-color: ${props => props.hasError ? '#ff0000' : '#dddddd'};
+  border-color: ${props => (props.hasError ? '#ff0000' : '#dddddd')};
   border-radius: 8px;
   padding: 10px;
   background-color: #f5f5f5;
@@ -92,58 +92,59 @@ const AcquaintanceInfo = () => {
   const [errors, setErrors] = useState<Partial<Record<FormField, string>>>({});
 
   // 유효성 검사 규칙
- const validations = {
-  // 이름: 2~5글자 한글
-  name: (value: string) => {
-    const nameRegex = /^[가-힣]{2,5}$/;
-    return nameRegex.test(value);
-  },
+  const validations = {
+    // 이름: 2~5글자 한글
+    name: (value: string) => {
+      const nameRegex = /^[가-힣]{2,5}$/;
+      return nameRegex.test(value);
+    },
 
-  // 관계: 선택했는지 확인
-  relationship: (value: string) => {
-    return value.trim().length > 0;
-  },
+    // 관계: 선택했는지 확인
+    relationship: (value: string) => {
+      return value.trim().length > 0;
+    },
 
-  // 매칭 코드는 선택사항이므로 validation 제외
-};
+    // 매칭 코드는 선택사항이므로 validation 제외
+  };
 
-const errorMessages = {
-  name: '2~5글자의 한글로 입력해주세요',
-  relationship: '관계를 선택해주세요',
-  required: '필수 입력 항목입니다',
-};
+  const errorMessages = {
+    name: '2~5글자의 한글로 입력해주세요',
+    relationship: '관계를 선택해주세요',
+    required: '필수 입력 항목입니다',
+  };
 
-const validateField = (name: FormField, value: string): string => {
-  // 매칭 코드는 필수가 아님
-  if (!value && name !== 'matchingCode') {
-    return errorMessages.required;
-  }
-
-  // 값이 있는 경우에만 유효성 검사
-  if (value) {
-    switch (name) {
-      case 'name':
-        return validations.name(value) ? '' : errorMessages.name;
-      case 'relationship':
-        return validations.relationship(value) ? '' : errorMessages.relationship;
-      default:
-        return '';
+  const validateField = (name: FormField, value: string): string => {
+    // 매칭 코드는 필수가 아님
+    if (!value && name !== 'matchingCode') {
+      return errorMessages.required;
     }
-  }
 
-  return '';
-};
+    // 값이 있는 경우에만 유효성 검사
+    if (value) {
+      switch (name) {
+        case 'name':
+          return validations.name(value) ? '' : errorMessages.name;
+        case 'relationship':
+          return validations.relationship(value)
+            ? ''
+            : errorMessages.relationship;
+        default:
+          return '';
+      }
+    }
 
-const handleChange = (name: FormField, value: string) => {
-  setFormData(prev => ({...prev, [name]: value}));
-  const error = validateField(name, value);
-  setErrors(prev => ({...prev, [name]: error}));
-};
+    return '';
+  };
 
+  const handleChange = (name: FormField, value: string) => {
+    setFormData(prev => ({...prev, [name]: value}));
+    const error = validateField(name, value);
+    setErrors(prev => ({...prev, [name]: error}));
+  };
 
   const handleSubmit = () => {
     const newErrors: Partial<Record<FormField, string>> = {};
-    
+
     (Object.keys(formData) as FormField[]).forEach(key => {
       // matchingCode는 유효성 검사에서 제외
       if (key !== 'matchingCode') {
@@ -155,7 +156,7 @@ const handleChange = (name: FormField, value: string) => {
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length === 0) {
-      setAcquaintanceData(formData);  // Context에 데이터 저장
+      setAcquaintanceData(formData); // Context에 데이터 저장
       navigation.navigate('Main');
     }
   };
@@ -190,7 +191,7 @@ const handleChange = (name: FormField, value: string) => {
             />
             {errors.name && <ErrorText>{errors.name}</ErrorText>}
           </InputGroup>
- 
+
           <InputGroup>
             <Label>매칭 코드</Label>
             <Input
@@ -199,7 +200,7 @@ const handleChange = (name: FormField, value: string) => {
               onChangeText={text => handleChange('matchingCode', text)}
             />
           </InputGroup>
- 
+
           <InputGroup>
             <Label>
               환자와의 관계 <Required>*</Required>
@@ -223,7 +224,7 @@ const handleChange = (name: FormField, value: string) => {
             )}
           </InputGroup>
         </Section>
- 
+
         <SubmitButton onPress={handleSubmit}>
           <SubmitText>작성 완료</SubmitText>
         </SubmitButton>

@@ -198,7 +198,7 @@ const GalleryCreate: React.FC<GalleryCreateProps> = ({route, navigation}) => {
           {
             text: '확인',
             onPress: () => {
-              navigation.navigate('Gallery', {refresh: true});
+              navigation.navigate('Main', {refresh: true});
             },
           },
         ]);

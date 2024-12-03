@@ -88,6 +88,7 @@ const EmptyMessageContainer = styled.View`
   flex: 1;
   justify-content: center;
   align-items: center;
+  height: 200px;
 `;
 
 const EmptyMessageText = styled.Text`

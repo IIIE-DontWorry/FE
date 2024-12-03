@@ -79,6 +79,7 @@ const EmptyMessageContainer = styled.View`
   flex: 1;
   justify-content: center;
   align-items: center;
+  height: 200px;
 `;
 
 const EmptyMessageText = styled.Text`
@@ -86,6 +87,7 @@ const EmptyMessageText = styled.Text`
   color: #888;
   font-weight: 600;
   text-align: center;
+  height: 50px;
 `;
 const RecentReports = () => {
   const [reports, setReports] = useState([]);

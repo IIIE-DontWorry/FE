@@ -236,10 +236,10 @@ const ReportCreate = ({route, navigation}) => {
 
       console.log('Payload:', JSON.stringify(payload, null, 2)); // 디버깅용 로그
 
-      const response = await ApiService.patch(`care-reports/3`, payload);
+      const response = await ApiService.patch(`care-reports/${id}`, payload);
       if (response.status === 'success') {
         Alert.alert('성공', '보고서가 성공적으로 저장되었습니다.');
-        navigation.navigate('Report', {shouldReload: true}); // 리로드 트리거 전달
+        navigation.navigate('Main', {shouldReload: true}); // 리로드 트리거 전달
       } else {
         throw new Error('서버에서 에러가 발생했습니다.');
       }

@@ -1,5 +1,12 @@
 import React, {useState, useEffect} from 'react';
-import {Text, View, Modal, TouchableOpacity, StyleSheet} from 'react-native';
+import {
+  Text,
+  View,
+  Modal,
+  TouchableOpacity,
+  StyleSheet,
+  RefreshControl,
+} from 'react-native';
 import styled from 'styled-components/native';
 import {useNavigation} from '@react-navigation/native';
 import {useReports} from '../../store/ReportContext'; // useReports 가져오기
@@ -161,13 +168,14 @@ const ScoreIndicator = ({score}: {score: number}) => {
   const progressPosition = (score / 100) * 100;
 
   return (
-    <View style={[
-      styles.scoreIndicator, 
-      {
-        left: `${progressPosition}%`,
-        transform: [{translateX: -20}]
-      }
-    ]}>
+    <View
+      style={[
+        styles.scoreIndicator,
+        {
+          left: `${progressPosition}%`,
+          transform: [{translateX: -20}],
+        },
+      ]}>
       <Text style={styles.scoreText}>{score.toFixed(1)}도</Text>
       <Triangle />
     </View>
@@ -197,17 +205,22 @@ const Home = () => {
   const {userType} = useUser();
   const [score, setScore] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     const fetchMannerScore = async () => {
       try {
         let response: ScoreResponse;
-        
+
         // userType에 따라 하드코딩된 ID로 API 호출
         if (userType === '보호자') {
-          response = await ApiService.get<ScoreResponse>('/notes/score/guardian/1');
+          response = await ApiService.get<ScoreResponse>(
+            '/notes/score/guardian/1',
+          );
         } else if (userType === '간병인') {
-          response = await ApiService.get<ScoreResponse>('/notes/score/caregiver/2');
+          response = await ApiService.get<ScoreResponse>(
+            '/notes/score/caregiver/1',
+          );
         } else {
           setScore(0);
           return;
@@ -236,10 +249,24 @@ const Home = () => {
     setModalVisible(false);
   };
 
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchMessages(); // 메시지를 새로 고침
+    setRefreshing(false);
+  };
+
   const progressWidth = `${(score / 100) * 100}%`;
 
   return (
-    <Container>
+    <Container
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          colors={['#00d6a3']}
+          progressBackgroundColor="#f8f9fa"
+        />
+      }>
       <MannerSection>
         <SectionHeader>
           <SectionTitleContainer>
@@ -247,7 +274,7 @@ const Home = () => {
           </SectionTitleContainer>
         </SectionHeader>
         <Text>
-          {userType === '보호자' 
+          {userType === '보호자'
             ? '간병인이 당신의 매너 온도를 다음과 같이 판단했어요.'
             : '보호자가 당신의 매너 온도를 다음과 같이 판단했어요.'}
         </Text>
@@ -257,79 +284,11 @@ const Home = () => {
         </ProgressContainer>
       </MannerSection>
 
-      {/* <Section>
-        <SectionHeader>
-          <SectionTitleContainer>
-            <IconContainer>
-              <GalleryIcon width={18} height={18} />
-            </IconContainer>
-            <SectionTitle>최근 갤러리</SectionTitle>
-          </SectionTitleContainer>
-          <MoreButton onPress={() => navigation.navigate('Gallery')}>
-            <MoreText>더보기 &gt;</MoreText>
-          </MoreButton>
-        </SectionHeader>
-        <ItemContainer>
-          {[1, 2, 3].map((_, index) => (
-            <Item key={index} onPress={() => openModal('Image')}>
-              <ItemImage />
-              <ItemInfo>
-                <Heart width={20} height={20} />
-                <ItemDate>2024.10.15</ItemDate>
-              </ItemInfo>
-              <ItemAuthor>작성자</ItemAuthor>
-            </Item>
-          ))}
-        </ItemContainer>
-      </Section> */}
       <RecentGallery />
-      {/* 최근 간병 보고서 섹션 */}
-      {/* <Section>
-        <SectionHeader>
-          <SectionTitleContainer>
-            <IconContainer>
-              <ReportIcon width={18} height={18} />
-            </IconContainer>
-            <SectionTitle>최근 간병 보고서</SectionTitle>
-          </SectionTitleContainer>
-          <MoreButton onPress={() => navigation.navigate('Report')}>
-            <MoreText>더보기 &gt;</MoreText>
-          </MoreButton>
-        </SectionHeader>
-        {reports.length === 0 ? (
-          <EmptyMessageContainer>
-            <EmptyMessageText>
-              최근 간병보고서가 아직 작성되지 않았어요!
-            </EmptyMessageText>
-          </EmptyMessageContainer>
-        ) : (
-          <ItemContainer>
-            {reports
-              .sort(
-                (a, b) =>
-                  new Date(b.date).getTime() - new Date(a.date).getTime(),
-              )
-              .slice(0, 3)
-              .map((report, index) => (
-                <Item
-                  key={index}
-                  onPress={() => navigation.navigate('ReportDetail', {report})}>
-                  <BookImageContainer>
-                    <Book width={70} height={70} />
-                  </BookImageContainer>
-                  <ItemDate>{report.date}</ItemDate>
-                  <SmallText>간병인</SmallText>
-                </Item>
-              ))}
-          </ItemContainer>
-        )}
-      </Section> */}
       <RecentReports />
 
-      {/* 최근 쪽지 섹션 */}
       <RecentMessages />
 
-      {/* 이미지 확대 모달 */}
       <Modal visible={isModalVisible} transparent={true} animationType="fade">
         <TouchableOpacity
           style={{

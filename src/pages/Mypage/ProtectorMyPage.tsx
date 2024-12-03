@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import styled from 'styled-components/native';
-import { Clipboard, TouchableOpacity, Alert } from 'react-native';
+import {Clipboard, TouchableOpacity, Alert} from 'react-native';
 import TopNavigationBar from '../../components/common/TopNavigationBar';
-import { useUser } from '../../store/UserContext';
-import { useFontSize } from '../../store/FontSizeContext';
-import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../../navigation/MainNavigator';
+import {useUser} from '../../store/UserContext';
+import {useFontSize} from '../../store/FontSizeContext';
+import {useNavigation} from '@react-navigation/native';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {RootStackParamList} from '../../navigation/MainNavigator';
 import ApiService from '../../utils/api';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
@@ -69,14 +69,14 @@ const ProfileInfo = styled.View`
 `;
 
 const ProfileName = styled.Text<FontSizeProps>`
-  font-size: ${({ fontSizes }) => fontSizes[3]}px; /* 기본 18px */
+  font-size: ${({fontSizes}) => fontSizes[3]}px; /* 기본 18px */
   font-weight: bold;
   margin-bottom: 5px;
 `;
 
 const ProfileContact = styled.Text<FontSizeProps>`
   color: #666;
-  font-size: ${({ fontSizes }) => fontSizes[1]}px; /* 기본 14px */
+  font-size: ${({fontSizes}) => fontSizes[1]}px; /* 기본 14px */
 `;
 
 const MenuSection = styled.View`
@@ -86,7 +86,7 @@ const MenuSection = styled.View`
 `;
 
 const MenuTitle = styled.Text<FontSizeProps>`
-  font-size: ${({ fontSizes }) => fontSizes[2]}px; /* 기본 16px */
+  font-size: ${({fontSizes}) => fontSizes[2]}px; /* 기본 16px */
   font-weight: bold;
   padding: 0 20px 10px 20px;
 `;
@@ -97,7 +97,7 @@ const MenuItemContainer = styled.TouchableOpacity`
 `;
 
 const MenuText = styled.Text<FontSizeProps>`
-  font-size: ${({ fontSizes }) => fontSizes[2]}px; /* 기본 16px */
+  font-size: ${({fontSizes}) => fontSizes[2]}px; /* 기본 16px */
   color: #333;
 `;
 
@@ -110,14 +110,14 @@ const CodeSection = styled.View`
 `;
 
 const CodeTitle = styled.Text<FontSizeProps>`
-  font-size: ${({ fontSizes }) => fontSizes[3]}px; /* 기본 18px */
+  font-size: ${({fontSizes}) => fontSizes[3]}px; /* 기본 18px */
   font-weight: bold;
   margin-bottom: 15px;
   color: #333;
 `;
 
 const CodeText = styled.Text<FontSizeProps>`
-  font-size: ${({ fontSizes }) => fontSizes[5]}px; /* 기본 24px */
+  font-size: ${({fontSizes}) => fontSizes[5]}px; /* 기본 24px */
   font-weight: bold;
   color: #00d6a3;
   margin-bottom: 15px;
@@ -134,15 +134,17 @@ const CopyButton = styled.TouchableOpacity`
 
 const CopyButtonText = styled.Text<FontSizeProps>`
   color: #ffffff;
-  font-size: ${({ fontSizes }) => fontSizes[2]}px; /* 기본 16px */
+  font-size: ${({fontSizes}) => fontSizes[2]}px; /* 기본 16px */
 `;
 
 const ProtectorMypage = () => {
   const navigation = useNavigation<NavigationProp>();
-  const { protectorData } = useUser();
-  const { fontSizes } = useFontSize();
+  const {protectorData} = useUser();
+  const {fontSizes} = useFontSize();
   const [loading, setLoading] = useState(true);
-  const [profileData, setProfileData] = useState<ApiResponse['data'] | null>(null);
+  const [profileData, setProfileData] = useState<ApiResponse['data'] | null>(
+    null,
+  );
   const [error, setError] = useState<string | null>(null);
 
   const copyToClipboard = async (code: string) => {
@@ -160,15 +162,18 @@ const ProtectorMypage = () => {
       try {
         setLoading(true);
         setError(null);
-        const response = await ApiService.get<ApiResponse>('/guardian/myPage/3');
-        
+        const response = await ApiService.get<ApiResponse>(
+          '/guardian/myPage/1', // API 엔드포인트 수정
+        );
+
         if (response.status === 'success' && response.data) {
           setProfileData(response.data);
         }
       } catch (error: any) {
         console.error('Error fetching profile:', error);
-        const errorMessage = error.response?.data?.errors?.[0]?.message || 
-                           '프로필 정보를 가져오는데 실패했습니다.';
+        const errorMessage =
+          error.response?.data?.errors?.[0]?.message ||
+          '프로필 정보를 가져오는데 실패했습니다.';
         setError(errorMessage);
         Alert.alert('오류 발생', errorMessage);
       } finally {
@@ -210,35 +215,41 @@ const ProtectorMypage = () => {
 
         <CodeSection>
           <CodeTitle fontSizes={fontSizes}>보호자 매칭 코드</CodeTitle>
-          <CodeText fontSizes={fontSizes}>F3Rr102A</CodeText>
-          <CopyButton onPress={() => copyToClipboard('F3Rr102A')}>
+          <CodeText fontSizes={fontSizes}>{profileData?.uniqueCode}</CodeText>
+          <CopyButton
+            onPress={() => copyToClipboard(profileData?.uniqueCode || '')}>
             <CopyButtonText fontSizes={fontSizes}>복사하기</CopyButtonText>
           </CopyButton>
         </CodeSection>
 
         <MenuSection>
           <MenuTitle fontSizes={fontSizes}>보호자 관리</MenuTitle>
-          <MenuItemContainer onPress={() => navigation.navigate('ViewProtectorProfile')}>
+          <MenuItemContainer
+            onPress={() => navigation.navigate('ViewProtectorProfile')}>
             <MenuText fontSizes={fontSizes}>보호자 프로필 조회</MenuText>
           </MenuItemContainer>
-          <MenuItemContainer onPress={() => navigation.navigate('EditProtectorProfile')}>
+          <MenuItemContainer
+            onPress={() => navigation.navigate('EditProtectorProfile')}>
             <MenuText fontSizes={fontSizes}>보호자 프로필 수정</MenuText>
           </MenuItemContainer>
         </MenuSection>
 
         <MenuSection>
           <MenuTitle fontSizes={fontSizes}>간병인 관리</MenuTitle>
-          <MenuItemContainer onPress={() => navigation.navigate('ViewCaregiverProfile')}>
+          <MenuItemContainer
+            onPress={() => navigation.navigate('ViewCaregiverProfile')}>
             <MenuText fontSizes={fontSizes}>간병인 프로필 조회</MenuText>
           </MenuItemContainer>
         </MenuSection>
 
         <MenuSection>
           <MenuTitle fontSizes={fontSizes}>설정</MenuTitle>
-          <MenuItemContainer onPress={() => navigation.navigate('FontSizeChange')}>
+          <MenuItemContainer
+            onPress={() => navigation.navigate('FontSizeChange')}>
             <MenuText fontSizes={fontSizes}>글씨 크기 변경</MenuText>
           </MenuItemContainer>
-          <MenuItemContainer onPress={() => navigation.navigate('DeleteProtectorAccount')}>
+          <MenuItemContainer
+            onPress={() => navigation.navigate('DeleteProtectorAccount')}>
             <MenuText fontSizes={fontSizes}>계정 탈퇴</MenuText>
           </MenuItemContainer>
         </MenuSection>

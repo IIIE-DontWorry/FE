@@ -31,7 +31,7 @@ const Report: React.FC<{navigation: any}> = ({navigation}) => {
 
   const fetchReports = async () => {
     try {
-      const careGiverId = 3;
+      const careGiverId = 1;
       const page = 0;
       const size = 3;
       const sort = 'postedDate,desc';
@@ -49,7 +49,6 @@ const Report: React.FC<{navigation: any}> = ({navigation}) => {
         setReports(response.data.content);
       } else {
         console.error('API did not return success status:', response);
-        Alert.alert('오류', '보고서를 가져오는 중 문제가 발생했습니다.');
       }
     } catch (error) {
       console.error('Fetch Reports Error:', error.message);
@@ -66,7 +65,7 @@ const Report: React.FC<{navigation: any}> = ({navigation}) => {
 
   const handleCreateReport = async () => {
     try {
-      const careGiverId = 3;
+      const careGiverId = 1;
       const response = await ApiService.post(
         `care-reports/${careGiverId}/init`,
       );

@@ -1,14 +1,14 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
-  Image,
-  Dimensions,
   SafeAreaView,
-  Linking,
+  Dimensions,
+  Image,
 } from 'react-native';
+import {WebView} from 'react-native-webview';
 import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import LogoSvg from '../../assets/landing/logo.svg';
@@ -17,25 +17,51 @@ import {RootStackParamList} from '../../navigation/MainNavigator';
 const {width, height} = Dimensions.get('window');
 
 const Landing = () => {
+  const [showWebView, setShowWebView] = useState(false);
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
-  // const handleKakaoLogin = () => {
-  //   const clientId = '77570be15ef8457bbb27ffc965017a74'; // 카카오 REST API 키
-  //   const redirectUri = 'http://localhost:8081//callback'; // 콜백 URL
-  //   const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code`;
-
-  //   // 카카오 로그인 URL로 리다이렉트
-  //   Linking.openURL(kakaoAuthUrl).catch(err =>
-  //     console.error('An error occurred during Kakao Login:', err),
-  //   );
-  // };
   const handleKakaoLogin = () => {
-    //추후 카카오 로그인 로직 구현
-    console.log('카카오 로그인 시도');
-    // 일단 UserCategory 화면으로 이동
-    navigation.navigate('UserCategory');
+    setShowWebView(true); // 웹뷰 열기
   };
+
+  const handleWebViewMessage = (event: any) => {
+    try {
+      const message = JSON.parse(event.nativeEvent.data);
+
+      if (message.status === 'success' && message.data) {
+        const kakaoAccessToken = message.data;
+
+        setShowWebView(false);
+        navigation.navigate('UserCategory', {kakaoAccessToken});
+      } else {
+        console.error('Failed to extract Kakao access token from WebView.');
+      }
+    } catch (error) {
+      console.error('Error parsing WebView message:', error);
+    }
+  };
+
+  if (showWebView) {
+    return (
+      <WebView
+        source={{
+          uri: `https://kauth.kakao.com/oauth/authorize?client_id=77570be15ef8457bbb27ffc965017a74&redirect_uri=http://52.78.188.251/callback&response_type=code`,
+        }}
+        injectedJavaScript={`
+          setTimeout(() => {
+            const content = document.body.innerText;
+            if (content) {
+              window.ReactNativeWebView.postMessage(content);
+            }
+          }, 500);
+        `}
+        onMessage={handleWebViewMessage}
+        style={{flex: 1}}
+      />
+    );
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
@@ -52,13 +78,10 @@ const Landing = () => {
 
         {/* 로그인 버튼 영역 */}
         <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={styles.kakaoButton}
-            onPress={handleKakaoLogin}>
+          <TouchableOpacity onPress={handleKakaoLogin}>
             <Image
               source={require('../../assets/landing/kakaoLogin.png')}
               style={styles.kakaoButtonImage}
-              resizeMode="contain"
             />
           </TouchableOpacity>
         </View>
@@ -102,15 +125,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     marginTop: height * 0.05,
   },
-  kakaoButton: {
-    width: '100%',
-    height: 48,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   kakaoButtonImage: {
     width: '100%',
-    height: '100%',
+    height: 48,
+    resizeMode: 'contain',
   },
 });
 
