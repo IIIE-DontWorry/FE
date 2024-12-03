@@ -92,7 +92,7 @@ const ViewProtectorProfile = () => {
     const fetchProfile = async () => {
       try {
         const response = await ApiService.get<ApiResponse>(
-          '/guardian/myPage/1',
+          '/guardian/myPage/4',
         ); // guardianId는 실제 값으로 대체 필요
         if (response.status === 'success') {
           setProfileData(response.data);

@@ -59,8 +59,8 @@ const Message: React.FC = () => {
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
 
-  const careGiverId = 3;
-  const guardianId = 3;
+  const careGiverId = 1;
+  const guardianId = 1;
 
   const fetchMessages = async () => {
     try {

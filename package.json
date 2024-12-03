@@ -39,7 +39,7 @@
     "react-native-screens": "^4.0.0",
     "react-native-svg": "^15.8.0",
     "react-native-system-navigation-bar": "^2.6.4",
-    "react-native-webview": "^13.12.3",
+    "react-native-webview": "^13.12.4",
     "styled-components": "^6.1.13"
   },
   "devDependencies": {

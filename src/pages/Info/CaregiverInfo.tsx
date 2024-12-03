@@ -1,15 +1,18 @@
-// src/pages/CaregiverInfo.tsx
 import React, {useState} from 'react';
 import styled from 'styled-components/native';
-import {ScrollView, Modal, TouchableOpacity, Text} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import {ScrollView, Alert, TouchableOpacity, Text} from 'react-native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RootStackParamList} from '../../navigation/MainNavigator';
-import {useUser} from '../../store/UserContext';
-
+import ApiService from '../../utils/api'; // ApiService 가져오기
+import {useUserType} from '../../store/UserTypeContext';
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
+type RouteProp = {
+  params: {
+    kakaoAccessToken: string;
+  };
+};
 
-// Styled Components
 const Container = styled.View`
   flex: 1;
   background-color: #ffffff;
@@ -42,9 +45,9 @@ const Required = styled.Text`
   color: red;
 `;
 
-const Input = styled.TextInput<{ hasError?: boolean }>`
+const Input = styled.TextInput<{hasError?: boolean}>`
   border-width: 1px;
-  border-color: ${props => props.hasError ? '#ff0000' : '#dddddd'};
+  border-color: ${props => (props.hasError ? '#ff0000' : '#dddddd')};
   border-radius: 8px;
   padding: 10px;
   background-color: #f5f5f5;
@@ -104,33 +107,22 @@ type FormField = keyof FormData;
 
 const CaregiverInfo = () => {
   const navigation = useNavigation<NavigationProp>();
-  const [experiences, setExperiences] = useState(['']);
-  const {setCaregiverData} = useUser();
+  const route = useRoute<RouteProp>();
+  const {kakaoAccessToken} = route.params;
+  const {dispatch} = useUserType();
   const [formData, setFormData] = useState<FormData>({
     name: '',
     phone: '',
     workplace: '',
-    matchingCode: '',
+    matchingCode: '', // 서버에서 매칭 코드 유효성을 처리함
   });
   const [errors, setErrors] = useState<Partial<Record<FormField, string>>>({});
+  const [careerHistories, setCareerHistories] = useState<string[]>(['']); // 경력 필드
 
   const validations = {
-    // 이름: 2~5글자 한글
-    name: (value: string) => {
-      const nameRegex = /^[가-힣]{2,5}$/;
-      return nameRegex.test(value);
-    },
-    
-    // 전화번호: 010-0000-0000 형식
-    phone: (value: string) => {
-      const phoneRegex = /^010-\d{4}-\d{4}$/;
-      return phoneRegex.test(value);
-    },
-
-    // 근무지: 최소 2글자 이상
-    workplace: (value: string) => {
-      return value.trim().length >= 2;
-    },
+    name: (value: string) => /^[가-힣]{2,5}$/.test(value),
+    phone: (value: string) => /^010-\d{4}-\d{4}$/.test(value),
+    workplace: (value: string) => value.trim().length >= 2,
   };
 
   const errorMessages = {
@@ -141,46 +133,22 @@ const CaregiverInfo = () => {
   };
 
   const validateField = (name: FormField, value: string): string => {
-    // matchingCode는 필수가 아님
     if (!value && name !== 'matchingCode') {
       return errorMessages.required;
     }
-
-    // 값이 있는 경우에만 유효성 검사
     if (value) {
       switch (name) {
         case 'name':
           return validations.name(value) ? '' : errorMessages.name;
-        
         case 'phone':
           return validations.phone(value) ? '' : errorMessages.phone;
-        
         case 'workplace':
           return validations.workplace(value) ? '' : errorMessages.workplace;
-        
         default:
           return '';
       }
     }
-
     return '';
-  };
-
-  const addExperience = () => {
-    setExperiences([...experiences, '']);
-  };
-
-  const removeExperience = (index: number) => {
-    if (experiences.length > 1) {
-      const newExperiences = experiences.filter((_, i) => i !== index);
-      setExperiences(newExperiences);
-    }
-  };
-
-  const handleExperienceChange = (text: string, index: number) => {
-    const newExperiences = [...experiences];
-    newExperiences[index] = text;
-    setExperiences(newExperiences);
   };
 
   const handleChange = (name: FormField, value: string) => {
@@ -189,39 +157,56 @@ const CaregiverInfo = () => {
     setErrors(prev => ({...prev, [name]: error}));
   };
 
-  const handleSubmit = () => {
-    const newErrors: Partial<Record<FormField, string>> = {};
-    
-    (Object.keys(formData) as FormField[]).forEach(key => {
-      // matchingCode는 유효성 검사에서 제외
-      if (key !== 'matchingCode') {
-        const error = validateField(key, formData[key]);
-        if (error) newErrors[key] = error;
-      }
-    });
+  const addCareer = () => {
+    setCareerHistories([...careerHistories, '']);
+  };
 
-    setErrors(newErrors);
-
-    if (Object.keys(newErrors).length === 0) {
-      setCaregiverData(formData);  // Context에 데이터 저장
-      navigation.navigate('Main');
+  const removeCareer = (index: number) => {
+    if (careerHistories.length > 1) {
+      const newCareerHistories = careerHistories.filter((_, i) => i !== index);
+      setCareerHistories(newCareerHistories);
     }
   };
 
-    // 카카오 로그인 로직
-  // const handleSubmit = async () => {
-  //   try {
-  //     const response = await axios.post(
-  //       `http://{베이스url}/${userType}/login`,
-  //       formData,
-  //       {headers: {Authorization: `Bearer ${accessToken}`}},
-  //     );
-  //     Alert.alert('회원가입 성공', '로그인되었습니다.');
-  //     navigation.navigate('Main');
-  //   } catch (error) {
-  //     Alert.alert('에러', '회원가입 중 문제가 발생했습니다.');
-  //   }
-  // };
+  const handleCareerChange = (text: string, index: number) => {
+    const newCareerHistories = [...careerHistories];
+    newCareerHistories[index] = text;
+    setCareerHistories(newCareerHistories);
+  };
+
+  const handleSubmit = async () => {
+    const payload = {
+      name: formData.name,
+      phone: formData.phone.replace(/-/g, ''),
+      hospital: formData.workplace,
+      careerHistories,
+      guardianUniqueCode: formData.matchingCode,
+    };
+
+    try {
+      const response = await ApiService.post(
+        `/caregivers/login?kakaoAccessToken=${kakaoAccessToken}`,
+        payload,
+      );
+
+      if (response.status === 'success') {
+        const {role, accessToken} = response.data;
+
+        // Update UserTypeContext
+        dispatch({
+          type: 'SET_USER_TYPE',
+          payload: {role, accessToken},
+        });
+
+        Alert.alert('회원가입 성공', '간병인 정보가 등록되었습니다.');
+        navigation.navigate('Main');
+      } else {
+        throw new Error(response.message || '회원가입 실패');
+      }
+    } catch (error: any) {
+      Alert.alert('에러', error.message || '회원가입 중 문제가 발생했습니다.');
+    }
+  };
 
   return (
     <Container>
@@ -240,9 +225,8 @@ const CaregiverInfo = () => {
             />
             {errors.name && <ErrorText>{errors.name}</ErrorText>}
           </InputGroup>
-
           <InputGroup>
-          <Label>
+            <Label>
               연락처 <Required>*</Required>
             </Label>
             <Input
@@ -265,41 +249,37 @@ const CaregiverInfo = () => {
             />
             {errors.workplace && <ErrorText>{errors.workplace}</ErrorText>}
           </InputGroup>
+        </Section>
 
-          <InputGroup>
-            <Label>경력</Label>
-            {experiences.map((experience, index) => (
-              <ExperienceContainer key={index}>
-                <ExperienceInput
-                  placeholder="예) 2020-2023 서울아산병원"
-                  value={experience}
-                  onChangeText={text => handleExperienceChange(text, index)}
-                />
-                {index === experiences.length - 1 ? (
-                  <IconButton onPress={addExperience}>
-                    <IconText>+</IconText>
-                  </IconButton>
-                ) : (
-                  <IconButton
-                    remove={true}
-                    onPress={() => removeExperience(index)}>
-                    <IconText>-</IconText>
-                  </IconButton>
-                )}
-              </ExperienceContainer>
-            ))}
-          </InputGroup>
+        <Section>
+          <SectionTitle>경력</SectionTitle>
+          {careerHistories.map((career, index) => (
+            <ExperienceContainer key={index}>
+              <ExperienceInput
+                placeholder="예) 2020-2023 서울아산병원"
+                value={career}
+                onChangeText={text => handleCareerChange(text, index)}
+              />
+              {index === careerHistories.length - 1 ? (
+                <IconButton onPress={addCareer}>
+                  <IconText>+</IconText>
+                </IconButton>
+              ) : (
+                <IconButton remove onPress={() => removeCareer(index)}>
+                  <IconText>-</IconText>
+                </IconButton>
+              )}
+            </ExperienceContainer>
+          ))}
         </Section>
 
         <Section>
           <SectionTitle>보호자 매칭 Code</SectionTitle>
           <InputGroup>
             <Input
-              placeholder="보호자 매칭 코드를 입력해주세요"
+              placeholder="매칭코드 입력"
               value={formData.matchingCode}
-              onChangeText={text =>
-                setFormData({...formData, matchingCode: text})
-              }
+              onChangeText={text => handleChange('matchingCode', text)}
             />
           </InputGroup>
         </Section>

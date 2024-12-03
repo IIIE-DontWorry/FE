@@ -1,21 +1,19 @@
-// src/pages/ProtectorInfo.tsx
 import React, {useState} from 'react';
 import styled from 'styled-components/native';
-import {
-  ScrollView,
-  Modal,
-  Clipboard,
-  TouchableOpacity,
-  Text,
-  View,
-} from 'react-native';
+import {ScrollView, Alert, TouchableOpacity, Text, View} from 'react-native';
 import {Picker} from '@react-native-picker/picker';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RootStackParamList} from '../../navigation/MainNavigator';
-import {useUser} from '../../store/UserContext';
+import ApiService from '../../utils/api';
+import {useUserType} from '../../store/UserTypeContext';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
+type RouteProp = {
+  params: {
+    kakaoAccessToken: string;
+  };
+};
 
 const Container = styled.View`
   flex: 1;
@@ -48,9 +46,9 @@ const Required = styled.Text`
   color: red;
 `;
 
-const Input = styled.TextInput<{ hasError?: boolean }>`
+const Input = styled.TextInput<{hasError?: boolean}>`
   border-width: 1px;
-  border-color: ${props => props.hasError ? '#ff0000' : '#dddddd'};
+  border-color: ${props => (props.hasError ? '#ff0000' : '#dddddd')};
   border-radius: 8px;
   padding: 10px;
   background-color: #f5f5f5;
@@ -68,6 +66,14 @@ const SubmitText = styled.Text`
   color: #ffffff;
   font-size: 16px;
   font-weight: bold;
+`;
+
+const PickerContainer = styled.View<{hasError?: boolean}>`
+  border-width: 1px;
+  border-color: ${props => (props.hasError ? '#ff0000' : '#dddddd')};
+  border-radius: 8px;
+  background-color: #f5f5f5;
+  margin-top: 5px;
 `;
 
 const MedicineContainer = styled.View`
@@ -90,62 +96,7 @@ const IconButton = styled.TouchableOpacity`
 
 const IconText = styled.Text`
   color: white;
-  font-size: 20px;
-`;
-
-
-const PickerContainer = styled.View<{ hasError?: boolean }>`
-  border-width: 1px;
-  border-color: ${props => props.hasError ? '#ff0000' : '#dddddd'};
-  border-radius: 8px;
-  background-color: #f5f5f5;
-  margin-top: 5px;
-`;
-
-// 유효성 검사를 위한 정규식과 검증 함수들
-const validations = {
-  // 전화번호: 010-0000-0000 형식
-  phone: (value: string) => {
-    const phoneRegex = /^010-\d{4}-\d{4}$/;
-    return phoneRegex.test(value);
-  },
-  
-  // 이름: 2~5글자 한글
-  name: (value: string) => {
-    const nameRegex = /^[가-힣]{2,5}$/;
-    return nameRegex.test(value);
-  },
-
-  // 나이: 1~150 사이의 숫자
-  age: (value: string) => {
-    const age = Number(value);
-    return !isNaN(age) && age > 0 && age <= 150;
-  },
-
-  // 주소: 최소 10글자 이상
-  address: (value: string) => {
-    return value.trim().length >= 10;
-  },
-
-  // 병원: 최소 2글자 이상
-  hospital: (value: string) => {
-    return value.trim().length >= 2;
-  }
-};
-
-// 에러 메시지
-const errorMessages = {
-  phone: '010-0000-0000 형식으로 입력해주세요',
-  name: '2~5글자의 한글로 입력해주세요',
-  age: '1~150 사이의 숫자를 입력해주세요',
-  address: '최소 10글자 이상 입력해주세요',
-  hospital: '최소 2글자 이상 입력해주세요',
-  required: '필수 입력 항목입니다'
-};
-
-// 입력 필드 컴포넌트에 에러 표시 추가
-const InputField = styled.View`
-  margin-bottom: 15px;
+  font-size: 16px;
 `;
 
 const ErrorText = styled.Text`
@@ -154,27 +105,34 @@ const ErrorText = styled.Text`
   margin-top: 5px;
 `;
 
-// FormData 타입 정의
-interface FormData {
-  protectorName: string;
-  protectorPhone: string;
-  protectorAddress: string;
-  relationship: string;
-  patientName: string;
-  patientAge: string;
-  disease: string;
-  hospital: string;
-  patientAddress: string;
-}
+// Validation logic
+const validations = {
+  phone: (value: string) => /^010-\d{4}-\d{4}$/.test(value),
+  name: (value: string) => /^[가-힣]{2,5}$/.test(value),
+  age: (value: string) => {
+    const age = Number(value);
+    return !isNaN(age) && age > 0 && age <= 150;
+  },
+  address: (value: string) => value.trim().length >= 10,
+  hospital: (value: string) => value.trim().length >= 2,
+};
 
-// 필드 이름에 대한 타입 정의
-type FormField = keyof FormData;
-
+const errorMessages = {
+  phone: '010-0000-0000 형식으로 입력해주세요',
+  name: '2~5글자의 한글로 입력해주세요',
+  age: '1~150 사이의 숫자를 입력해주세요',
+  address: '최소 10글자 이상 입력해주세요',
+  hospital: '최소 2글자 이상 입력해주세요',
+  required: '필수 입력 항목입니다',
+};
 
 const ProtectorInfo = () => {
-  const navigation = useNavigation();
-  const [medicines, setMedicines] = useState(['']); //약 목록을 배열로 관리
-  const [formData, setFormData] = useState<FormData>({
+  const navigation = useNavigation<NavigationProp>();
+  const route = useRoute<RouteProp>();
+  const {kakaoAccessToken} = route.params;
+  const {dispatch} = useUserType();
+
+  const [formData, setFormData] = useState({
     protectorName: '',
     protectorPhone: '',
     protectorAddress: '',
@@ -183,49 +141,35 @@ const ProtectorInfo = () => {
     patientAge: '',
     disease: '',
     hospital: '',
-    patientAddress: '',
+    medications: [''],
   });
-  const [errors, setErrors] = useState<Partial<Record<FormField, string>>>({});
-  const {setProtectorData} = useUser();
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const addMedicine = () => {
-    setMedicines([...medicines, '']);
+  const handleChange = (field: string, value: string) => {
+    setFormData(prev => ({...prev, [field]: value}));
+    const error = validateField(field, value);
+    setErrors(prev => ({...prev, [field]: error}));
   };
 
-  const removeMedicine = (index: number) => {
-    if (medicines.length > 1) {
-      const newMedicines = medicines.filter((_, i) => i !== index);
-      setMedicines(newMedicines);
-    }
-  };
-
-  const handleMedicineChange = (text: string, index: number) => {
-    const newMedicines = [...medicines];
-    newMedicines[index] = text;
-    setMedicines(newMedicines);
-  };
-
-  const validateField = (name: FormField, value: string): string => {
-    if (!value && name !== 'protectorAddress'&& name !== 'patientAddress' && name !== 'disease') {
+  const validateField = (name: string, value: string): string => {
+    if (!value && name !== 'protectorAddress' && name !== 'disease') {
       return errorMessages.required;
     }
 
     switch (name) {
       case 'protectorPhone':
         return validations.phone(value) ? '' : errorMessages.phone;
-      
       case 'protectorName':
-        
       case 'patientName':
         return validations.name(value) ? '' : errorMessages.name;
-      
       case 'patientAge':
         return validations.age(value) ? '' : errorMessages.age;
-      
       case 'protectorAddress':
-      case 'patientAddress':
-        return value ? (validations.address(value) ? '' : errorMessages.address) : '';
-      
+        return value
+          ? validations.address(value)
+            ? ''
+            : errorMessages.address
+          : '';
       case 'hospital':
         return validations.hospital(value) ? '' : errorMessages.hospital;
       default:
@@ -233,27 +177,76 @@ const ProtectorInfo = () => {
     }
   };
 
-  const handleChange = (name: FormField, value: string) => {
-    setFormData(prev => ({...prev, [name]: value}));
-    const error = validateField(name, value);
-    setErrors(prev => ({...prev, [name]: error}));
+  const addMedication = () => {
+    setFormData(prev => ({
+      ...prev,
+      medications: [...prev.medications, ''],
+    }));
   };
 
-  const handleSubmit = () => {
-    // 전체 폼 유효성 검사
-    const newErrors: Partial<Record<FormField, string>> = {};
-    
-    (Object.keys(formData) as FormField[]).forEach(key => {
-      const error = validateField(key, formData[key]);
-      if (error) newErrors[key] = error;
-    });
+  const updateMedication = (index: number, value: string) => {
+    const newMedications = [...formData.medications];
+    newMedications[index] = value;
+    setFormData(prev => ({...prev, medications: newMedications}));
+  };
 
+  const removeMedication = (index: number) => {
+    const newMedications = formData.medications.filter((_, i) => i !== index);
+    setFormData(prev => ({...prev, medications: newMedications}));
+  };
+
+  const handleSubmit = async () => {
+    const newErrors: Record<string, string> = {};
+    Object.keys(formData).forEach(field => {
+      const error = validateField(
+        field,
+        formData[field as keyof typeof formData],
+      );
+      if (error) newErrors[field] = error;
+    });
     setErrors(newErrors);
 
-    // 에러가 없으면 제출
     if (Object.keys(newErrors).length === 0) {
-      setProtectorData(formData);  // Context에 데이터 저장
-      navigation.navigate('Main');
+      const payload = {
+        creationGuardian: {
+          name: formData.protectorName,
+          phone: formData.protectorPhone,
+          address: formData.protectorAddress,
+        },
+        creationPatient: {
+          name: formData.patientName,
+          age: parseInt(formData.patientAge, 10),
+          diseaseName: formData.disease || '없음',
+          hospitalName: formData.hospital,
+          medicationInfos: formData.medications
+            .filter(med => med.trim() !== '')
+            .map(name => ({name})),
+        },
+      };
+
+      try {
+        const response = await ApiService.post(
+          `guardians/login?kakaoAccessToken=${kakaoAccessToken}`,
+          payload,
+        );
+
+        if (response.status === 'success') {
+          const {role, accessToken} = response.data;
+
+          // UserTypeContext에 role과 accessToken 저장
+          dispatch({type: 'SET_USER_TYPE', payload: {role, accessToken}});
+
+          Alert.alert('회원가입 성공', '보호자 정보가 등록되었습니다.');
+          navigation.navigate('Main');
+        } else {
+          throw new Error(response.message || '회원가입 실패');
+        }
+      } catch (error: any) {
+        Alert.alert(
+          '에러',
+          error.message || '회원가입 중 문제가 발생했습니다.',
+        );
+      }
     }
   };
 
@@ -283,7 +276,7 @@ const ProtectorInfo = () => {
             <Input
               placeholder="예) 010-1234-5678"
               value={formData.protectorPhone}
-              onChangeText={text =>  handleChange('protectorPhone', text)}
+              onChangeText={text => handleChange('protectorPhone', text)}
               hasError={!!errors.protectorPhone}
             />
             {errors.protectorPhone && (
@@ -303,29 +296,26 @@ const ProtectorInfo = () => {
             )}
           </InputGroup>
           <InputGroup>
-          <Label>
-            환자와의 관계 <Required>*</Required>
-          </Label>
-          <PickerContainer hasError={!!errors.relationship}>
-            <Picker
-              selectedValue={formData.relationship}
-              onValueChange={(value: string) =>
-                handleChange('relationship', value)
-              }>
-              <Picker.Item label="선택해주세요" value="" />
-              <Picker.Item label="부" value="father" />
-              <Picker.Item label="모" value="mother" />
-              <Picker.Item label="자녀" value="child" />
-              <Picker.Item label="형제/자매" value="sibling" />
-              <Picker.Item label="기타" value="other" />
-            </Picker>
-          </PickerContainer>
-          {errors.relationship && (
-            <ErrorText>{errors.relationship}</ErrorText>
-          )}
-        </InputGroup>
+            <Label>
+              환자와의 관계<Required>*</Required>
+            </Label>
+            <PickerContainer hasError={!!errors.relationship}>
+              <Picker
+                selectedValue={formData.relationship}
+                onValueChange={value => handleChange('relationship', value)}>
+                <Picker.Item label="선택해주세요" value="" />
+                <Picker.Item label="부" value="father" />
+                <Picker.Item label="모" value="mother" />
+                <Picker.Item label="자녀" value="child" />
+                <Picker.Item label="형제/자매" value="sibling" />
+                <Picker.Item label="기타" value="other" />
+              </Picker>
+            </PickerContainer>
+            {errors.relationship && (
+              <ErrorText>{errors.relationship}</ErrorText>
+            )}
+          </InputGroup>
         </Section>
-
         <Section>
           <SectionTitle>환자 정보</SectionTitle>
           <InputGroup>
@@ -338,9 +328,7 @@ const ProtectorInfo = () => {
               onChangeText={text => handleChange('patientName', text)}
               hasError={!!errors.patientName}
             />
-            {errors.patientName && (
-              <ErrorText>{errors.patientName}</ErrorText>
-            )}
+            {errors.patientName && <ErrorText>{errors.patientName}</ErrorText>}
           </InputGroup>
           <InputGroup>
             <Label>
@@ -352,65 +340,46 @@ const ProtectorInfo = () => {
               onChangeText={text => handleChange('patientAge', text)}
               hasError={!!errors.patientAge}
             />
-            {errors.patientAge && (
-              <ErrorText>{errors.patientAge}</ErrorText>
-            )}
+            {errors.patientAge && <ErrorText>{errors.patientAge}</ErrorText>}
           </InputGroup>
           <InputGroup>
-            <Label>병명</Label>
+            <Label>
+              병명<Required>*</Required>
+            </Label>
             <Input
-              placeholder="예) 알츠하이머, 척추손상"
+              placeholder="예) 알츠하이머"
               value={formData.disease}
               onChangeText={text => handleChange('disease', text)}
               hasError={!!errors.disease}
             />
-            {errors.disease && (
-              <ErrorText>{errors.disease}</ErrorText>
-            )}
+            {errors.disease && <ErrorText>{errors.disease}</ErrorText>}
           </InputGroup>
           <InputGroup>
-            <Label>
-              병원 <Required>*</Required>
-            </Label>
+            <Label>병원</Label>
             <Input
-              placeholder="예) 치매: OO병원 신경과 / 척추: XO병원 물리치료과"
+              placeholder="예) 세브란스"
               value={formData.hospital}
               onChangeText={text => handleChange('hospital', text)}
               hasError={!!errors.hospital}
             />
-            {errors.hospital && (
-              <ErrorText>{errors.hospital}</ErrorText>
-            )}
-          </InputGroup>
-          <InputGroup>
-            <Label>주소 </Label> 
-            <Input
-              placeholder="예) 서울특별시 중구 필동로1길 30 "
-              value={formData.patientAddress}
-              onChangeText={text => handleChange('patientAddress', text)}
-              hasError={!!errors.patientAddress}
-            />
-            {errors.patientAddress && (
-              <ErrorText>{errors.patientAddress}</ErrorText>
-            )}
+            {errors.hospital && <ErrorText>{errors.hospital}</ErrorText>}
           </InputGroup>
           <InputGroup>
             <Label>
-              투약 정보
+              투약 정보<Required>*</Required>
             </Label>
-            {medicines.map((medicine, index) => (
+            {formData.medications.map((med, index) => (
               <MedicineContainer key={index}>
                 <MedicineInput
                   placeholder="예) 도네페질"
-                  value={medicine}
-                  onChangeText={text => handleMedicineChange(text, index)}
+                  value={med}
+                  onChangeText={text => updateMedication(index, text)}
                 />
-                {index === medicines.length - 1 ? (
-                  <IconButton onPress={addMedicine}>
-                    <IconText>+</IconText>
-                  </IconButton>
-                ) : (
-                  <IconButton onPress={() => removeMedicine(index)}>
+                <IconButton onPress={addMedication}>
+                  <IconText>+</IconText>
+                </IconButton>
+                {index > 0 && (
+                  <IconButton onPress={() => removeMedication(index)}>
                     <IconText>-</IconText>
                   </IconButton>
                 )}
@@ -418,13 +387,10 @@ const ProtectorInfo = () => {
             ))}
           </InputGroup>
         </Section>
-
-        {/* 작성 완료 버튼 */}
         <SubmitButton onPress={handleSubmit}>
-          <SubmitText>작성 완료</SubmitText>
+          <SubmitText>회원가입</SubmitText>
         </SubmitButton>
       </ScrollContainer>
-
     </Container>
   );
 };

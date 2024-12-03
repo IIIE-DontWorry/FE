@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import styled from 'styled-components/native';
-import ApiService from '../../utils/api'; // ApiService 임포트
+import ApiService from '../../utils/api';
+import {useUserType} from '../../store/UserTypeContext'; // UserTypeContext 사용
 
 const InputContainer = styled.View`
   flex-direction: row;
@@ -37,22 +38,21 @@ interface MessageInputProps {
 const MessageInput: React.FC<MessageInputProps> = ({onMessageSent}) => {
   const [input, setInput] = useState<string>(''); // 입력 상태
   const [isSending, setIsSending] = useState<boolean>(false); // 전송 상태
+  const {state} = useUserType(); // 사용자 상태 가져오기 (role과 accessToken)
 
   const handleSend = async () => {
     if (!input.trim() || isSending) return;
 
     setIsSending(true);
 
+    // role에 따라 메시지 전송 데이터 설정
+    const payload = JSON.stringify({
+      guardianId: state.role === '보호자' ? 1 : null, // 보호자일 때만 guardianId 설정
+      caregiverId: state.role === '간병인' ? 1 : null, // 간병인일 때만 caregiverId 설정
+      noteContent: input.trim(), // 메시지 내용
+    });
+
     try {
-      // JSON 문자열로 요청 데이터 생성
-      const payload = JSON.stringify({
-        guardianId: null, // 수신자 ID
-        caregiverId: 3, // 작성자 ID
-        noteContent: input.trim(), // 메시지 내용
-      });
-
-      console.log('전송할 데이터:', payload);
-
       const response = await ApiService.post<{
         status: string;
         message: string;
@@ -63,10 +63,7 @@ const MessageInput: React.FC<MessageInputProps> = ({onMessageSent}) => {
         },
       });
 
-      console.log('응답:', response);
-
       if (response.status === 'success') {
-        console.log('쪽지 추가 성공:', response.data);
         setInput(''); // 입력 필드 초기화
         onMessageSent(); // 메시지 전송 후 메시지 갱신 함수 호출
       } else {

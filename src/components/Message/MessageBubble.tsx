@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import styled from 'styled-components/native';
 import {Modal, TouchableOpacity, Alert, Clipboard} from 'react-native';
 import ApiService from '../../utils/api';
-
+import {useUserType} from '../../store/UserTypeContext';
 const MessageRow = styled.View<{isMe: boolean}>`
   flex-direction: column;
   align-items: ${props => (props.isMe ? 'flex-end' : 'flex-start')};
@@ -87,6 +87,7 @@ interface MessageProps {
 
 const MessageBubble: React.FC<MessageProps> = ({message, onDeleteComplete}) => {
   const [modalVisible, setModalVisible] = useState(false);
+  const {state} = useUserType(); // 사용자 상태 가져오기 (role과 accessToken)
 
   const handleCopy = () => {
     Clipboard.setString(message.text);
