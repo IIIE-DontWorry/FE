@@ -71,23 +71,66 @@ const LoadingContainer = styled.View`
   align-items: center;
 `;
 
-// 인터페이스 정의
+const CareerInputContainer = styled.View`
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 10px;
+`;
+
+const CareerInput = styled.TextInput<InputProps>`
+  flex: 1;
+  border-width: 1px;
+  border-color: ${props => (props.hasError ? '#ff0000' : '#dddddd')};
+  border-radius: 8px;
+  padding: 10px;
+  background-color: #f5f5f5;
+`;
+
+const IconButton = styled.TouchableOpacity`
+  padding: 5px 10px;
+  background-color: #00d6a3;
+  border-radius: 5px;
+  margin-left: 5px;
+`;
+
+const IconText = styled.Text`
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
+`;
+
+const CareerContainer = styled.View`
+  margin-top: 10px;
+`;
+
 interface FormData {
-  name: string;
+  caregiverName: string;
   phone: string;
   hospital: string;
+  carrierHistory: string[];
+  patientName: string;
+  age: number;
+  diseaseName: string;
+  hospitalName: string;
+  address: string;
 }
 
 interface Errors {
-  name?: string;
+  caregiverName?: string;
   phone?: string;
   hospital?: string;
+  carrierHistory?: string;
+  patientName?: string;
+  age?: string;
+  diseaseName?: string;
+  hospitalName?: string;
+  address?: string;
 }
 
 interface ApiResponse {
-  data: FormData;
-  message: string;
   status: string;
+  message: string;
+  data: FormData;
 }
 
 const EditCaregiverProfile = () => {
@@ -95,18 +138,47 @@ const EditCaregiverProfile = () => {
   const [loading, setLoading] = useState(true);
   const [errors, setErrors] = useState<Errors>({});
   const [formData, setFormData] = useState<FormData>({
-    name: '',
+    caregiverName: '',
     phone: '',
     hospital: '',
+    carrierHistory: [],
+    patientName: '',
+    age: 0,
+    diseaseName: '',
+    hospitalName: '',
+    address: '',
   });
+
+  const addCareer = () => {
+    setFormData(prev => ({
+      ...prev,
+      carrierHistory: [...prev.carrierHistory, '']
+    }));
+  };
+
+  const removeCareer = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      carrierHistory: prev.carrierHistory.filter((_, i) => i !== index)
+    }));
+  };
+
+  const updateCareer = (index: number, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      carrierHistory: prev.carrierHistory.map((career, i) => 
+        i === index ? value : career
+      )
+    }));
+  };
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await ApiService.get<ApiResponse>(
-          '/care-givers/myPage/1' // caregiverId를 실제 값으로 대체 필요
-        );
-        setFormData(response.data);
+        const response = await ApiService.get<ApiResponse>('/care-givers/myPage/3/1');
+        if (response.status === 'success') {
+          setFormData(response.data);
+        }
       } catch (error) {
         console.error('Error fetching profile:', error);
         Alert.alert('오류 발생', '간병인 정보를 가져오는데 실패했습니다.');
@@ -118,15 +190,19 @@ const EditCaregiverProfile = () => {
     fetchProfile();
   }, []);
 
-  const validateField = (field: keyof FormData, value: string) => {
+  const validateField = (field: keyof FormData, value: string | number | string[]) => {
     let error = '';
-    if (!value) {
-      error = '필수 입력 항목입니다.';
-    } else if (field === 'phone') {
+    if (field === 'phone' && typeof value === 'string') {
       const phoneRegex = /^010-\d{4}-\d{4}$/;
       if (!phoneRegex.test(value)) {
         error = '올바른 전화번호 형식이 아닙니다.';
       }
+    } else if (field === 'age' && typeof value === 'number') {
+      if (value <= 0 || value > 120) {
+        error = '올바른 나이를 입력해주세요.';
+      }
+    } else if (typeof value === 'string' && !value) {
+      error = '필수 입력 항목입니다.';
     }
 
     setErrors(prev => ({
@@ -135,7 +211,7 @@ const EditCaregiverProfile = () => {
     }));
   };
 
-  const handleChange = (field: keyof FormData, value: string) => {
+  const handleChange = (field: keyof FormData, value: string | number) => {
     setFormData(prev => ({
       ...prev,
       [field]: value,
@@ -144,8 +220,9 @@ const EditCaregiverProfile = () => {
   };
 
   const handleSubmit = async () => {
-    // 모든 필드 유효성 검사
-    Object.keys(formData).forEach(key => validateField(key as keyof FormData, formData[key as keyof FormData]));
+    // 필수 필드 유효성 검사
+    const requiredFields: (keyof FormData)[] = ['caregiverName', 'phone', 'hospital'];
+    requiredFields.forEach(field => validateField(field, formData[field]));
 
     if (Object.values(errors).some(error => error)) {
       Alert.alert('오류 발생', '입력값을 확인해주세요.');
@@ -153,14 +230,18 @@ const EditCaregiverProfile = () => {
     }
 
     try {
-      const response = await ApiService.post<ApiResponse>(
-        '/care-givers/myPage/update/1', // caregiverId를 실제 값으로 대체 필요
+      const response = await ApiService.patch<ApiResponse>(
+        `/care-givers/myPage/update/3/1`,
         formData
       );
 
       if (response.status === 'success') {
-        Alert.alert('성공', '간병인 정보가 성공적으로 수정되었습니다.');
-        navigation.goBack();
+        Alert.alert('성공', '간병인 정보가 성공적으로 수정되었습니다.', [
+          {
+            text: '확인',
+            onPress: () => navigation.goBack(),
+          },
+        ]);
       }
     } catch (error) {
       console.error('Error updating profile:', error);
@@ -186,12 +267,12 @@ const EditCaregiverProfile = () => {
           <InputGroup>
             <Label>이름</Label>
             <Input
-              value={formData.name}
-              onChangeText={text => handleChange('name', text)}
+              value={formData.caregiverName}
+              onChangeText={text => handleChange('caregiverName', text)}
               placeholder="이름을 입력하세요"
-              hasError={!!errors.name}
+              hasError={!!errors.caregiverName}
             />
-            {errors.name && <ErrorText>{errors.name}</ErrorText>}
+            {errors.caregiverName && <ErrorText>{errors.caregiverName}</ErrorText>}
           </InputGroup>
 
           <InputGroup>
@@ -214,6 +295,94 @@ const EditCaregiverProfile = () => {
               hasError={!!errors.hospital}
             />
             {errors.hospital && <ErrorText>{errors.hospital}</ErrorText>}
+          </InputGroup>
+
+          <CareerContainer>
+            <Label>경력</Label>
+            {formData.carrierHistory.map((career, index) => (
+              <CareerInputContainer key={index}>
+                <CareerInput
+                  value={career}
+                  onChangeText={(text) => updateCareer(index, text)}
+                  placeholder="경력을 입력하세요"
+                  hasError={false}
+                />
+                {index === formData.carrierHistory.length - 1 ? (
+                  <IconButton onPress={addCareer}>
+                    <IconText>+</IconText>
+                  </IconButton>
+                ) : (
+                  <IconButton onPress={() => removeCareer(index)}>
+                    <IconText>-</IconText>
+                  </IconButton>
+                )}
+              </CareerInputContainer>
+            ))}
+            {formData.carrierHistory.length === 0 && (
+              <IconButton onPress={addCareer}>
+                <IconText>+</IconText>
+              </IconButton>
+            )}
+          </CareerContainer>
+
+        </Section>
+
+        <Section>
+          <SectionTitle>환자 정보</SectionTitle>
+          <InputGroup>
+            <Label>환자 이름</Label>
+            <Input
+              value={formData.patientName}
+              onChangeText={text => handleChange('patientName', text)}
+              placeholder="환자 이름을 입력하세요"
+              hasError={!!errors.patientName}
+            />
+            {errors.patientName && <ErrorText>{errors.patientName}</ErrorText>}
+          </InputGroup>
+
+          <InputGroup>
+            <Label>나이</Label>
+            <Input
+              value={String(formData.age)}
+              onChangeText={text => handleChange('age', parseInt(text) || 0)}
+              keyboardType="numeric"
+              placeholder="나이를 입력하세요"
+              hasError={!!errors.age}
+            />
+            {errors.age && <ErrorText>{errors.age}</ErrorText>}
+          </InputGroup>
+
+          <InputGroup>
+            <Label>질병명</Label>
+            <Input
+              value={formData.diseaseName}
+              onChangeText={text => handleChange('diseaseName', text)}
+              placeholder="질병명을 입력하세요"
+              hasError={!!errors.diseaseName}
+            />
+            {errors.diseaseName && <ErrorText>{errors.diseaseName}</ErrorText>}
+          </InputGroup>
+
+          <InputGroup>
+            <Label>병원 이름</Label>
+            <Input
+              value={formData.hospitalName}
+              onChangeText={text => handleChange('hospitalName', text)}
+              placeholder="병원 이름을 입력하세요"
+              hasError={!!errors.hospitalName}
+            />
+            {errors.hospitalName && <ErrorText>{errors.hospitalName}</ErrorText>}
+          </InputGroup>
+
+          <InputGroup>
+            <Label>주소</Label>
+            <Input
+              value={formData.address}
+              onChangeText={text => handleChange('address', text)}
+              placeholder="주소를 입력하세요"
+              hasError={!!errors.address}
+            />
+            {errors.address && <ErrorText>{errors.address}</ErrorText>}
           </InputGroup>
         </Section>
 

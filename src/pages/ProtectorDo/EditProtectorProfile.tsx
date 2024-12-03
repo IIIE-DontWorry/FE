@@ -72,20 +72,39 @@ const LoadingContainer = styled.View`
  align-items: center;
 `;
 
+const Row = styled.View`
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 10px;
+`;
+
+const IconButton = styled.TouchableOpacity`
+  padding: 5px 10px;
+  background-color: #00d6a3;
+  border-radius: 5px;
+  margin-left: 5px;
+`;
+
+const IconText = styled.Text`
+  color: #ffffff;
+  font-size: 16px;
+`;
+
+
 // 인터페이스 정의
 interface FormData {
- guardianInfo: {
-   address: string;
-   name: string;
-   phone: string;
- };
- patientInfo: {
-   age: number;
-   diseaseName: string;
-   hospitalName: string;
-   medicationInfos: any[];
-   name: string;
- };
+  guardianInfo: {
+    address: string;
+    name: string;
+    phone: string;
+  };
+  patientInfo: {
+    age: number;
+    diseaseName: string;
+    hospitalName: string;
+    medicationInfos: string[];
+    name: string;
+  };
 }
 
 interface Errors {
@@ -109,23 +128,25 @@ interface ApiResponse {
 }
 
 const EditProtectorProfile = () => {
- const navigation = useNavigation();
- const [loading, setLoading] = useState(true);
- const [errors, setErrors] = useState<Errors>({});
- const [formData, setFormData] = useState<FormData>({
-   guardianInfo: {
-     address: '',
-     name: '',
-     phone: ''
-   },
-   patientInfo: {
-     age: 0,
-     diseaseName: '',
-     hospitalName: '',
-     medicationInfos: [],
-     name: ''
-   }
- });
+  const navigation = useNavigation();
+  const [loading, setLoading] = useState(true);
+  const [errors, setErrors] = useState<Errors>({});
+  const [formData, setFormData] = useState<FormData>({
+    guardianInfo: {
+      address: '',
+      name: '',
+      phone: ''
+    },
+    patientInfo: {
+      age: 0,
+      diseaseName: '',
+      hospitalName: '',
+      medicationInfos: [],
+      name: ''
+    }
+  });
+  const [medications, setMedications] = useState<string[]>(['']);
+  const [specialRequests, setSpecialRequests] = useState<string[]>(['']);
 
  useEffect(() => {
    const fetchProfile = async () => {
@@ -185,30 +206,72 @@ const EditProtectorProfile = () => {
    validateField(section, field, value);
  };
 
- const handleSubmit = async () => {
-   try {
-     const response = await ApiService.post<ApiResponse>(
-       '/guardian/myPage/update/1',
-       formData.guardianInfo
-     );
+  // 약물 정보 관련 함수
+  const addMedication = () => {
+    setMedications([...medications, '']);
+  };
 
-     if (response.data.status === 'success') {
-       Alert.alert('성공', '프로필이 성공적으로 수정되었습니다.');
-       navigation.goBack();
-     }
-   } catch (error) {
-     console.error('Error updating profile:', error);
-     Alert.alert('오류 발생', '프로필 수정에 실패했습니다.');
-   }
- };
+  const removeMedication = (index: number) => {
+    const newMedications = medications.filter((_, i) => i !== index);
+    setMedications(newMedications);
+  };
 
- if (loading) {
-   return (
-     <LoadingContainer>
-       <ActivityIndicator size="large" color="#00d6a3" />
-     </LoadingContainer>
-   );
- }
+  const handleMedicationSubmit = async () => {
+    try {
+      const validMedications = medications.filter(med => med.trim() !== '');
+      const response = await ApiService.post('/medication-checks/1', {
+        names: validMedications
+      });
+
+      if (response.status === 'success') {
+        Alert.alert('성공', '복용 약물 정보가 저장되었습니다.');
+      }
+    } catch (error) {
+      console.error('Error updating medications:', error);
+      Alert.alert('오류 발생', '복용 약물 정보 저장에 실패했습니다.');
+    }
+  };
+
+  // 특별 요청사항 관련 함수
+  const addSpecialRequest = () => {
+    setSpecialRequests([...specialRequests, '']);
+  };
+
+  const removeSpecialRequest = (index: number) => {
+    const newRequests = specialRequests.filter((_, i) => i !== index);
+    setSpecialRequests(newRequests);
+  };
+
+  const handleSpecialRequestSubmit = async () => {
+    try {
+      const validRequests = specialRequests.filter(req => req.trim() !== '');
+      const response = await ApiService.post('/guardian_requests/1', {
+        requests: validRequests
+      });
+
+      if (response.status === 'success') {
+        Alert.alert('성공', '특별 요청사항이 저장되었습니다.');
+      }
+    } catch (error) {
+      console.error('Error updating special requests:', error);
+      Alert.alert('오류 발생', '특별 요청사항 저장에 실패했습니다.');
+    }
+  };
+
+  // 기존 handleSubmit 수정
+  const handleSubmit = async () => {
+    try {
+      const response = await ApiService.patch('/guardian/myPage/update/1', formData.guardianInfo);
+
+      if (response.status === 'success') {
+        Alert.alert('성공', '프로필이 성공적으로 수정되었습니다.');
+        navigation.goBack();
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      Alert.alert('오류 발생', '프로필 수정에 실패했습니다.');
+    }
+  };
 
  return (
    <Container>
@@ -313,6 +376,66 @@ const EditProtectorProfile = () => {
            )}
          </InputGroup>
        </Section>
+
+       <Section>
+          <Row>
+            <SectionTitle>복용 약물</SectionTitle>
+            <SubmitButton onPress={handleMedicationSubmit} style={{ marginLeft: 'auto', padding: 8 }}>
+              <SubmitText style={{ fontSize: 14 }}>약물 정보 저장</SubmitText>
+            </SubmitButton>
+          </Row>
+          {medications.map((medication, index) => (
+            <Row key={index}>
+              <Input
+                style={{ flex: 1 }}
+                value={medication}
+                onChangeText={(text) => {
+                  const newMedications = [...medications];
+                  newMedications[index] = text;
+                  setMedications(newMedications);
+                }}
+                placeholder="복용 중인 약물을 입력하세요"
+              />
+              <IconButton
+                onPress={() => index === medications.length - 1 
+                  ? addMedication() 
+                  : removeMedication(index)}
+              >
+                <IconText>{index === medications.length - 1 ? '+' : '-'}</IconText>
+              </IconButton>
+            </Row>
+          ))}
+        </Section>
+
+        <Section>
+          <Row>
+            <SectionTitle>특별 요청 사항</SectionTitle>
+            <SubmitButton onPress={handleSpecialRequestSubmit} style={{ marginLeft: 'auto', padding: 8 }}>
+              <SubmitText style={{ fontSize: 14 }}>요청사항 저장</SubmitText>
+            </SubmitButton>
+          </Row>
+          {specialRequests.map((request, index) => (
+            <Row key={index}>
+              <Input
+                style={{ flex: 1 }}
+                value={request}
+                onChangeText={(text) => {
+                  const newRequests = [...specialRequests];
+                  newRequests[index] = text;
+                  setSpecialRequests(newRequests);
+                }}
+                placeholder="특별 요청 사항을 입력하세요"
+              />
+              <IconButton
+                onPress={() => index === specialRequests.length - 1 
+                  ? addSpecialRequest() 
+                  : removeSpecialRequest(index)}
+              >
+                <IconText>{index === specialRequests.length - 1 ? '+' : '-'}</IconText>
+              </IconButton>
+            </Row>
+          ))}
+        </Section>
 
        <SubmitButton onPress={handleSubmit}>
          <SubmitText>수정 완료</SubmitText>

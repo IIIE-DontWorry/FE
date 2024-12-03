@@ -85,17 +85,20 @@ const MedicationItem = styled.Text`
 const ViewProtectorProfile = () => {
   const [loading, setLoading] = useState(true);
   const [profileData, setProfileData] = useState<ApiResponse['data'] | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await ApiService.get<ApiResponse>('/care-givers/myPage/guardianProfile/1'); // caregiverId를 실제 값으로 대체 필요
+        const response = await ApiService.get<ApiResponse>('/care-givers/myPage/guardianProfile/3');
         if (response.status === 'success') {
           setProfileData(response.data);
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error fetching profile:', error);
-        Alert.alert('오류 발생', '보호자 프로필 정보를 가져오는데 실패했습니다.');
+        const errorMessage = error.response?.data?.errors?.[0]?.message || '보호자 프로필 정보를 가져오는데 실패했습니다.';
+        setError(errorMessage);
+        Alert.alert('오류 발생', errorMessage);
       } finally {
         setLoading(false);
       }
@@ -106,9 +109,23 @@ const ViewProtectorProfile = () => {
 
   if (loading) {
     return (
-      <LoadingContainer>
-        <ActivityIndicator size="large" color="#00d6a3" />
-      </LoadingContainer>
+      <Container>
+        <TopNavigationBar title="보호자 프로필 조회" />
+        <LoadingContainer>
+          <ActivityIndicator size="large" color="#00d6a3" />
+        </LoadingContainer>
+      </Container>
+    );
+  }
+
+  if (error) {
+    return (
+      <Container>
+        <TopNavigationBar title="보호자 프로필 조회" />
+        <LoadingContainer>
+          <InfoText>{error}</InfoText>
+        </LoadingContainer>
+      </Container>
     );
   }
 
