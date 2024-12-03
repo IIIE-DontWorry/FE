@@ -90,7 +90,7 @@ const AcquaintanceMyPage = () => {
         <MenuSection>
           <MenuTitle>설정</MenuTitle>
           <MenuItem>
-            <MenuText>글씨체</MenuText>
+            <MenuText>글씨 크기 변경</MenuText>
           </MenuItem>
         </MenuSection>
       </ScrollContainer>

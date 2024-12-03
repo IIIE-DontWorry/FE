@@ -4,7 +4,7 @@ import {ActivityIndicator, Alert} from 'react-native';
 import TopNavigationBar from '../../components/common/TopNavigationBar';
 import ApiService from '../../utils/api';
 
-// 인터페이스 정의
+// API 응답 인터페이스 정의
 interface MedicationInfo {
   name: string;
 }
@@ -91,11 +91,16 @@ const ViewProtectorProfile = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
+        // API 호출
         const response = await ApiService.get<ApiResponse>(
-          '/guardian/myPage/4',
-        ); // guardianId는 실제 값으로 대체 필요
+          '/guardian/myPage/3',
+        );
+
+        // 응답 상태 확인
         if (response.status === 'success') {
           setProfileData(response.data);
+        } else {
+          throw new Error(response.message);
         }
       } catch (error) {
         console.error('Error fetching profile:', error);
@@ -119,6 +124,17 @@ const ViewProtectorProfile = () => {
     );
   }
 
+  if (!profileData) {
+    return (
+      <Container>
+        <TopNavigationBar title="보호자 프로필 조회" />
+        <LoadingContainer>
+          <InfoText>프로필 정보를 불러올 수 없습니다.</InfoText>
+        </LoadingContainer>
+      </Container>
+    );
+  }
+
   return (
     <Container>
       <TopNavigationBar title="보호자 프로필 조회" />
@@ -127,18 +143,16 @@ const ViewProtectorProfile = () => {
           <SectionTitle>보호자 정보</SectionTitle>
           <InputGroup>
             <Label>이름</Label>
-            <InfoText>{profileData?.guardianInfo.name || '정보 없음'}</InfoText>
+            <InfoText>{profileData.guardianInfo.name || '정보 없음'}</InfoText>
           </InputGroup>
           <InputGroup>
             <Label>연락처</Label>
-            <InfoText>
-              {profileData?.guardianInfo.phone || '정보 없음'}
-            </InfoText>
+            <InfoText>{profileData.guardianInfo.phone || '정보 없음'}</InfoText>
           </InputGroup>
           <InputGroup>
             <Label>주소</Label>
             <InfoText>
-              {profileData?.guardianInfo.address || '정보 없음'}
+              {profileData.guardianInfo.address || '정보 없음'}
             </InfoText>
           </InputGroup>
         </Section>
@@ -147,30 +161,34 @@ const ViewProtectorProfile = () => {
           <SectionTitle>환자 정보</SectionTitle>
           <InputGroup>
             <Label>이름</Label>
-            <InfoText>{profileData?.patientInfo.name || '정보 없음'}</InfoText>
+            <InfoText>{profileData.patientInfo.name || '정보 없음'}</InfoText>
           </InputGroup>
           <InputGroup>
             <Label>나이</Label>
-            <InfoText>{profileData?.patientInfo.age || '정보 없음'}</InfoText>
+            <InfoText>{profileData.patientInfo.age || '정보 없음'}</InfoText>
           </InputGroup>
           <InputGroup>
             <Label>질병명</Label>
             <InfoText>
-              {profileData?.patientInfo.diseaseName || '정보 없음'}
+              {profileData.patientInfo.diseaseName || '정보 없음'}
             </InfoText>
           </InputGroup>
           <InputGroup>
             <Label>병원명</Label>
             <InfoText>
-              {profileData?.patientInfo.hospitalName || '정보 없음'}
+              {profileData.patientInfo.hospitalName || '정보 없음'}
             </InfoText>
           </InputGroup>
           <InputGroup>
             <Label>복용 약물</Label>
             <MedicationList>
-              {profileData?.patientInfo.medicationInfos.map((med, index) => (
-                <MedicationItem key={index}>• {med.name}</MedicationItem>
-              )) || <InfoText>정보 없음</InfoText>}
+              {profileData.patientInfo.medicationInfos?.length > 0 ? (
+                profileData.patientInfo.medicationInfos.map((med, index) => (
+                  <MedicationItem key={index}>• {med.name}</MedicationItem>
+                ))
+              ) : (
+                <InfoText>정보 없음</InfoText>
+              )}
             </MedicationList>
           </InputGroup>
         </Section>

@@ -9,16 +9,22 @@ import ApiService from '../../utils/api';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
+interface ProfileData {
+  caregiverName: string;
+  phone: string;
+  hospital: string;
+  carrierHistory: string[];
+  patientName: string;
+  age: number;
+  diseaseName: string;
+  hospitalName: string;
+  address: string;
+}
+
 interface ApiResponse {
   status: string;
   message: string;
-  data: {
-    name: string;
-    phone: string;
-    hospital: string;
-    patientName: string;
-    careerHistories: { career: string }[];
-  };
+  data: ProfileData;
 }
 
 const Container = styled.View`
@@ -82,15 +88,18 @@ const MenuText = styled.Text`
   color: #333;
 `;
 
+
 const CaregiverMyPage = () => {
   const navigation = useNavigation<NavigationProp>();
-  const [profileData, setProfileData] = useState<ApiResponse['data'] | null>(null);
+  const [profileData, setProfileData] = useState<ProfileData | null>(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await ApiService.get('/care-givers/myPage/1'); // caregiverId는 실제 값으로 대체 필요
-        setProfileData(response.data);
+        const response = await ApiService.get<ApiResponse>('/care-givers/myPage/3/1');
+        if (response.status === 'success') {
+          setProfileData(response.data);
+        }
       } catch (error) {
         console.error('Error fetching profile:', error);
       }
@@ -107,7 +116,7 @@ const CaregiverMyPage = () => {
           <ProfileImage />
           <ProfileInfo>
             <ProfileName>
-              {profileData?.name || '이름 없음'}
+              {profileData?.caregiverName || '이름 없음'}
             </ProfileName>
             <ProfileContact>
               {profileData? `${profileData.patientName}님의 간병인\n${profileData.phone}`: '정보 없음'}
@@ -126,26 +135,16 @@ const CaregiverMyPage = () => {
         </MenuSection>
 
         <MenuSection>
-          <MenuTitle>보호자와 환자 관리</MenuTitle>
+          <MenuTitle>보호자 관리</MenuTitle>
           <MenuItem onPress={() => navigation.navigate('Caregiver_ViewProtectorProfile')}>
-            <MenuText>보호자와 환자 프로필 조회</MenuText>
-          </MenuItem>
-        </MenuSection>
-
-        <MenuSection>
-          <MenuTitle>갤러리</MenuTitle>
-          <MenuItem>
-            <MenuText>사진 전체 다운로드</MenuText>
-          </MenuItem>
-          <MenuItem>
-            <MenuText>최근 삭제한 사진</MenuText>
+            <MenuText>보호자 프로필 조회</MenuText>
           </MenuItem>
         </MenuSection>
 
         <MenuSection>
           <MenuTitle>설정</MenuTitle>
-          <MenuItem>
-            <MenuText>글씨체</MenuText>
+          <MenuItem onPress={() => navigation.navigate('FontSizeChange')}>
+            <MenuText>글씨 크기 변경</MenuText>
           </MenuItem>
           <MenuItem onPress={() => navigation.navigate('DeleteCaregiverAccount')}>
             <MenuText>계정 탈퇴</MenuText>

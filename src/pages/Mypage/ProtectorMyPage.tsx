@@ -1,15 +1,20 @@
 import React, {useState, useEffect} from 'react';
 import styled from 'styled-components/native';
-import {Clipboard, TouchableOpacity} from 'react-native';
+import {Clipboard, TouchableOpacity, Alert} from 'react-native';
 import TopNavigationBar from '../../components/common/TopNavigationBar';
 import {useUser} from '../../store/UserContext';
-import {useFontSize} from '../../store/FontSizeContext'; // FontSizeContext 추가
+import {useFontSize} from '../../store/FontSizeContext';
 import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RootStackParamList} from '../../navigation/MainNavigator';
 import ApiService from '../../utils/api';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
+
+// API 응답 인터페이스 정확히 정의
+interface MedicationInfo {
+  name: string;
+}
 
 interface ApiResponse {
   status: string;
@@ -25,7 +30,7 @@ interface ApiResponse {
       age: number;
       diseaseName: string;
       hospitalName: string;
-      medicationInfos: any[];
+      medicationInfos: MedicationInfo[];
     };
   };
 }
@@ -134,31 +139,61 @@ const CopyButtonText = styled.Text<FontSizeProps>`
 
 const ProtectorMypage = () => {
   const navigation = useNavigation<NavigationProp>();
-  const {protectorData} = useUser(); // 유저컨텍스트
-  const {fontSizes} = useFontSize(); // 폰트 크기 가져오기
+  const {protectorData} = useUser();
+  const {fontSizes} = useFontSize();
+  const [loading, setLoading] = useState(true);
   const [profileData, setProfileData] = useState<ApiResponse['data'] | null>(
     null,
   );
+  const [error, setError] = useState<string | null>(null);
 
   const copyToClipboard = async (code: string) => {
     try {
       await Clipboard.setString(code);
+      Alert.alert('알림', '코드가 클립보드에 복사되었습니다.');
     } catch (error) {
       console.error('Failed to copy to clipboard:', error);
+      Alert.alert('오류', '코드 복사에 실패했습니다.');
     }
   };
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await ApiService.get('/guardian/myPage/1');
-        setProfileData(response.data);
-      } catch (error) {
+        setLoading(true);
+        setError(null);
+        const response = await ApiService.get<ApiResponse>(
+          '/guardian/myPage/3',
+        );
+
+        if (response.status === 'success' && response.data) {
+          setProfileData(response.data);
+        }
+      } catch (error: any) {
         console.error('Error fetching profile:', error);
+        const errorMessage =
+          error.response?.data?.errors?.[0]?.message ||
+          '프로필 정보를 가져오는데 실패했습니다.';
+        setError(errorMessage);
+        Alert.alert('오류 발생', errorMessage);
+      } finally {
+        setLoading(false);
       }
     };
+
     fetchProfile();
   }, []);
+
+  if (error) {
+    return (
+      <Container>
+        <TopNavigationBar title="보호자 프로필" />
+        <CodeSection>
+          <CodeTitle fontSizes={fontSizes}>{error}</CodeTitle>
+        </CodeSection>
+      </Container>
+    );
+  }
 
   return (
     <Container>
@@ -172,7 +207,7 @@ const ProtectorMypage = () => {
             </ProfileName>
             <ProfileContact fontSizes={fontSizes}>
               {profileData
-                ? `${profileData.patientInfo.name}(${profileData.patientInfo.age})님의 보호자\n${profileData.guardianInfo.phone}`
+                ? `${profileData.patientInfo.name}(${profileData.patientInfo.age}세)님의 보호자\n${profileData.guardianInfo.phone}`
                 : '정보 없음'}
             </ProfileContact>
           </ProfileInfo>
@@ -187,14 +222,14 @@ const ProtectorMypage = () => {
         </CodeSection>
 
         <MenuSection>
-          <MenuTitle fontSizes={fontSizes}>보호자와 환자 관리</MenuTitle>
+          <MenuTitle fontSizes={fontSizes}>보호자 관리</MenuTitle>
           <MenuItemContainer
             onPress={() => navigation.navigate('ViewProtectorProfile')}>
-            <MenuText fontSizes={fontSizes}>보호자와 환자 프로필 조회</MenuText>
+            <MenuText fontSizes={fontSizes}>보호자 프로필 조회</MenuText>
           </MenuItemContainer>
           <MenuItemContainer
             onPress={() => navigation.navigate('EditProtectorProfile')}>
-            <MenuText fontSizes={fontSizes}>보호자와 환자 프로필 수정</MenuText>
+            <MenuText fontSizes={fontSizes}>보호자 프로필 수정</MenuText>
           </MenuItemContainer>
         </MenuSection>
 
