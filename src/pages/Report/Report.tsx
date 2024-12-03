@@ -49,7 +49,6 @@ const Report: React.FC<{navigation: any}> = ({navigation}) => {
         setReports(response.data.content);
       } else {
         console.error('API did not return success status:', response);
-        Alert.alert('오류', '보고서를 가져오는 중 문제가 발생했습니다.');
       }
     } catch (error) {
       console.error('Fetch Reports Error:', error.message);

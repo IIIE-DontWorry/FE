@@ -163,7 +163,7 @@ const ProtectorMypage = () => {
         setLoading(true);
         setError(null);
         const response = await ApiService.get<ApiResponse>(
-          '/guardian/myPage/1',
+          '/guardian/myPage/1', // API 엔드포인트 수정
         );
 
         if (response.status === 'success' && response.data) {
@@ -215,8 +215,9 @@ const ProtectorMypage = () => {
 
         <CodeSection>
           <CodeTitle fontSizes={fontSizes}>보호자 매칭 코드</CodeTitle>
-          <CodeText fontSizes={fontSizes}>F3Rr102A</CodeText>
-          <CopyButton onPress={() => copyToClipboard('F3Rr102A')}>
+          <CodeText fontSizes={fontSizes}>{profileData?.uniqueCode}</CodeText>
+          <CopyButton
+            onPress={() => copyToClipboard(profileData?.uniqueCode || '')}>
             <CopyButtonText fontSizes={fontSizes}>복사하기</CopyButtonText>
           </CopyButton>
         </CodeSection>

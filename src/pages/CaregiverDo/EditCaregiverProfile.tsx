@@ -175,7 +175,7 @@ const EditCaregiverProfile = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await ApiService.get<ApiResponse>('/care-givers/myPage/3/1');
+        const response = await ApiService.get<ApiResponse>('/care-givers/myPage/1/1');
         if (response.status === 'success') {
           setFormData(response.data);
         }
@@ -231,7 +231,7 @@ const EditCaregiverProfile = () => {
 
     try {
       const response = await ApiService.patch<ApiResponse>(
-        `/care-givers/myPage/update/3/1`,
+        `/care-givers/myPage/update/1/1`,
         formData
       );
 
